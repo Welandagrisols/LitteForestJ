@@ -1,0 +1,23 @@
+{
+  "name": "LittleForest - Agrisols Farm Management System",
+  "short_name": "Agrisols Farm",
+  "description": "Comprehensive farm and nursery management system for inventory, sales, and customer management",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8EA",
+  "theme_color": "#22A45D",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
