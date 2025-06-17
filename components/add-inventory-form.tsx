@@ -12,9 +12,10 @@ import { useToast } from "@/components/ui/use-toast"
 
 interface AddInventoryFormProps {
   onSuccess: () => void
+  onClose?: () => void
 }
 
-export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
+export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -50,6 +51,24 @@ export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
       ...prev,
       [name]: value,
     }))
+  }
+
+  const resetForm = () => {
+    setFormData({
+      plant_name: "",
+      scientific_name: "",
+      category: "",
+      quantity: 0,
+      age: "",
+      date_planted: "",
+      status: "Healthy",
+      price: 0,
+      batch_cost: 0,
+      sku: "",
+      section: "",
+      row: "",
+      source: "",
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,24 +113,10 @@ export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
         description: `New plant batch added to inventory. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
       })
 
+      // Reset form and close dialog
+      resetForm()
       onSuccess()
-
-      // Reset form
-      setFormData({
-        plant_name: "",
-        scientific_name: "",
-        category: "",
-        quantity: 0,
-        age: "",
-        date_planted: "",
-        status: "Healthy",
-        price: 0,
-        batch_cost: 0,
-        sku: "",
-        section: "",
-        row: "",
-        source: "",
-      })
+      if (onClose) onClose()
     } catch (error: any) {
       toast({
         title: "Error adding plant",
@@ -289,6 +294,11 @@ export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
       {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
+          {onClose && (
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+          )}
           <Button
             type="submit"
             form="add-inventory-form"
