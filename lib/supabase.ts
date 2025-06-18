@@ -1,36 +1,18 @@
 import { createClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/supabase"
 
-// Get environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-// Check if we're in demo mode (no real Supabase config or invalid config)
-export const isDemoMode =
-  !supabaseUrl ||
-  !supabaseAnonKey ||
-  supabaseUrl === "" ||
-  supabaseAnonKey === "" ||
-  supabaseUrl === "your_supabase_project_url_here" ||
-  supabaseAnonKey === "your_supabase_anon_key_here" ||
-  !isValidUrl(supabaseUrl)
-
-// Helper function to validate URL format
-function isValidUrl(string: string): boolean {
-  try {
-    new URL(string)
-    return true
-  } catch (_) {
-    return false
-  }
-}
-
-// Use valid demo values when in demo mode to prevent URL constructor errors
-const validSupabaseUrl = isDemoMode ? "https://demo.supabase.co" : supabaseUrl!
-const validSupabaseAnonKey = isDemoMode ? "demo-key" : supabaseAnonKey!
-
 // Create a single supabase client for the entire app
-export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAnonKey, {
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://demo.supabase.co"
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "demo-key"
+
+// Check if we're in demo mode (no real Supabase config)
+export const isDemoMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL === "" ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === ""
+
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,

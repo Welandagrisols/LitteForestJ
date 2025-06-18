@@ -12,10 +12,9 @@ import { useToast } from "@/components/ui/use-toast"
 
 interface AddInventoryFormProps {
   onSuccess: () => void
-  onClose?: () => void
 }
 
-export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) {
+export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -27,22 +26,18 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     age: "",
     date_planted: "",
     status: "Healthy",
-    price: 0, // Selling price per unit
-    batch_cost: 0, // Total cost for the entire batch
+    price: 0,
     sku: "",
     section: "",
     row: "",
     source: "",
   })
 
-  // Calculate cost per seedling
-  const costPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "quantity" || name === "price" || name === "batch_cost" ? Number(value) : value,
+      [name]: name === "quantity" || name === "price" ? Number(value) : value,
     }))
   }
 
@@ -51,24 +46,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       ...prev,
       [name]: value,
     }))
-  }
-
-  const resetForm = () => {
-    setFormData({
-      plant_name: "",
-      scientific_name: "",
-      category: "",
-      quantity: 0,
-      age: "",
-      date_planted: "",
-      status: "Healthy",
-      price: 0,
-      batch_cost: 0,
-      sku: "",
-      section: "",
-      row: "",
-      source: "",
-    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,14 +70,9 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         formData.sku = `${prefix}${randomNum}`
       }
 
-      // Calculate cost per seedling
-      const calculatedCostPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
-
       const { error } = await supabase.from("inventory").insert([
         {
           ...formData,
-          cost_per_seedling: calculatedCostPerSeedling,
-          batch_cost: formData.batch_cost,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -110,13 +82,26 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
 
       toast({
         title: "Success",
-        description: `New plant batch added to inventory. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
+        description: "New plant added to inventory",
       })
 
-      // Reset form and close dialog
-      resetForm()
       onSuccess()
-      if (onClose) onClose()
+
+      // Reset form
+      setFormData({
+        plant_name: "",
+        scientific_name: "",
+        category: "",
+        quantity: 0,
+        age: "",
+        date_planted: "",
+        status: "Healthy",
+        price: 0,
+        sku: "",
+        section: "",
+        row: "",
+        source: "",
+      })
     } catch (error: any) {
       toast({
         title: "Error adding plant",
@@ -171,7 +156,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity (Number of Seedlings) *</Label>
+              <Label htmlFor="quantity">Quantity *</Label>
               <Input
                 id="quantity"
                 name="quantity"
@@ -182,49 +167,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
                 required
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="batch_cost">Total Batch Cost (Ksh) *</Label>
-              <Input
-                id="batch_cost"
-                name="batch_cost"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.batch_cost}
-                onChange={handleChange}
-                required
-                placeholder="Total cost for this entire batch"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="price">Selling Price per Seedling (Ksh) *</Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                placeholder="Price you'll sell each seedling for"
-              />
-            </div>
-
-            {/* Cost per seedling display */}
-            {formData.quantity > 0 && formData.batch_cost > 0 && (
-              <div className="space-y-2 md:col-span-2">
-                <div className="p-3 bg-muted rounded-md border">
-                  <div className="text-sm font-medium text-muted-foreground">Calculated Cost per Seedling:</div>
-                  <div className="text-lg font-bold text-primary">Ksh {costPerSeedling.toFixed(2)}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Batch Cost: Ksh {formData.batch_cost.toLocaleString()} ÷ {formData.quantity} seedlings
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div className="space-y-2">
               <Label htmlFor="age">Age</Label>
@@ -254,6 +196,19 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
                   <SelectItem value="Critical">Critical</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="price">Price (Ksh) *</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                min="0"
+                value={formData.price}
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div className="space-y-2">
@@ -294,11 +249,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
-          {onClose && (
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-              Cancel
-            </Button>
-          )}
           <Button
             type="submit"
             form="add-inventory-form"

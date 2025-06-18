@@ -12,10 +12,9 @@ import { useToast } from "@/components/ui/use-toast"
 
 interface AddConsumableFormProps {
   onSuccess: () => void
-  onClose?: () => void
 }
 
-export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps) {
+export function AddConsumableForm({ onSuccess }: AddConsumableFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -45,21 +44,6 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
       ...prev,
       [name]: value,
     }))
-  }
-
-  const resetForm = () => {
-    setFormData({
-      item_name: "",
-      category: "",
-      quantity: 0,
-      unit: "Pieces",
-      purchase_date: new Date().toISOString().split("T")[0],
-      status: "Available",
-      price: 0,
-      sku: "",
-      supplier: "",
-      storage_location: "",
-    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,10 +96,21 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         description: "New consumable added to inventory",
       })
 
-      // Reset form and close dialog
-      resetForm()
       onSuccess()
-      if (onClose) onClose()
+
+      // Reset form
+      setFormData({
+        item_name: "",
+        category: "",
+        quantity: 0,
+        unit: "Pieces",
+        purchase_date: new Date().toISOString().split("T")[0],
+        status: "Available",
+        price: 0,
+        sku: "",
+        supplier: "",
+        storage_location: "",
+      })
     } catch (error: any) {
       toast({
         title: "Error adding consumable",
@@ -261,17 +256,11 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
       {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
-          {onClose && (
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-              Cancel
-            </Button>
-          )}
           <Button
             type="submit"
             form="add-consumable-form"
             className="bg-primary hover:bg-primary/90 text-white"
             disabled={loading}
-            onClick={handleSubmit}
           >
             {loading ? "Adding..." : "Add to Inventory"}
           </Button>
