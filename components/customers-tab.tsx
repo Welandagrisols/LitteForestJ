@@ -14,9 +14,11 @@ import { DemoModeBanner } from "@/components/demo-mode-banner"
 export function CustomersTab() {
   const [customers, setCustomers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [tableExists, setTableExists] = useState(true)
   const { toast } = useToast()
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     async function init() {
@@ -62,6 +64,47 @@ export function CustomersTab() {
     }
   }
 
+  const formatCustomersForExport = (customers: any[]) => {
+    return customers.map((customer) => ({
+      Name: customer.name,
+      Contact: customer.contact,
+      Email: customer.email || "-",
+      "Added On": new Date(customer.created_at).toLocaleDateString(),
+    }))
+  }
+
+  const exportToExcel = async (data: any[], fileName: string, sheetName: string) => {
+    if (typeof window === 'undefined') {
+        console.warn("Attempted to run exportToExcel in a non-browser environment");
+        return;
+    }
+    const XLSX = (await import('xlsx')).default;
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    XLSX.writeFile(wb, `${fileName}.xlsx`);
+  };
+
+  const handleExportToExcel = async () => {
+    setExporting(true)
+    try {
+      const formattedCustomers = formatCustomersForExport(filteredCustomers)
+      await exportToExcel(formattedCustomers, "customers", "Customers")
+      toast({
+        title: "Export successful",
+        description: "Customer data has been exported to Excel",
+      })
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the data",
+        variant: "destructive",
+      })
+    } finally {
+      setExporting(false)
+    }
+  }
+
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -75,27 +118,44 @@ export function CustomersTab() {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold">Customer Directory</h2>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              className="bg-accent hover:bg-accent/90 text-white"
-              disabled={isDemoMode || !tableExists}
-              title={
-                isDemoMode || !tableExists
-                  ? "Connect to Supabase and set up tables to enable adding customers"
-                  : "Add new customer"
-              }
-            >
-              Add New Customer
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Add New Customer</DialogTitle>
-            </DialogHeader>
-            <AddCustomerForm onSuccess={() => fetchCustomers()} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-2">
+          <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                className="bg-accent hover:bg-accent/90 text-white"
+                disabled={isDemoMode || !tableExists}
+                title={
+                  isDemoMode || !tableExists
+                    ? "Connect to Supabase and set up tables to enable adding customers"
+                    : "Add new customer"
+                }
+              >
+                Add New Customer
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Add New Customer</DialogTitle>
+              </DialogHeader>
+              <AddCustomerForm onSuccess={() => {
+                fetchCustomers();
+                setIsCustomerDialogOpen(false);
+              }} onClose={() => setIsCustomerDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
+          <Button
+            variant="outline"
+            disabled={isDemoMode || !tableExists || exporting}
+            onClick={handleExportToExcel}
+            title={
+              isDemoMode || !tableExists
+                ? "Connect to Supabase and set up tables to enable exporting customers"
+                : "Export customers to Excel"
+            }
+          >
+            {exporting ? "Exporting..." : "Export to Excel"}
+          </Button>
+        </div>
       </div>
 
       <div className="mb-6">
