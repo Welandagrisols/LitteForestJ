@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { demoSales, demoInventory } from "@/components/demo-data"
-import { TrendingUp, DollarSign, Percent, Target } from "lucide-react"
+import { exportToExcel } from "@/lib/excel-export"
+import { TrendingUp, DollarSign, Percent, Target, Download, Loader2 } from "lucide-react"
 
 interface ProfitData {
   plantName: string
@@ -30,6 +31,7 @@ export function FinancialReportsTab() {
   const [overallProfitMargin, setOverallProfitMargin] = useState(0)
   const [loading, setLoading] = useState(true)
   const [tableExists, setTableExists] = useState(true)
+  const [exporting, setExporting] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -182,6 +184,45 @@ export function FinancialReportsTab() {
 
   const top5Profitable = profitData.slice(0, 5)
 
+  const handleExportToExcel = async () => {
+    try {
+      setExporting(true)
+
+      // Format the profit data for export
+      const exportData = profitData.map((item, index) => ({
+        Rank: index + 1,
+        "Plant Name": item.plantName,
+        Category: item.category,
+        "Units Sold": item.quantitySold,
+        "Revenue (Ksh)": item.totalRevenue,
+        "Cost (Ksh)": item.totalCost,
+        "Profit (Ksh)": item.profit,
+        "Margin %": item.profitMargin.toFixed(1),
+        "Profit per Unit (Ksh)": item.profitPerUnit.toFixed(0),
+      }))
+
+      // Export to Excel
+      const success = exportToExcel(exportData, `Financial_Report_${new Date().toISOString().split("T")[0]}`)
+
+      if (success) {
+        toast({
+          title: "Export Successful",
+          description: `Financial report with ${exportData.length} items exported to Excel`,
+        })
+      } else {
+        throw new Error("Export failed")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Export Failed",
+        description: error.message || "An error occurred during export",
+        variant: "destructive",
+      })
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />}
@@ -281,7 +322,18 @@ export function FinancialReportsTab() {
 
       {/* Detailed Profit Margins Table */}
       <div className="warm-card rounded-lg shadow-sm p-6">
-        <h2 className="text-2xl font-bold mb-6">Profit Margins by Seedling</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Profit Margins by Seedling</h2>
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={handleExportToExcel}
+            disabled={exporting || profitData.length === 0}
+          >
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Export to Excel
+          </Button>
+        </div>
         
         <div className="rounded-md border border-border overflow-hidden">
           <Table>
