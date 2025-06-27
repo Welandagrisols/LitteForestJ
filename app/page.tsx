@@ -4,6 +4,7 @@ import { InventoryTab } from "@/components/inventory-tab"
 import { SalesTab } from "@/components/sales-tab"
 import { CustomersTab } from "@/components/customers-tab"
 import { DashboardTab } from "@/components/dashboard-tab"
+import { FinancialReportsTab } from "@/components/financial-reports-tab"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
 
@@ -44,7 +45,7 @@ export default function Home() {
                   value="reports"
                   className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
                 >
-                  Financial Reports
+                  Reports
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="dashboard">
@@ -58,6 +59,9 @@ export default function Home() {
               </TabsContent>
               <TabsContent value="customers">
                 <CustomersTab />
+              </TabsContent>
+              <TabsContent value="reports">
+                <FinancialReportsTab />
               </TabsContent>
             </Tabs>
           </SupabaseProvider>
