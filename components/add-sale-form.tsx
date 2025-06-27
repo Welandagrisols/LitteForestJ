@@ -14,10 +14,9 @@ import { isDemoMode } from "@/lib/supabase"
 
 interface AddSaleFormProps {
   onSuccess: () => void
-  onClose?: () => void
 }
 
-export function AddSaleForm({ onSuccess, onClose }: AddSaleFormProps) {
+export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
   const [loading, setLoading] = useState(false)
   const [inventory, setInventory] = useState<any[]>([])
   const [customers, setCustomers] = useState<any[]>([])
@@ -182,22 +181,7 @@ export function AddSaleForm({ onSuccess, onClose }: AddSaleFormProps) {
         description: "Sale recorded successfully",
       })
 
-      // Reset form
-      setFormData({
-        inventory_id: "",
-        quantity: 1,
-        sale_date: new Date().toISOString().split("T")[0],
-        customer_id: "",
-        customer_name: "",
-        customer_contact: "",
-        customer_email: "",
-        total_amount: 0,
-      })
-      setSelectedItem(null)
-      setIsNewCustomer(false)
-
       onSuccess()
-      onClose?.()
     } catch (error: any) {
       toast({
         title: "Error recording sale",

@@ -16,7 +16,6 @@ import { Download, Loader2 } from "lucide-react"
 export function SalesTab() {
   const [sales, setSales] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [isSaleDialogOpen, setIsSaleDialogOpen] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [totalSales, setTotalSales] = useState(0)
   const [totalSeedlings, setTotalSeedlings] = useState(0)
@@ -184,7 +183,7 @@ export function SalesTab() {
               {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               Export to Excel
             </Button>
-            <Dialog open={isSaleDialogOpen} onOpenChange={setIsSaleDialogOpen}>
+            <Dialog>
               <DialogTrigger asChild>
                 <Button
                   className="bg-secondary hover:bg-secondary/90 text-white"
@@ -202,10 +201,7 @@ export function SalesTab() {
                 <DialogHeader>
                   <DialogTitle>Record New Sale</DialogTitle>
                 </DialogHeader>
-                <AddSaleForm onSuccess={() => {
-                  fetchSales();
-                  setIsSaleDialogOpen(false);
-                }} onClose={() => setIsSaleDialogOpen(false)} />
+                <AddSaleForm onSuccess={() => fetchSales()} />
               </DialogContent>
             </Dialog>
           </div>

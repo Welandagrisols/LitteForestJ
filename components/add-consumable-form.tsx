@@ -12,10 +12,9 @@ import { useToast } from "@/components/ui/use-toast"
 
 interface AddConsumableFormProps {
   onSuccess: () => void
-  onClose?: () => void
 }
 
-export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps) {
+export function AddConsumableForm({ onSuccess }: AddConsumableFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -98,7 +97,6 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
       })
 
       onSuccess()
-      onClose?.()
 
       // Reset form
       setFormData({

@@ -12,10 +12,9 @@ import { useToast } from "@/components/ui/use-toast"
 
 interface AddInventoryFormProps {
   onSuccess: () => void
-  onClose?: () => void
 }
 
-export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) {
+export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -29,6 +28,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     status: "Healthy",
     price: 0,
     sku: "",
+    section: "",
+    row: "",
     source: "",
   })
 
@@ -47,46 +48,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     }))
   }
 
-  const generateSKU = async (plantName: string) => {
-    // Generate initials from plant name
-    const words = plantName.trim().split(/\s+/)
-    let initials = ""
-    
-    if (words.length === 1) {
-      // Single word: take first 3 characters
-      initials = words[0].substring(0, 3).toUpperCase()
-    } else if (words.length === 2) {
-      // Two words: take first 2 chars of first word + first char of second
-      initials = (words[0].substring(0, 2) + words[1].substring(0, 1)).toUpperCase()
-    } else {
-      // Three or more words: take first char of first 3 words
-      initials = words.slice(0, 3).map(word => word.charAt(0)).join("").toUpperCase()
-    }
-
-    // Get next batch number for this plant type
-    const { data: existingSKUs } = await supabase
-      .from("inventory")
-      .select("sku")
-      .like("sku", `${initials}%`)
-      .order("sku", { ascending: false })
-
-    let batchNumber = 1
-    if (existingSKUs && existingSKUs.length > 0) {
-      // Find the highest batch number
-      const highestBatch = existingSKUs.reduce((max, item) => {
-        if (item.sku && item.sku.startsWith(initials)) {
-          const batchPart = item.sku.replace(initials, "")
-          const batchNum = parseInt(batchPart) || 0
-          return Math.max(max, batchNum)
-        }
-        return max
-      }, 0)
-      batchNumber = highestBatch + 1
-    }
-
-    return `${initials}${batchNumber.toString().padStart(2, "0")}`
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -103,8 +64,10 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       setLoading(true)
 
       // Generate SKU if not provided
-      if (!formData.sku && formData.plant_name) {
-        formData.sku = await generateSKU(formData.plant_name)
+      if (!formData.sku) {
+        const prefix = formData.category.substring(0, 3).toUpperCase()
+        const randomNum = Math.floor(1000 + Math.random() * 9000)
+        formData.sku = `${prefix}${randomNum}`
       }
 
       const { error } = await supabase.from("inventory").insert([
@@ -123,7 +86,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       })
 
       onSuccess()
-      onClose?.()
 
       // Reset form
       setFormData({
@@ -136,6 +98,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         status: "Healthy",
         price: 0,
         sku: "",
+        section: "",
+        row: "",
         source: "",
       })
     } catch (error: any) {
@@ -248,14 +212,24 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sku">SKU (Auto-generated from plant name)</Label>
-              <Input 
-                id="sku" 
-                name="sku" 
-                value={formData.sku} 
+              <Label htmlFor="sku">SKU (Auto-generated if empty)</Label>
+              <Input id="sku" name="sku" value={formData.sku} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="section">Section</Label>
+              <Input
+                id="section"
+                name="section"
+                placeholder="e.g. A"
+                value={formData.section}
                 onChange={handleChange}
-                placeholder="Auto-generated based on plant name"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="row">Row</Label>
+              <Input id="row" name="row" placeholder="e.g. 3" value={formData.row} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
