@@ -15,7 +15,7 @@ export default function Home() {
         <ErrorBoundary>
           <SupabaseProvider>
             <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6 warm-nav">
+              <TabsList className="grid w-full grid-cols-6 mb-6 warm-nav">
                 <TabsTrigger
                   value="dashboard"
                   className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
@@ -39,6 +39,12 @@ export default function Home() {
                   className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
                 >
                   Customers
+                </TabsTrigger>
+                <TabsTrigger
+                  value="reports"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
+                >
+                  Financial Reports
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="dashboard">
