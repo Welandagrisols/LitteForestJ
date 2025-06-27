@@ -10,8 +10,6 @@ import { AddCustomerForm } from "@/components/add-customer-form"
 import { useToast } from "@/components/ui/use-toast"
 import { demoCustomers } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
-import { exportToExcel } from "@/lib/excel-export"
-import { Download, Loader2 } from "lucide-react"
 
 export function CustomersTab() {
   const [customers, setCustomers] = useState<any[]>([])
@@ -19,7 +17,6 @@ export function CustomersTab() {
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [tableExists, setTableExists] = useState(true)
-  const [exporting, setExporting] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -73,70 +70,26 @@ export function CustomersTab() {
       (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
-  const handleExportToExcel = async () => {
-    try {
-      setExporting(true)
-
-      // Format the data for export
-      const exportData = filteredCustomers.map((customer) => ({
-        Name: customer.name,
-        Contact: customer.contact,
-        Email: customer.email || "",
-        "Date Added": new Date(customer.created_at).toLocaleDateString(),
-      }))
-
-      // Export to Excel
-      const success = exportToExcel(exportData, `Customers_Export_${new Date().toISOString().split("T")[0]}`)
-
-      if (success) {
-        toast({
-          title: "Export Successful",
-          description: `${exportData.length} customers exported to Excel`,
-        })
-      } else {
-        throw new Error("Export failed")
-      }
-    } catch (error: any) {
-      toast({
-        title: "Export Failed",
-        description: error.message || "An error occurred during export",
-        variant: "destructive",
-      })
-    } finally {
-      setExporting(false)
-    }
-  }
-
   return (
     <div className="warm-card rounded-lg shadow-sm p-6">
       {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />}
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold">Customer Directory</h2>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={handleExportToExcel}
-            disabled={exporting || filteredCustomers.length === 0}
-          >
-            {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            Export to Excel
-          </Button>
-          <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                className="bg-accent hover:bg-accent/90 text-white"
-                disabled={isDemoMode || !tableExists}
-                title={
-                  isDemoMode || !tableExists
-                    ? "Connect to Supabase and set up tables to enable adding customers"
-                    : "Add new customer"
-                }
-              >
-                Add New Customer
-              </Button>
-            </DialogTrigger>
+        <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              className="bg-accent hover:bg-accent/90 text-white"
+              disabled={isDemoMode || !tableExists}
+              title={
+                isDemoMode || !tableExists
+                  ? "Connect to Supabase and set up tables to enable adding customers"
+                  : "Add new customer"
+              }
+            >
+              Add New Customer
+            </Button>
+          </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Add New Customer</DialogTitle>
