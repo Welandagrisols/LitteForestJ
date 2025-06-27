@@ -31,8 +31,6 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
     status: item.status || (isConsumable ? "Available" : "Healthy"),
     price: item.price || 0,
     sku: item.sku || "",
-    section: item.section || "",
-    row: item.row || "",
     source: item.source || "",
     unit: item.unit || "Pieces",
     item_type: item.item_type || "Plant",
@@ -196,22 +194,6 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
             <div className="space-y-2">
               <Label htmlFor="sku">SKU</Label>
               <Input id="sku" name="sku" value={formData.sku} onChange={handleChange} disabled />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="section">Section</Label>
-              <Input
-                id="section"
-                name="section"
-                placeholder="e.g. A"
-                value={formData.section}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="row">Row</Label>
-              <Input id="row" name="row" placeholder="e.g. 3" value={formData.row} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
