@@ -7,10 +7,16 @@ import { cn } from "@/lib/utils"
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   className?: string
+  onCheckedChange?: (checked: boolean) => void
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, onCheckedChange, onChange, ...props }, ref) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange?.(e)
+      onCheckedChange?.(e.target.checked)
+    }
+
     return (
       <div className="relative inline-flex items-center">
         <input
@@ -21,6 +27,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             className
           )}
           ref={ref}
+          onChange={handleChange}
           {...props}
         />
         <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 left-0.5 top-0.5" />
