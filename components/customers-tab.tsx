@@ -76,7 +76,7 @@ export function CustomersTab() {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold">Customer Directory</h2>
-        <Dialog>
+        <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
           <DialogTrigger asChild>
             <Button
               className="bg-accent hover:bg-accent/90 text-white"
@@ -94,7 +94,10 @@ export function CustomersTab() {
             <DialogHeader>
               <DialogTitle>Add New Customer</DialogTitle>
             </DialogHeader>
-            <AddCustomerForm onSuccess={() => fetchCustomers()} />
+            <AddCustomerForm onSuccess={() => {
+              fetchCustomers();
+              setIsCustomerDialogOpen(false);
+            }} onClose={() => setIsCustomerDialogOpen(false)} />
           </DialogContent>
         </Dialog>
       </div>

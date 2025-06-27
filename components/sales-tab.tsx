@@ -184,7 +184,7 @@ export function SalesTab() {
               {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               Export to Excel
             </Button>
-            <Dialog>
+            <Dialog open={isSaleDialogOpen} onOpenChange={setIsSaleDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   className="bg-secondary hover:bg-secondary/90 text-white"
@@ -202,7 +202,10 @@ export function SalesTab() {
                 <DialogHeader>
                   <DialogTitle>Record New Sale</DialogTitle>
                 </DialogHeader>
-                <AddSaleForm onSuccess={() => fetchSales()} />
+                <AddSaleForm onSuccess={() => {
+                  fetchSales();
+                  setIsSaleDialogOpen(false);
+                }} onClose={() => setIsSaleDialogOpen(false)} />
               </DialogContent>
             </Dialog>
           </div>
