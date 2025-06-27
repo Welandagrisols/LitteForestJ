@@ -14,9 +14,10 @@ import { isDemoMode } from "@/lib/supabase"
 
 interface AddSaleFormProps {
   onSuccess: () => void
+  onClose?: () => void
 }
 
-export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
+export function AddSaleForm({ onSuccess, onClose }: AddSaleFormProps) {
   const [loading, setLoading] = useState(false)
   const [inventory, setInventory] = useState<any[]>([])
   const [customers, setCustomers] = useState<any[]>([])
@@ -182,6 +183,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       })
 
       onSuccess()
+      onClose?.()
     } catch (error: any) {
       toast({
         title: "Error recording sale",

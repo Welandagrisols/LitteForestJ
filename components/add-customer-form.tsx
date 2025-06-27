@@ -12,9 +12,10 @@ import { isDemoMode } from "@/lib/supabase"
 
 interface AddCustomerFormProps {
   onSuccess: () => void
+  onClose?: () => void
 }
 
-export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
+export function AddCustomerForm({ onSuccess, onClose }: AddCustomerFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -64,6 +65,7 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
       })
 
       onSuccess()
+      onClose?.()
 
       // Reset form
       setFormData({

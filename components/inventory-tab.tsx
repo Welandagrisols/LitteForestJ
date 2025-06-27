@@ -26,6 +26,8 @@ export function InventoryTab() {
   const [categoryFilter, setCategoryFilter] = useState("All Categories")
   const [editItem, setEditItem] = useState<any>(null)
   const [tableExists, setTableExists] = useState(true)
+  const [isPlantDialogOpen, setIsPlantDialogOpen] = useState(false)
+  const [isConsumableDialogOpen, setIsConsumableDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("plants")
   const { toast } = useToast()
 
@@ -218,7 +220,7 @@ export function InventoryTab() {
           </Button>
 
           {activeTab === "plants" ? (
-            <Dialog>
+            <Dialog open={isPlantDialogOpen} onOpenChange={setIsPlantDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   className="bg-primary hover:bg-primary/90 text-white"
@@ -236,11 +238,14 @@ export function InventoryTab() {
                 <DialogHeader>
                   <DialogTitle>Add New Plant to Inventory</DialogTitle>
                 </DialogHeader>
-                <AddInventoryForm onSuccess={() => fetchInventory()} />
+                <AddInventoryForm onSuccess={() => {
+                  fetchInventory();
+                  setIsPlantDialogOpen(false);
+                }} />
               </DialogContent>
             </Dialog>
           ) : (
-            <Dialog>
+            <Dialog open={isConsumableDialogOpen} onOpenChange={setIsConsumableDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   className="bg-primary hover:bg-primary/90 text-white"
@@ -258,7 +263,10 @@ export function InventoryTab() {
                 <DialogHeader>
                   <DialogTitle>Add New Consumable to Inventory</DialogTitle>
                 </DialogHeader>
-                <AddConsumableForm onSuccess={() => fetchInventory()} />
+                <AddConsumableForm onSuccess={() => {
+                  fetchInventory();
+                  setIsConsumableDialogOpen(false);
+                }} />
               </DialogContent>
             </Dialog>
           )}

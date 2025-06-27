@@ -12,9 +12,10 @@ import { useToast } from "@/components/ui/use-toast"
 
 interface AddInventoryFormProps {
   onSuccess: () => void
+  onClose?: () => void
 }
 
-export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
+export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -122,6 +123,7 @@ export function AddInventoryForm({ onSuccess }: AddInventoryFormProps) {
       })
 
       onSuccess()
+      onClose?.()
 
       // Reset form
       setFormData({

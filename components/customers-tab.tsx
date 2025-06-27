@@ -14,6 +14,7 @@ import { DemoModeBanner } from "@/components/demo-mode-banner"
 export function CustomersTab() {
   const [customers, setCustomers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [tableExists, setTableExists] = useState(true)
   const { toast } = useToast()

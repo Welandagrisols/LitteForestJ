@@ -16,6 +16,7 @@ import { Download, Loader2 } from "lucide-react"
 export function SalesTab() {
   const [sales, setSales] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isSaleDialogOpen, setIsSaleDialogOpen] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [totalSales, setTotalSales] = useState(0)
   const [totalSeedlings, setTotalSeedlings] = useState(0)
