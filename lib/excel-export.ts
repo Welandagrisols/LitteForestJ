@@ -60,7 +60,7 @@ function getConsumableCategory(item: any) {
   return item.category
 }
 
-// Update the formatInventoryForExport function to handle both plants and consumables
+// Update the formatInventoryForExport function to include cost tracking
 export function formatInventoryForExport(inventoryData: any[], isConsumablesTab = false) {
   return inventoryData.map((item) => {
     const itemIsConsumable = isConsumablesTab || isConsumable(item)
@@ -72,7 +72,8 @@ export function formatInventoryForExport(inventoryData: any[], isConsumablesTab 
         Quantity: item.quantity,
         Unit: getConsumableUnit(item),
         Status: item.status,
-        "Price (Ksh)": item.price,
+        "Price per Unit (Ksh)": item.price,
+        "Total Batch Cost (Ksh)": item.batch_cost || 0,
         SKU: item.sku,
         "Storage Location": item.section || "",
         Supplier: item.source || "",
@@ -80,6 +81,11 @@ export function formatInventoryForExport(inventoryData: any[], isConsumablesTab 
         "Last Updated": new Date(item.updated_at).toLocaleDateString(),
       }
     } else {
+      // Calculate profit margin for plants
+      const costPerSeedling = item.cost_per_seedling || 0
+      const sellingPrice = item.price || 0
+      const profitMargin = sellingPrice > 0 ? (((sellingPrice - costPerSeedling) / sellingPrice) * 100).toFixed(1) : "0"
+
       return {
         "Plant Name": item.plant_name,
         "Scientific Name": item.scientific_name || "",
@@ -88,7 +94,11 @@ export function formatInventoryForExport(inventoryData: any[], isConsumablesTab 
         Age: item.age || "",
         "Date Planted": item.date_planted ? new Date(item.date_planted).toLocaleDateString() : "",
         Status: item.status,
-        "Price (Ksh)": item.price,
+        "Selling Price per Seedling (Ksh)": item.price,
+        "Cost per Seedling (Ksh)": costPerSeedling,
+        "Total Batch Cost (Ksh)": item.batch_cost || 0,
+        "Profit Margin (%)": profitMargin,
+        "Total Batch Value (Ksh)": (item.quantity * item.price).toLocaleString(),
         SKU: item.sku,
         Section: item.section || "",
         Row: item.row || "",
@@ -99,16 +109,28 @@ export function formatInventoryForExport(inventoryData: any[], isConsumablesTab 
   })
 }
 
-// Format sales data for Excel export
+// Format sales data for Excel export with profit calculations
 export function formatSalesForExport(salesData: any[]) {
-  return salesData.map((sale) => ({
-    Date: new Date(sale.sale_date).toLocaleDateString(),
-    Plant: sale.inventory?.plant_name || "Unknown",
-    Category: sale.inventory?.category || "",
-    Quantity: sale.quantity,
-    "Unit Price (Ksh)": sale.inventory?.price || 0,
-    "Total Amount (Ksh)": sale.total_amount,
-    Customer: sale.customer?.name || "Walk-in Customer",
-    "Customer Contact": sale.customer?.contact || "",
-  }))
+  return salesData.map((sale) => {
+    const costPerSeedling = sale.inventory?.cost_per_seedling || 0
+    const sellingPrice = sale.inventory?.price || 0
+    const totalCost = costPerSeedling * sale.quantity
+    const profit = sale.total_amount - totalCost
+    const profitMargin = sale.total_amount > 0 ? ((profit / sale.total_amount) * 100).toFixed(1) : "0"
+
+    return {
+      Date: new Date(sale.sale_date).toLocaleDateString(),
+      Plant: sale.inventory?.plant_name || "Unknown",
+      Category: sale.inventory?.category || "",
+      Quantity: sale.quantity,
+      "Unit Selling Price (Ksh)": sellingPrice,
+      "Unit Cost (Ksh)": costPerSeedling,
+      "Total Revenue (Ksh)": sale.total_amount,
+      "Total Cost (Ksh)": totalCost,
+      "Profit (Ksh)": profit,
+      "Profit Margin (%)": profitMargin,
+      Customer: sale.customer?.name || "Walk-in Customer",
+      "Customer Contact": sale.customer?.contact || "",
+    }
+  })
 }

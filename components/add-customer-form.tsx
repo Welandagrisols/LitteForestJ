@@ -12,10 +12,9 @@ import { isDemoMode } from "@/lib/supabase"
 
 interface AddCustomerFormProps {
   onSuccess: () => void
-  onClose?: () => void
 }
 
-export function AddCustomerForm({ onSuccess, onClose }: AddCustomerFormProps) {
+export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -64,15 +63,14 @@ export function AddCustomerForm({ onSuccess, onClose }: AddCustomerFormProps) {
         description: "New customer added",
       })
 
+      onSuccess()
+
       // Reset form
       setFormData({
         name: "",
         contact: "",
         email: "",
       })
-
-      onSuccess()
-      onClose?.()
     } catch (error: any) {
       toast({
         title: "Error adding customer",

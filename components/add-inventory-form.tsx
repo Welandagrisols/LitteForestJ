@@ -27,16 +27,22 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     age: "",
     date_planted: "",
     status: "Healthy",
-    price: 0,
+    price: 0, // Selling price per unit
+    batch_cost: 0, // Total cost for the entire batch
     sku: "",
+    section: "",
+    row: "",
     source: "",
   })
+
+  // Calculate cost per seedling
+  const costPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "quantity" || name === "price" ? Number(value) : value,
+      [name]: name === "quantity" || name === "price" || name === "batch_cost" ? Number(value) : value,
     }))
   }
 
@@ -47,44 +53,22 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     }))
   }
 
-  const generateSKU = async (plantName: string) => {
-    // Generate initials from plant name
-    const words = plantName.trim().split(/\s+/)
-    let initials = ""
-    
-    if (words.length === 1) {
-      // Single word: take first 3 characters
-      initials = words[0].substring(0, 3).toUpperCase()
-    } else if (words.length === 2) {
-      // Two words: take first 2 chars of first word + first char of second
-      initials = (words[0].substring(0, 2) + words[1].substring(0, 1)).toUpperCase()
-    } else {
-      // Three or more words: take first char of first 3 words
-      initials = words.slice(0, 3).map(word => word.charAt(0)).join("").toUpperCase()
-    }
-
-    // Get next batch number for this plant type
-    const { data: existingSKUs } = await supabase
-      .from("inventory")
-      .select("sku")
-      .like("sku", `${initials}%`)
-      .order("sku", { ascending: false })
-
-    let batchNumber = 1
-    if (existingSKUs && existingSKUs.length > 0) {
-      // Find the highest batch number
-      const highestBatch = existingSKUs.reduce((max, item) => {
-        if (item.sku && item.sku.startsWith(initials)) {
-          const batchPart = item.sku.replace(initials, "")
-          const batchNum = parseInt(batchPart) || 0
-          return Math.max(max, batchNum)
-        }
-        return max
-      }, 0)
-      batchNumber = highestBatch + 1
-    }
-
-    return `${initials}${batchNumber.toString().padStart(2, "0")}`
+  const resetForm = () => {
+    setFormData({
+      plant_name: "",
+      scientific_name: "",
+      category: "",
+      quantity: 0,
+      age: "",
+      date_planted: "",
+      status: "Healthy",
+      price: 0,
+      batch_cost: 0,
+      sku: "",
+      section: "",
+      row: "",
+      source: "",
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,13 +87,20 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       setLoading(true)
 
       // Generate SKU if not provided
-      if (!formData.sku && formData.plant_name) {
-        formData.sku = await generateSKU(formData.plant_name)
+      if (!formData.sku) {
+        const prefix = formData.category.substring(0, 3).toUpperCase()
+        const randomNum = Math.floor(1000 + Math.random() * 9000)
+        formData.sku = `${prefix}${randomNum}`
       }
+
+      // Calculate cost per seedling
+      const calculatedCostPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
 
       const { error } = await supabase.from("inventory").insert([
         {
           ...formData,
+          cost_per_seedling: calculatedCostPerSeedling,
+          batch_cost: formData.batch_cost,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -119,25 +110,13 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
 
       toast({
         title: "Success",
-        description: "New plant added to inventory",
+        description: `New plant batch added to inventory. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
       })
 
+      // Reset form and close dialog
+      resetForm()
       onSuccess()
-      onClose?.()
-
-      // Reset form
-      setFormData({
-        plant_name: "",
-        scientific_name: "",
-        category: "",
-        quantity: 0,
-        age: "",
-        date_planted: "",
-        status: "Healthy",
-        price: 0,
-        sku: "",
-        source: "",
-      })
+      if (onClose) onClose()
     } catch (error: any) {
       toast({
         title: "Error adding plant",
@@ -192,7 +171,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity *</Label>
+              <Label htmlFor="quantity">Quantity (Number of Seedlings) *</Label>
               <Input
                 id="quantity"
                 name="quantity"
@@ -203,6 +182,49 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
                 required
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="batch_cost">Total Batch Cost (Ksh) *</Label>
+              <Input
+                id="batch_cost"
+                name="batch_cost"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.batch_cost}
+                onChange={handleChange}
+                required
+                placeholder="Total cost for this entire batch"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="price">Selling Price per Seedling (Ksh) *</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.price}
+                onChange={handleChange}
+                required
+                placeholder="Price you'll sell each seedling for"
+              />
+            </div>
+
+            {/* Cost per seedling display */}
+            {formData.quantity > 0 && formData.batch_cost > 0 && (
+              <div className="space-y-2 md:col-span-2">
+                <div className="p-3 bg-muted rounded-md border">
+                  <div className="text-sm font-medium text-muted-foreground">Calculated Cost per Seedling:</div>
+                  <div className="text-lg font-bold text-primary">Ksh {costPerSeedling.toFixed(2)}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Batch Cost: Ksh {formData.batch_cost.toLocaleString()} ÷ {formData.quantity} seedlings
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="age">Age</Label>
@@ -235,27 +257,24 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price">Price (Ksh) *</Label>
+              <Label htmlFor="sku">SKU (Auto-generated if empty)</Label>
+              <Input id="sku" name="sku" value={formData.sku} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="section">Section</Label>
               <Input
-                id="price"
-                name="price"
-                type="number"
-                min="0"
-                value={formData.price}
+                id="section"
+                name="section"
+                placeholder="e.g. A"
+                value={formData.section}
                 onChange={handleChange}
-                required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sku">SKU (Auto-generated from plant name)</Label>
-              <Input 
-                id="sku" 
-                name="sku" 
-                value={formData.sku} 
-                onChange={handleChange}
-                placeholder="Auto-generated based on plant name"
-              />
+              <Label htmlFor="row">Row</Label>
+              <Input id="row" name="row" placeholder="e.g. 3" value={formData.row} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
@@ -275,6 +294,11 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
+          {onClose && (
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+          )}
           <Button
             type="submit"
             form="add-inventory-form"

@@ -26,9 +26,9 @@ export function InventoryTab() {
   const [categoryFilter, setCategoryFilter] = useState("All Categories")
   const [editItem, setEditItem] = useState<any>(null)
   const [tableExists, setTableExists] = useState(true)
-  const [isPlantDialogOpen, setIsPlantDialogOpen] = useState(false)
-  const [isConsumableDialogOpen, setIsConsumableDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("plants")
+  const [addPlantDialogOpen, setAddPlantDialogOpen] = useState(false)
+  const [addConsumableDialogOpen, setAddConsumableDialogOpen] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -103,6 +103,12 @@ export function InventoryTab() {
         variant: "destructive",
       })
     }
+  }
+
+  const handleAddSuccess = () => {
+    fetchInventory()
+    setAddPlantDialogOpen(false)
+    setAddConsumableDialogOpen(false)
   }
 
   // Helper function to determine if an item is a consumable
@@ -220,7 +226,7 @@ export function InventoryTab() {
           </Button>
 
           {activeTab === "plants" ? (
-            <Dialog open={isPlantDialogOpen} onOpenChange={setIsPlantDialogOpen}>
+            <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   className="bg-primary hover:bg-primary/90 text-white"
@@ -238,14 +244,14 @@ export function InventoryTab() {
                 <DialogHeader>
                   <DialogTitle>Add New Plant to Inventory</DialogTitle>
                 </DialogHeader>
-                <AddInventoryForm onSuccess={() => {
-                  fetchInventory();
-                  setIsPlantDialogOpen(false);
-                }} />
+                <AddInventoryForm 
+                  onSuccess={handleAddSuccess} 
+                  onClose={() => setAddPlantDialogOpen(false)}
+                />
               </DialogContent>
             </Dialog>
           ) : (
-            <Dialog open={isConsumableDialogOpen} onOpenChange={setIsConsumableDialogOpen}>
+            <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   className="bg-primary hover:bg-primary/90 text-white"
@@ -263,10 +269,10 @@ export function InventoryTab() {
                 <DialogHeader>
                   <DialogTitle>Add New Consumable to Inventory</DialogTitle>
                 </DialogHeader>
-                <AddConsumableForm onSuccess={() => {
-                  fetchInventory();
-                  setIsConsumableDialogOpen(false);
-                }} />
+                <AddConsumableForm 
+                  onSuccess={handleAddSuccess} 
+                  onClose={() => setAddConsumableDialogOpen(false)}
+                />
               </DialogContent>
             </Dialog>
           )}
