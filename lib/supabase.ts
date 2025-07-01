@@ -5,6 +5,11 @@ import type { Database } from "@/types/supabase"
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+// Debug logging
+console.log("Supabase URL:", supabaseUrl)
+console.log("Supabase Key:", supabaseAnonKey ? "Set" : "Not set")
+console.log("Is valid URL:", supabaseUrl ? isValidUrl(supabaseUrl) : false)
+
 // Check if we're in demo mode (no real Supabase config or invalid config)
 export const isDemoMode =
   !supabaseUrl ||
@@ -14,6 +19,8 @@ export const isDemoMode =
   supabaseUrl === "your_supabase_project_url_here" ||
   supabaseAnonKey === "your_supabase_anon_key_here" ||
   !isValidUrl(supabaseUrl)
+
+console.log("Is Demo Mode:", isDemoMode)
 
 // Helper function to validate URL format
 function isValidUrl(string: string): boolean {
@@ -39,18 +46,27 @@ export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAn
 
 // Helper function to check if a table exists
 export async function checkTableExists(tableName: string): Promise<boolean> {
-  if (isDemoMode) return false
+  console.log(`Checking if table ${tableName} exists...`)
+  
+  if (isDemoMode) {
+    console.log(`Skipping table check - in demo mode`)
+    return false
+  }
 
   try {
     // Try to select a single row to check if the table exists
-    const { error } = await supabase.from(tableName).select("id").limit(1).single()
+    const { data, error } = await supabase.from(tableName).select("id").limit(1)
+    
+    console.log(`Table ${tableName} check result:`, { data, error })
 
     // If the error contains "relation does not exist", the table doesn't exist
     if (error && error.message.includes("relation") && error.message.includes("does not exist")) {
+      console.log(`Table ${tableName} does not exist`)
       return false
     }
 
     // If there's no error or a different error, assume the table exists
+    console.log(`Table ${tableName} exists`)
     return true
   } catch (error) {
     console.error(`Error checking if table ${tableName} exists:`, error)
