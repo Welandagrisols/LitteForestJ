@@ -1,11 +1,12 @@
 import { Header } from "@/components/header"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { InventoryTab } from "@/components/inventory-tab"
-import { SalesTab } from "@/components/sales-tab"
 import { CustomersTab } from "@/components/customers-tab"
-import { TasksTab } from "@/components/tasks-tab"
 import { ReportsTab } from "@/components/reports-tab"
 import { DashboardTab } from "@/components/dashboard-tab"
+import { OpsTab } from "@/components/ops-tab"
+import { ErrorBoundary } from "@/components/error-boundary"
+import { SupabaseProvider } from "@/components/supabase-provider"
 
 export default function Home() {
   return (
@@ -15,7 +16,7 @@ export default function Home() {
         <ErrorBoundary>
           <SupabaseProvider>
             <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-6 mb-6 warm-nav">
+              <TabsList className="grid w-full grid-cols-5 mb-6 warm-nav">
                 <TabsTrigger
                   value="dashboard"
                   className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
@@ -29,22 +30,16 @@ export default function Home() {
                   Inventory
                 </TabsTrigger>
                 <TabsTrigger
-                  value="sales"
+                  value="ops"
                   className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
                 >
-                  Sales
+                  Ops
                 </TabsTrigger>
                 <TabsTrigger
                   value="customers"
                   className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
                 >
                   Customers
-                </TabsTrigger>
-                <TabsTrigger
-                  value="tasks"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
-                >
-                  Tasks
                 </TabsTrigger>
                 <TabsTrigger
                   value="reports"
@@ -59,14 +54,11 @@ export default function Home() {
               <TabsContent value="inventory">
                 <InventoryTab />
               </TabsContent>
-              <TabsContent value="sales">
-                <SalesTab />
+              <TabsContent value="ops">
+                <OpsTab />
               </TabsContent>
               <TabsContent value="customers">
                 <CustomersTab />
-              </TabsContent>
-              <TabsContent value="tasks">
-                <TasksTab />
               </TabsContent>
               <TabsContent value="reports">
                 <ReportsTab />
