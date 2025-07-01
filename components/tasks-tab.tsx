@@ -1,0 +1,315 @@
+
+"use client"
+
+import { useState, useEffect } from "react"
+import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
+import { useToast } from "@/components/ui/use-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Plus, Search, Calendar, DollarSign, Clock } from "lucide-react"
+import { AddTaskForm } from "./add-task-form"
+import { DemoModeBanner } from "./demo-mode-banner"
+
+// Demo data for tasks
+const demoTasks = [
+  {
+    id: "1",
+    task_name: "Watering Mango Seedlings",
+    task_type: "Watering",
+    description: "Regular watering of mango seedlings in section A",
+    task_date: "2024-01-15",
+    batch_sku: "MAN01",
+    labor_cost: 500,
+    labor_hours: 2,
+    labor_rate: 250,
+    consumables_cost: 0,
+    total_cost: 500,
+    status: "Completed",
+    assigned_to: "John Doe",
+  },
+  {
+    id: "2",
+    task_name: "Fertilizing Avocado Batch",
+    task_type: "Fertilizing",
+    description: "Applied organic fertilizer to avocado seedlings",
+    task_date: "2024-01-14",
+    batch_sku: "AVA01",
+    labor_cost: 750,
+    labor_hours: 3,
+    labor_rate: 250,
+    consumables_cost: 2500,
+    total_cost: 3250,
+    status: "Completed",
+    assigned_to: "Jane Smith",
+  },
+]
+
+export function TasksTab() {
+  const [tasks, setTasks] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("All Status")
+  const [typeFilter, setTypeFilter] = useState("All Types")
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [tableExists, setTableExists] = useState(true)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    fetchTasks()
+  }, [])
+
+  async function fetchTasks() {
+    if (isDemoMode) {
+      setTasks(demoTasks)
+      setLoading(false)
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      // Check if table exists
+      const tasksTableExists = await checkTableExists("tasks")
+      setTableExists(tasksTableExists)
+
+      if (!tasksTableExists) {
+        setTasks(demoTasks)
+        setLoading(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+        .order("task_date", { ascending: false })
+
+      if (error) throw error
+
+      setTasks(data || [])
+    } catch (error: any) {
+      console.error("Error fetching tasks:", error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch tasks. Using demo data.",
+        variant: "destructive",
+      })
+      setTasks(demoTasks)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Get unique task types for filter
+  const taskTypes = ["All Types", ...new Set(tasks.map((task) => task.task_type))]
+  const statusOptions = ["All Status", "Planned", "In Progress", "Completed"]
+
+  // Filter tasks
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch =
+      task.task_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.batch_sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.assigned_to?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === "All Status" || task.status === statusFilter
+    const matchesType = typeFilter === "All Types" || task.task_type === typeFilter
+    return matchesSearch && matchesStatus && matchesType
+  })
+
+  // Calculate summary metrics
+  const totalTasks = tasks.length
+  const totalCost = tasks.reduce((sum, task) => sum + (task.total_cost || 0), 0)
+  const completedTasks = tasks.filter((task) => task.status === "Completed").length
+  const averageCost = totalTasks > 0 ? totalCost / totalTasks : 0
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return "default"
+      case "In Progress":
+        return "secondary"
+      case "Planned":
+        return "outline"
+      default:
+        return "outline"
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {(isDemoMode || !tableExists) && (
+        <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />
+      )}
+
+      {/* Summary Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card className="warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Tasks</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">{totalTasks}</div>
+          </CardContent>
+        </Card>
+        <Card className="warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Cost</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-secondary">Ksh {totalCost.toLocaleString()}</div>
+          </CardContent>
+        </Card>
+        <Card className="warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-accent">{completedTasks}</div>
+          </CardContent>
+        </Card>
+        <Card className="warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Average Cost</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-accent">Ksh {averageCost.toLocaleString()}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters and Add Button */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-4 flex-1">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search tasks, SKU, or assignee..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Filter by type" />
+            </SelectTrigger>
+            <SelectContent>
+              {taskTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Task
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add New Task</DialogTitle>
+            </DialogHeader>
+            <AddTaskForm
+              onSuccess={() => {
+                setIsAddDialogOpen(false)
+                fetchTasks()
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Tasks Table */}
+      <Card className="warm-card">
+        <CardHeader className="sage-header border-b border-border">
+          <CardTitle>Tasks</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="text-center py-8">Loading tasks...</div>
+          ) : filteredTasks.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {tasks.length === 0 ? "No tasks found. Add your first task!" : "No tasks match your filters."}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="sage-header">
+                  <TableHead>Task</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Batch SKU</TableHead>
+                  <TableHead>Labor</TableHead>
+                  <TableHead>Consumables</TableHead>
+                  <TableHead>Total Cost</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Assigned To</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTasks.map((task) => (
+                  <TableRow key={task.id} className="hover:bg-muted/50">
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{task.task_name}</div>
+                        {task.description && (
+                          <div className="text-sm text-muted-foreground truncate max-w-[200px]">
+                            {task.description}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{task.task_type}</TableCell>
+                    <TableCell>{new Date(task.task_date).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {task.batch_sku && (
+                        <Badge variant="outline" className="font-mono">
+                          {task.batch_sku}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>Ksh {task.labor_cost?.toLocaleString() || 0}</div>
+                        {task.labor_hours && (
+                          <div className="text-muted-foreground">{task.labor_hours}h</div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>Ksh {task.consumables_cost?.toLocaleString() || 0}</TableCell>
+                    <TableCell className="font-medium">
+                      Ksh {task.total_cost?.toLocaleString() || 0}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadgeVariant(task.status)}>{task.status}</Badge>
+                    </TableCell>
+                    <TableCell>{task.assigned_to || "-"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

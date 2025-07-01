@@ -6,6 +6,7 @@ import { CustomersTab } from "@/components/customers-tab"
 import { DashboardTab } from "@/components/dashboard-tab"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
+import { TasksTab } from "@/components/tasks-tab"
 
 export default function Home() {
   return (
@@ -15,7 +16,7 @@ export default function Home() {
         <ErrorBoundary>
           <SupabaseProvider>
             <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6 warm-nav">
+              <TabsList className="grid w-full grid-cols-5 mb-6 warm-nav">
                 <TabsTrigger
                   value="dashboard"
                   className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
@@ -40,6 +41,12 @@ export default function Home() {
                 >
                   Customers
                 </TabsTrigger>
+                <TabsTrigger
+                  value="tasks"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
+                >
+                  Tasks
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="dashboard">
                 <DashboardTab />
@@ -52,6 +59,9 @@ export default function Home() {
               </TabsContent>
               <TabsContent value="customers">
                 <CustomersTab />
+              </TabsContent>
+              <TabsContent value="tasks">
+                <TasksTab />
               </TabsContent>
             </Tabs>
           </SupabaseProvider>
