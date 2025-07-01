@@ -161,13 +161,13 @@ export function InventoryTab() {
   // Get all unique categories for the filter dropdown
   const plantCategories = [
     "All Categories",
-    ...new Set(inventory.filter((item) => !isConsumable(item)).map((item) => item.category)),
-  ]
+    ...new Set(inventory.filter((item) => !isConsumable(item) && item.category).map((item) => item.category)),
+  ].filter(Boolean) // Remove any empty/null values
 
   const consumableCategories = [
     "All Categories",
-    ...new Set(inventory.filter((item) => isConsumable(item)).map((item) => getConsumableCategory(item))),
-  ]
+    ...new Set(inventory.filter((item) => isConsumable(item)).map((item) => getConsumableCategory(item)).filter(Boolean)),
+  ].filter(Boolean) // Remove any empty/null values
 
   const categories = activeTab === "plants" ? plantCategories : consumableCategories
 
