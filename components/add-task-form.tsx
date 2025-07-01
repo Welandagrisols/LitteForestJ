@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase, isDemoMode } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -60,30 +60,26 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
   }, [formData.labor_hours, formData.labor_rate])
 
   async function fetchConsumablesAndBatches() {
-    if (isDemoMode) {
-      setConsumables([
-        { sku: "FER01", plant_name: "Organic Fertilizer", price: 50 },
-        { sku: "POT01", plant_name: "Plastic Pots", price: 25 },
-      ])
-      setBatches([
-        { sku: "MAN01", plant_name: "Mango" },
-        { sku: "AVA01", plant_name: "Avocado" },
-      ])
-      return
-    }
-
     try {
-      // Fetch consumables
-      const { data: consumableData } = await supabase
+      // Fetch consumables (items with item_type = 'Consumable')
+      const { data: consumableData, error: consumableError } = await supabase
         .from("inventory")
         .select("sku, plant_name, price")
-        .like("category", "Consumable:%")
+        .eq("item_type", "Consumable")
 
-      // Fetch plant batches
-      const { data: batchData } = await supabase
+      if (consumableError) {
+        console.error("Error fetching consumables:", consumableError)
+      }
+
+      // Fetch plant batches (items with item_type = 'Plant')
+      const { data: batchData, error: batchError } = await supabase
         .from("inventory")
         .select("sku, plant_name")
-        .not("category", "like", "Consumable:%")
+        .eq("item_type", "Plant")
+
+      if (batchError) {
+        console.error("Error fetching batches:", batchError)
+      }
 
       setConsumables(consumableData || [])
       setBatches(batchData || [])
@@ -150,15 +146,6 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (isDemoMode) {
-      toast({
-        title: "Demo Mode",
-        description: "Task would be added in a real database connection.",
-      })
-      onSuccess()
-      return
-    }
 
     try {
       setLoading(true)

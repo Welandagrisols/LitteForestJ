@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -11,43 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Plus, Search, Calendar, DollarSign, Clock } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 import { AddTaskForm } from "./add-task-form"
-import { DemoModeBanner } from "./demo-mode-banner"
-
-// Demo data for tasks
-const demoTasks = [
-  {
-    id: "1",
-    task_name: "Watering Mango Seedlings",
-    task_type: "Watering",
-    description: "Regular watering of mango seedlings in section A",
-    task_date: "2024-01-15",
-    batch_sku: "MAN01",
-    labor_cost: 500,
-    labor_hours: 2,
-    labor_rate: 250,
-    consumables_cost: 0,
-    total_cost: 500,
-    status: "Completed",
-    assigned_to: "John Doe",
-  },
-  {
-    id: "2",
-    task_name: "Fertilizing Avocado Batch",
-    task_type: "Fertilizing",
-    description: "Applied organic fertilizer to avocado seedlings",
-    task_date: "2024-01-14",
-    batch_sku: "AVA01",
-    labor_cost: 750,
-    labor_hours: 3,
-    labor_rate: 250,
-    consumables_cost: 2500,
-    total_cost: 3250,
-    status: "Completed",
-    assigned_to: "Jane Smith",
-  },
-]
 
 export function TasksTab() {
   const [tasks, setTasks] = useState<any[]>([])
@@ -56,7 +21,6 @@ export function TasksTab() {
   const [statusFilter, setStatusFilter] = useState("All Status")
   const [typeFilter, setTypeFilter] = useState("All Types")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [tableExists, setTableExists] = useState(true)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -64,24 +28,8 @@ export function TasksTab() {
   }, [])
 
   async function fetchTasks() {
-    if (isDemoMode) {
-      setTasks(demoTasks)
-      setLoading(false)
-      return
-    }
-
     try {
       setLoading(true)
-
-      // Check if table exists
-      const tasksTableExists = await checkTableExists("tasks")
-      setTableExists(tasksTableExists)
-
-      if (!tasksTableExists) {
-        setTasks(demoTasks)
-        setLoading(false)
-        return
-      }
 
       const { data, error } = await supabase
         .from("tasks")
@@ -95,10 +43,10 @@ export function TasksTab() {
       console.error("Error fetching tasks:", error)
       toast({
         title: "Error",
-        description: "Failed to fetch tasks. Using demo data.",
+        description: "Failed to fetch tasks. Please ensure the tasks table exists.",
         variant: "destructive",
       })
-      setTasks(demoTasks)
+      setTasks([])
     } finally {
       setLoading(false)
     }
@@ -140,10 +88,6 @@ export function TasksTab() {
 
   return (
     <div className="space-y-6">
-      {(isDemoMode || !tableExists) && (
-        <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />
-      )}
-
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="warm-card hover:shadow-md transition-shadow">
