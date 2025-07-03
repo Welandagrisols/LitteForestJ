@@ -16,38 +16,40 @@ export default function Home() {
         <ErrorBoundary>
           <SupabaseProvider>
             <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="grid w-full grid-cols-5 mb-6 warm-nav">
-                <TabsTrigger
-                  value="dashboard"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
-                >
-                  Dashboard
-                </TabsTrigger>
-                <TabsTrigger
-                  value="inventory"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
-                >
-                  Inventory
-                </TabsTrigger>
-                <TabsTrigger
-                  value="ops"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
-                >
-                  Ops
-                </TabsTrigger>
-                <TabsTrigger
-                  value="customers"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
-                >
-                  Customers
-                </TabsTrigger>
-                <TabsTrigger
-                  value="reports"
-                  className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
-                >
-                  Reports
-                </TabsTrigger>
-              </TabsList>
+              <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border mb-6">
+                <TabsList className="grid w-full grid-cols-5 warm-nav shadow-sm">
+                  <TabsTrigger
+                    value="dashboard"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
+                  >
+                    Dashboard
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="inventory"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
+                  >
+                    Inventory
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="ops"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
+                  >
+                    Ops
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="customers"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
+                  >
+                    Customers
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="reports"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md"
+                  >
+                    Reports
+                  </TabsTrigger>
+                </TabsList>
+              </div>
               <TabsContent value="dashboard">
                 <DashboardTab />
               </TabsContent>
