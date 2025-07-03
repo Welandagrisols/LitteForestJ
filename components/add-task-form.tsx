@@ -278,12 +278,12 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="batch_sku">Batch SKU</Label>
-          <Select value={formData.batch_sku} onValueChange={(value) => setFormData((prev) => ({ ...prev, batch_sku: value }))}>
+          <Select value={formData.batch_sku || "none"} onValueChange={(value) => setFormData((prev) => ({ ...prev, batch_sku: value === "none" ? "" : value }))}>
             <SelectTrigger>
               <SelectValue placeholder="Select batch (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No specific batch</SelectItem>
+              <SelectItem value="none">No specific batch</SelectItem>
               {batches.map((batch) => (
                 <SelectItem key={batch.sku} value={batch.sku}>
                   {batch.sku} - {batch.plant_name}
