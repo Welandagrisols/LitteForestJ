@@ -62,21 +62,21 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
   async function fetchConsumablesAndBatches() {
     try {
-      // Fetch consumables (items with item_type = 'Consumable')
+      // Fetch consumables (items with category starting with 'Consumable:')
       const { data: consumableData, error: consumableError } = await supabase
         .from("inventory")
-        .select("sku, plant_name, price")
-        .eq("item_type", "Consumable")
+        .select("sku, plant_name, cost")
+        .like("category", "Consumable:%")
 
       if (consumableError) {
         console.error("Error fetching consumables:", consumableError)
       }
 
-      // Fetch plant batches (items with item_type = 'Plant')
+      // Fetch plant batches (items with category NOT starting with 'Consumable:')
       const { data: batchData, error: batchError } = await supabase
         .from("inventory")
         .select("sku, plant_name")
-        .eq("item_type", "Plant")
+        .not("category", "like", "Consumable:%")
 
       if (batchError) {
         console.error("Error fetching batches:", batchError)
@@ -124,7 +124,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
             const consumable = consumables.find((c) => c.sku === value)
             if (consumable) {
               updatedUsage.consumable_name = consumable.plant_name
-              updatedUsage.unit_cost = consumable.price
+              updatedUsage.unit_cost = consumable.cost
               updatedUsage.unit = "Pieces" // Default unit
             }
           }
@@ -140,6 +140,23 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
       })
     )
   }
+
+  const unitOptions = [
+    "Pieces",
+    "Kilograms",
+    "Grams",
+    "Liters",
+    "Milliliters",
+    "Meters",
+    "Square Meters",
+    "Cubic Meters",
+    "Hours",
+    "Days",
+    "Packets",
+    "Boxes",
+    "Bottles",
+    "Bags"
+  ]
 
   const calculateTotalConsumablesCost = () => {
     return consumableUsages.reduce((sum, usage) => sum + usage.total_cost, 0)
@@ -444,11 +461,21 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
                 <div className="space-y-2">
                   <Label>Unit</Label>
-                  <Input
+                  <Select
                     value={usage.unit}
-                    onChange={(e) => updateConsumableUsage(usage.id, "unit", e.target.value)}
-                    placeholder="e.g., kg, pieces"
-                  />
+                    onValueChange={(value) => updateConsumableUsage(usage.id, "unit", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {unitOptions.map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
