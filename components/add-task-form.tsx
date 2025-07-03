@@ -65,7 +65,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
       // Fetch consumables (items with category starting with 'Consumable:')
       const { data: consumableData, error: consumableError } = await supabase
         .from("inventory")
-        .select("sku, plant_name, cost")
+        .select("sku, plant_name, price")
         .like("category", "Consumable:%")
 
       if (consumableError) {
@@ -124,7 +124,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
             const consumable = consumables.find((c) => c.sku === value)
             if (consumable) {
               updatedUsage.consumable_name = consumable.plant_name
-              updatedUsage.unit_cost = consumable.cost
+              updatedUsage.unit_cost = consumable.price
               updatedUsage.unit = "Pieces" // Default unit
             }
           }
@@ -145,6 +145,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
     "Pieces",
     "Kilograms",
     "Grams",
+    "Tonnes",
     "Liters",
     "Milliliters",
     "Meters",
@@ -155,7 +156,8 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
     "Packets",
     "Boxes",
     "Bottles",
-    "Bags"
+    "Bags",
+    "Sachets"
   ]
 
   const calculateTotalConsumablesCost = () => {

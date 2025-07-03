@@ -183,8 +183,10 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
                 <SelectContent>
                   <SelectItem value="Pieces">Pieces</SelectItem>
                   <SelectItem value="Kg">Kilograms</SelectItem>
+                  <SelectItem value="Tonnes">Tonnes</SelectItem>
                   <SelectItem value="Liters">Liters</SelectItem>
                   <SelectItem value="Bags">Bags</SelectItem>
+                  <SelectItem value="Sachets">Sachets</SelectItem>
                   <SelectItem value="Boxes">Boxes</SelectItem>
                 </SelectContent>
               </Select>
