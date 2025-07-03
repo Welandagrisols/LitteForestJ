@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase"
+import { supabase, isDemoMode } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,7 +30,7 @@ interface AddTaskFormProps {
 export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
   const [formData, setFormData] = useState({
     task_name: "",
-    task_type: "",
+    task_type: "Watering", // Set default value instead of empty string
     description: "",
     task_date: new Date().toISOString().split("T")[0],
     batch_sku: "",
@@ -147,6 +147,15 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Connect to Supabase and set up tables to enable adding tasks",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -241,7 +250,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="task_type">Task Type *</Label>
-          <Select value={formData.task_type} onValueChange={(value) => setFormData((prev) => ({ ...prev, task_type: value }))}>
+          <Select value={formData.task_type} onValueChange={(value) => setFormData((prev) => ({ ...prev, task_type: value }))} required>
             <SelectTrigger>
               <SelectValue placeholder="Select task type" />
             </SelectTrigger>
