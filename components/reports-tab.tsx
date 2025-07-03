@@ -308,7 +308,7 @@ export function ReportsTab() {
       {/* Profitability Table */}
       <Card className="warm-card">
         <CardHeader className="sage-header border-b border-border">
-          <CardTitle>Profitability Analysis - Merit List (Most Profitable First)</CardTitle>
+          <CardTitle>Profit Leaderboard</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
