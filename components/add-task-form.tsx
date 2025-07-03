@@ -31,6 +31,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
   const [formData, setFormData] = useState({
     task_name: "",
     task_type: "Watering", // Set default value instead of empty string
+    custom_task_type: "",
     description: "",
     task_date: new Date().toISOString().split("T")[0],
     batch_sku: "",
@@ -167,7 +168,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         .from("tasks")
         .insert({
           task_name: formData.task_name,
-          task_type: formData.task_type,
+          task_type: formData.task_type === "Other" ? formData.custom_task_type : formData.task_type,
           description: formData.description,
           task_date: formData.task_date,
           batch_sku: formData.batch_sku || null,
@@ -262,6 +263,19 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
               ))}
             </SelectContent>
           </Select>
+          {formData.task_type === "Other" && (
+            <div className="mt-2">
+              <Label htmlFor="custom_task_type">Custom Task Type *</Label>
+              <Input
+                id="custom_task_type"
+                name="custom_task_type"
+                value={formData.custom_task_type || ""}
+                onChange={(e) => setFormData((prev) => ({ ...prev, custom_task_type: e.target.value }))}
+                placeholder="Enter custom task type"
+                required
+              />
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
