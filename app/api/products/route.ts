@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase, isDemoMode } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
+  // Add CORS headers for website integration
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  }
+
   try {
     // In demo mode, return sample data
     if (isDemoMode) {
@@ -71,13 +78,13 @@ export async function GET(request: NextRequest) {
       success: true,
       products: transformedProducts,
       total_count: transformedProducts.length
-    })
+    }, { headers })
 
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers }
     )
   }
 }

@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase, isDemoMode } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  // Add CORS headers for website integration
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  }
+
   try {
     if (isDemoMode) {
       return NextResponse.json({
@@ -87,13 +94,13 @@ export async function POST(request: NextRequest) {
       message: 'Inventory updated successfully',
       new_quantity: newQuantity,
       availability_status: newQuantity >= 100 ? 'Available' : newQuantity >= 10 ? 'Limited' : 'Not Available'
-    })
+    }, { headers })
 
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers }
     )
   }
 }
