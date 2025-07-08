@@ -329,19 +329,20 @@ export function InventoryTab() {
                   <TableHead>Date Planted</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Price (Ksh)</TableHead>
+                  <TableHead>Website Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
+                    <TableCell colSpan={9} className="text-center py-8">
                       Loading inventory...
                     </TableCell>
                   </TableRow>
                 ) : filteredPlants.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
+                    <TableCell colSpan={9} className="text-center py-8">
                       No plants found
                     </TableCell>
                   </TableRow>
@@ -383,6 +384,34 @@ export function InventoryTab() {
                         </Badge>
                       </TableCell>
                       <TableCell>{item.price.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <Badge
+                            variant={item.ready_for_sale ? "default" : "outline"}
+                            className={
+                              item.ready_for_sale
+                                ? "bg-primary hover:bg-primary"
+                                : "bg-muted hover:bg-muted"
+                            }
+                          >
+                            {item.ready_for_sale ? "Listed" : "Not Listed"}
+                          </Badge>
+                          {item.ready_for_sale && (
+                            <Badge
+                              variant="outline"
+                              className={
+                                item.quantity >= 100
+                                  ? "bg-green-50 text-green-700 border-green-200"
+                                  : item.quantity >= 10
+                                    ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                    : "bg-red-50 text-red-700 border-red-200"
+                              }
+                            >
+                              {item.quantity >= 100 ? "Available" : item.quantity >= 10 ? "Limited" : "Not Available"}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Dialog>

@@ -33,6 +33,9 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     section: "",
     row: "",
     source: "",
+    ready_for_sale: false,
+    description: "",
+    image_url: "",
   })
 
   // Calculate cost per seedling
@@ -68,6 +71,9 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       section: "",
       row: "",
       source: "",
+      ready_for_sale: false,
+      description: "",
+      image_url: "",
     })
   }
 
@@ -286,6 +292,44 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
                 value={formData.source}
                 onChange={handleChange}
               />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="description">Description for Website</Label>
+              <Input
+                id="description"
+                name="description"
+                placeholder="Short description for the landing page"
+                value={formData.description}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image_url">Image URL</Label>
+              <Input
+                id="image_url"
+                name="image_url"
+                placeholder="https://example.com/plant-image.jpg"
+                value={formData.image_url}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="ready_for_sale" className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="ready_for_sale"
+                  checked={formData.ready_for_sale}
+                  onChange={(e) => setFormData(prev => ({ ...prev, ready_for_sale: e.target.checked }))}
+                  className="rounded"
+                />
+                Ready for Sale on Website
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Check this box to make this item available on your landing page
+              </p>
             </div>
           </div>
         </form>
