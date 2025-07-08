@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
+import { Upload, X, ImageIcon } from "lucide-react"
 
 interface EditInventoryFormProps {
   item: any
@@ -17,6 +18,9 @@ interface EditInventoryFormProps {
 
 export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
   const [loading, setLoading] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const { toast } = useToast()
 
   const isConsumable =
@@ -48,6 +52,96 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
       ...prev,
       [name]: name === "quantity" || name === "price" || name === "batch_cost" ? Number(value) : value,
     }))
+  }
+
+  const handleImageUpload = async (file: File): Promise<string | null> => {
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Connect to Supabase to enable image uploads",
+        variant: "destructive",
+      })
+      return null
+    }
+
+    try {
+      setUploadingImage(true)
+
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `plants/${fileName}`
+
+      // Upload file to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('plant-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (error) {
+        console.error('Upload error:', error)
+        throw error
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('plant-images')
+        .getPublicUrl(filePath)
+
+      return publicUrl
+    } catch (error: any) {
+      console.error('Error uploading image:', error)
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload image",
+        variant: "destructive",
+      })
+      return null
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB",
+          variant: "destructive",
+        })
+        return
+      }
+
+      setImageFile(file)
+      
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeImage = () => {
+    setImageFile(null)
+    setImagePreview(null)
+    setFormData(prev => ({ ...prev, image_url: "" }))
   }
 
   const handleSelectChange = (name: string, value: string) => {
