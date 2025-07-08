@@ -42,6 +42,46 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     image_url: "",
   })
 
+  // Auto-fill description and image based on existing entries
+  const autoFillFromExisting = async (plantName: string, scientificName: string) => {
+    if (isDemoMode || (!plantName && !scientificName)) return
+
+    try {
+      let query = supabase.from("inventory").select("description, image_url")
+      
+      if (plantName && scientificName) {
+        // First try exact match on both
+        query = query.or(`plant_name.ilike.${plantName},scientific_name.ilike.${scientificName}`)
+      } else if (plantName) {
+        query = query.ilike("plant_name", plantName)
+      } else if (scientificName) {
+        query = query.ilike("scientific_name", scientificName)
+      }
+
+      const { data, error } = await query
+        .not("description", "is", null)
+        .not("description", "eq", "")
+        .limit(1)
+
+      if (error) {
+        console.error("Error fetching existing plant data:", error)
+        return
+      }
+
+      if (data && data.length > 0) {
+        const existing = data[0]
+        if (existing.description && !formData.description) {
+          setFormData(prev => ({ ...prev, description: existing.description }))
+        }
+        if (existing.image_url && !formData.image_url && !imagePreview) {
+          setFormData(prev => ({ ...prev, image_url: existing.image_url }))
+        }
+      }
+    } catch (error) {
+      console.error("Error in auto-fill:", error)
+    }
+  }
+
   // Calculate cost per seedling
   const costPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
 
@@ -51,6 +91,13 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       ...prev,
       [name]: name === "quantity" || name === "price" || name === "batch_cost" ? Number(value) : value,
     }))
+
+    // Auto-fill description and image when plant name or scientific name changes
+    if (name === "plant_name" && value.length > 2) {
+      autoFillFromExisting(value, formData.scientific_name)
+    } else if (name === "scientific_name" && value.length > 2) {
+      autoFillFromExisting(formData.plant_name, value)
+    }
   }
 
   const handleSelectChange = (name: string, value: string) => {
@@ -408,10 +455,15 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
               <Input
                 id="description"
                 name="description"
-                placeholder="Short description for the landing page"
+                placeholder="Short description for the landing page (auto-filled from existing entries)"
                 value={formData.description}
                 onChange={handleChange}
               />
+              {formData.description && (
+                <p className="text-xs text-muted-foreground">
+                  💡 This description was auto-filled from similar entries
+                </p>
+              )}
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -493,7 +545,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
                 {/* Alternative: Manual URL Input */}
                 <div className="pt-4 border-t border-muted">
                   <Label htmlFor="image_url" className="text-xs text-muted-foreground">
-                    Or provide image URL manually:
+                    Or provide image URL manually (auto-filled from existing entries):
                   </Label>
                   <Input
                     id="image_url"
@@ -504,6 +556,11 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
                     className="mt-1"
                     disabled={!!imageFile}
                   />
+                  {formData.image_url && !imageFile && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      💡 This image URL was auto-filled from similar entries
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

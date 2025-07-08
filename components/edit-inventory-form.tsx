@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { supabase, isDemoMode } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -41,6 +41,9 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
     section: item.section || "",
     row: item.row || "",
     source: item.source || "",
+    description: item.description || "",
+    image_url: item.image_url || "",
+    ready_for_sale: item.ready_for_sale || false,
   })
 
   // Calculate cost per seedling for plants (not consumables)
@@ -52,6 +55,13 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
       ...prev,
       [name]: name === "quantity" || name === "price" || name === "batch_cost" ? Number(value) : value,
     }))
+
+    // Auto-fill description and image when plant name or scientific name changes
+    if (name === "plant_name" && value.length > 2) {
+      autoFillFromExisting(value, formData.scientific_name)
+    } else if (name === "scientific_name" && value.length > 2) {
+      autoFillFromExisting(formData.plant_name, value)
+    }
   }
 
   const handleImageUpload = async (file: File): Promise<string | null> => {
@@ -128,7 +138,7 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
       }
 
       setImageFile(file)
-      
+
       // Create preview
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -151,6 +161,50 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
     }))
   }
 
+  const autoFillFromExisting = async (plantName: string, scientificName: string) => {
+    // Fetch data from Supabase based on plantName or scientificName
+    let query = supabase
+      .from("inventory")
+      .select("description, image_url")
+      .limit(1)
+
+    if (plantName) {
+      query = query.ilike("plant_name", plantName)
+    } else if (scientificName) {
+      query = query.ilike("scientific_name", scientificName)
+    } else {
+      return // Don't run query if both are empty
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      console.error("Error fetching similar entries:", error)
+      toast({
+        title: "Error auto-filling data",
+        description: error.message,
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (data && data.length > 0) {
+      const { description, image_url } = data[0]
+      setFormData((prev) => ({
+        ...prev,
+        description: description || "",
+        image_url: image_url || "",
+      }))
+    } else {
+      // Reset description and image URL if no matching entries are found
+      setFormData((prev) => ({
+        ...prev,
+        description: "",
+        image_url: "",
+      }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -170,13 +224,27 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
       const calculatedCostPerSeedling =
         !isConsumable && formData.quantity > 0 ? formData.batch_cost / formData.quantity : item.cost_per_seedling || 0
 
-      const updateData = {
-        ...formData,
-        cost_per_seedling: calculatedCostPerSeedling,
-        updated_at: new Date().toISOString(),
+      // Upload image if selected
+      let imageUrl = formData.image_url
+      if (imageFile) {
+        const uploadedUrl = await handleImageUpload(imageFile)
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl
+        } else {
+          // If image upload fails, don't proceed with form submission
+          return
+        }
       }
 
-      const { error } = await supabase.from("inventory").update(updateData).eq("id", item.id)
+      const { error } = await supabase
+        .from("inventory")
+        .update({
+          ...formData,
+          image_url: imageUrl,
+          cost_per_seedling: calculatedCostPerSeedling,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", item.id)
 
       if (error) throw error
 
@@ -314,6 +382,141 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
                     value={formData.date_planted}
                     onChange={handleChange}
                   />
+                </div>
+              </>
+            )}
+
+            {!isConsumable && (
+              <>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="description">Description for Website</Label>
+                  <Input
+                    id="description"
+                    name="description"
+                    placeholder="Short description for the landing page (auto-filled from existing entries)"
+                    value={formData.description}
+                    onChange={handleChange}
+                  />
+                  {formData.description && (
+                    <p className="text-xs text-muted-foreground">
+                      💡 This description was auto-filled from similar entries
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Plant Image</Label>
+                  <div className="space-y-4">
+                    {/* Image Upload Area */}
+                    {!imagePreview && !formData.image_url ? (
+                      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                        <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">Upload a plant image</p>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            className="hidden"
+                            id="image-upload"
+                            disabled={uploadingImage || isDemoMode}
+                          />
+                          <label
+                            htmlFor="image-upload"
+                            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
+                              uploadingImage || isDemoMode
+                                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                : "bg-primary text-primary-foreground hover:bg-primary/90"
+                            }`}
+                          >
+                            <Upload className="h-4 w-4" />
+                            {uploadingImage ? "Uploading..." : "Choose Image"}
+                          </label>
+                          <p className="text-xs text-muted-foreground">
+                            Supports JPG, PNG, WebP (max 5MB)
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {/* Image Preview */}
+                        <div className="relative inline-block">
+                          <img
+                            src={imagePreview || formData.image_url}
+                            alt="Plant preview"
+                            className="h-32 w-32 object-cover rounded-lg border"
+                          />
+                          <button
+                            type="button"
+                            onClick={removeImage}
+                            className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs hover:bg-destructive/90"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+
+                        {/* Replace Image Button */}
+                        <div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            className="hidden"
+                            id="image-replace"
+                            disabled={uploadingImage || isDemoMode}
+                          />
+                          <label
+                            htmlFor="image-replace"
+                            className={`inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md cursor-pointer transition-colors ${
+                              uploadingImage || isDemoMode
+                                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                            }`}
+                          >
+                            <Upload className="h-3 w-3" />
+                            {uploadingImage ? "Uploading..." : "Replace Image"}
+                          </label>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Alternative: Manual URL Input */}
+                    <div className="pt-4 border-t border-muted">
+                      <Label htmlFor="image_url" className="text-xs text-muted-foreground">
+                        Or provide image URL manually (auto-filled from existing entries):
+                      </Label>
+                      <Input
+                        id="image_url"
+                        name="image_url"
+                        placeholder="https://example.com/plant-image.jpg"
+                        value={formData.image_url}
+                        onChange={handleChange}
+                        className="mt-1"
+                        disabled={!!imageFile}
+                      />
+                      {formData.image_url && !imageFile && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          💡 This image URL was auto-filled from similar entries
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ready_for_sale" className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="ready_for_sale"
+                      checked={formData.ready_for_sale}
+                      onChange={(e) => setFormData(prev => ({ ...prev, ready_for_sale: e.target.checked }))}
+                      className="rounded"
+                    />
+                    Ready for Sale on Website
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Check this box to make this item available on your landing page
+                  </p>
                 </div>
               </>
             )}
