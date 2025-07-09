@@ -6,6 +6,7 @@ channel = "stable-24_05"
 
 [deployment]
 run = ["sh", "-c", "npm start -- --hostname 0.0.0.0 --port 3000"]
+build = ["sh", "-c", "npm run build"]
 
 [[ports]]
 localPort = 3000
