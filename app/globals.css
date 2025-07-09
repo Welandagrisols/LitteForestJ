@@ -36,6 +36,60 @@
   }
 }
 
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  /* Touch-friendly buttons */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improved form inputs for mobile */
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Mobile-optimized cards */
+  .mobile-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Swipe indicators */
+  .swipe-indicator {
+    position: relative;
+  }
+  
+  .swipe-indicator::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 4px;
+    background-color: hsl(var(--muted-foreground));
+    border-radius: 2px;
+    opacity: 0.5;
+  }
+}
+
+/* PWA-specific styles */
+@media (display-mode: standalone) {
+  /* When app is installed as PWA */
+  body {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  
+  /* Allow text selection in specific areas */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
 body {
   background-image: url("/images/nursery-background-new.jpg");
   background-size: cover;

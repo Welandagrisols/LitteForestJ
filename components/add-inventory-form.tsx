@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 
 interface AddInventoryFormProps {
@@ -38,7 +39,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     source: "",
   })
 
-  
+
 
   // Calculate cost per seedling
   const costPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
@@ -76,7 +77,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     })
   }
 
-  
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -150,12 +151,11 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     }
   }
 
+  const isMobile = useIsMobile()
+
   return (
-    <div className="flex flex-col h-[70vh] max-h-[600px]">
-      {/* Scrollable form content */}
-      <div className="flex-1 overflow-y-auto pr-2">
-        <form id="add-inventory-form" onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className={`space-y-4 ${isMobile ? 'mobile-card p-4' : ''}`}>
+      <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-2 gap-4'}`}>
             <div className="space-y-2">
               <Label htmlFor="plant_name">Plant Name *</Label>
               <Input id="plant_name" name="plant_name" value={formData.plant_name} onChange={handleChange} required />
@@ -310,28 +310,25 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
               />
             </div>
 
-            
-          </div>
-        </form>
-      </div>
 
-      {/* Sticky action buttons */}
-      <div className="border-t border-border bg-white pt-4 mt-4">
-        <div className="flex justify-end gap-2">
-          {onClose && (
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-              Cancel
-            </Button>
-          )}
-          <Button
-            type="submit"
-            form="add-inventory-form"
-            className="bg-primary hover:bg-primary/90 text-white"
-            disabled={loading}
-          >
-            {loading ? "Adding..." : "Add to Inventory"}
-          </Button>
-        </div>
+          </div>
+
+      <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-end space-x-2'}`}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onClose}
+          className={isMobile ? 'mobile-touch-target w-full' : ''}
+        >
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={loading}
+          className={isMobile ? 'mobile-touch-target w-full' : ''}
+        >
+          {loading ? "Adding..." : "Add Item"}
+        </Button>
       </div>
     </div>
   )
