@@ -7,6 +7,7 @@ import { DashboardTab } from "@/components/dashboard-tab"
 import { OpsTab } from "@/components/ops-tab"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
+import { WebsiteIntegrationTab } from "@/components/website-integration-tab"
 
 export default function Home() {
   return (
