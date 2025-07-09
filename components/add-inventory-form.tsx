@@ -18,7 +18,8 @@ interface AddInventoryFormProps {
 
 export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) {
   const [loading, setLoading] = useState(false)
-  
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const { toast } = useToast()
 
   const [formData, setFormData] = useState({
@@ -73,8 +74,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       row: "",
       source: "",
     })
-    setImageFile(null)
-    setImagePreview(null)
   }
 
   
@@ -95,26 +94,39 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       setLoading(true)
 
       // Generate SKU if not provided
-      if (!formData.sku) {
-        const prefix = formData.category.substring(0, 3).toUpperCase()
+      const finalFormData = { ...formData }
+      if (!finalFormData.sku) {
+        const prefix = finalFormData.category.substring(0, 3).toUpperCase()
         const randomNum = Math.floor(1000 + Math.random() * 9000)
-        formData.sku = `${prefix}${randomNum}`
+        finalFormData.sku = `${prefix}${randomNum}`
       }
 
-      
-
       // Calculate cost per seedling
-      const calculatedCostPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
+      const calculatedCostPerSeedling = finalFormData.quantity > 0 ? finalFormData.batch_cost / finalFormData.quantity : 0
 
-      const { error } = await supabase.from("inventory").insert([
-        {
-          ...formData,
-          cost_per_seedling: calculatedCostPerSeedling,
-          batch_cost: formData.batch_cost,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ])
+      const insertData = {
+        plant_name: finalFormData.plant_name,
+        scientific_name: finalFormData.scientific_name,
+        category: finalFormData.category,
+        quantity: finalFormData.quantity,
+        age: finalFormData.age,
+        date_planted: finalFormData.date_planted || null,
+        status: finalFormData.status,
+        price: finalFormData.price,
+        batch_cost: finalFormData.batch_cost,
+        cost_per_seedling: calculatedCostPerSeedling,
+        sku: finalFormData.sku,
+        section: finalFormData.section,
+        row: finalFormData.row,
+        source: finalFormData.source,
+        item_type: 'Plant',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      console.log('Inserting data:', insertData)
+
+      const { error } = await supabase.from("inventory").insert([insertData])
 
       if (error) throw error
 
