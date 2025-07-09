@@ -1,3 +1,5 @@
+"use client"
+
 import { Header } from "@/components/header"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DashboardTab } from "@/components/dashboard-tab"
