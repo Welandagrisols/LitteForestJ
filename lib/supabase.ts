@@ -9,13 +9,13 @@ console.log("Supabase URL:", supabaseUrl)
 console.log("Supabase Key:", supabaseAnonKey ? "Set" : "Not set")
 
 // Check if we have valid Supabase configuration
-const isValidUrl = supabaseUrl && supabaseUrl.startsWith("https://") && supabaseUrl.includes(".supabase.co")
+const hasValidUrl = supabaseUrl && supabaseUrl.startsWith("https://") && supabaseUrl.includes(".supabase.co")
 const hasValidKey = supabaseAnonKey && supabaseAnonKey.length > 50
 
-console.log("Is valid URL:", isValidUrl)
+console.log("Is valid URL:", hasValidUrl)
 
 // We're in demo mode if we don't have valid Supabase configuration
-export const isDemoMode = !isValidUrl || !hasValidKey
+export const isDemoMode = !hasValidUrl || !hasValidKey
 
 console.log("Is Demo Mode:", isDemoMode)
 
@@ -23,7 +23,7 @@ console.log("Is Demo Mode:", isDemoMode)
 if (isDemoMode) {
   console.log("Demo mode reason:", {
     hasUrl: !!supabaseUrl,
-    isValidUrl,
+    hasValidUrl,
     hasKey: !!supabaseAnonKey,
     hasValidKey
   })
