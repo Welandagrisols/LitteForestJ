@@ -200,112 +200,116 @@ export function DashboardTab() {
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-200">
+          <CardHeader className="pb-2 px-0 pt-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Plants</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{inventorySummary.totalItems}</div>
+          <CardContent className="px-0 pb-0">
+            <div className="text-2xl sm:text-3xl font-bold text-primary">{inventorySummary.totalItems}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
+        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-200">
+          <CardHeader className="pb-2 px-0 pt-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Seedlings</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{inventorySummary.totalQuantity}</div>
+          <CardContent className="px-0 pb-0">
+            <div className="text-2xl sm:text-3xl font-bold text-primary">{inventorySummary.totalQuantity}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
+        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-all duration-200">
+          <CardHeader className="pb-2 px-0 pt-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-secondary">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+          <CardContent className="px-0 pb-0">
+            <div className="text-xl sm:text-2xl font-bold text-secondary">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
+        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-all duration-200">
+          <CardHeader className="pb-2 px-0 pt-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Today's Sales</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-secondary">{salesSummary.todaySales}</div>
+          <CardContent className="px-0 pb-0">
+            <div className="text-2xl sm:text-3xl font-bold text-secondary">{salesSummary.todaySales}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Recent Sales */}
-        <Card className="warm-card">
-          <CardHeader className="sage-header border-b border-border">
-            <CardTitle className="text-lg">Recent Sales</CardTitle>
+        <Card className="rounded-2xl shadow-md overflow-hidden">
+          <CardHeader className="bg-muted/50 px-4 py-4 sm:px-6">
+            <CardTitle className="text-lg font-semibold">Recent Sales</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
-              <div className="text-center py-4">Loading...</div>
+              <div className="text-center py-8 text-muted-foreground">Loading...</div>
             ) : recentSales.length === 0 ? (
-              <div className="text-center py-4 text-muted-foreground">No recent sales</div>
+              <div className="text-center py-8 text-muted-foreground">No recent sales</div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow className="sage-header hover:bg-muted/50">
-                    <TableHead>Date</TableHead>
-                    <TableHead>Plant</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentSales.map((sale) => (
-                    <TableRow key={sale.id} className="hover:bg-muted/50">
-                      <TableCell>{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
-                      <TableCell>{sale.inventory?.plant_name || "Unknown"}</TableCell>
-                      <TableCell>{sale.quantity}</TableCell>
-                      <TableCell>Ksh {sale.total_amount.toLocaleString()}</TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/50">
+                      <TableHead className="text-sm font-medium px-4 py-3">Date</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Plant</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Qty</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Amount</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {recentSales.map((sale) => (
+                      <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors">
+                        <TableCell className="text-sm px-4 py-3">{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-sm px-4 py-3 font-medium">{sale.inventory?.plant_name || "Unknown"}</TableCell>
+                        <TableCell className="text-sm px-4 py-3">{sale.quantity}</TableCell>
+                        <TableCell className="text-sm px-4 py-3 font-semibold">Ksh {sale.total_amount.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Low Stock Items */}
-        <Card className="warm-card">
-          <CardHeader className="sage-header border-b border-border">
-            <CardTitle className="text-lg">Low Stock Items</CardTitle>
+        <Card className="rounded-2xl shadow-md overflow-hidden">
+          <CardHeader className="bg-muted/50 px-4 py-4 sm:px-6">
+            <CardTitle className="text-lg font-semibold">Low Stock Items</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
-              <div className="text-center py-4">Loading...</div>
+              <div className="text-center py-8 text-muted-foreground">Loading...</div>
             ) : lowStockItems.length === 0 ? (
-              <div className="text-center py-4 text-muted-foreground">No low stock items</div>
+              <div className="text-center py-8 text-muted-foreground">No low stock items</div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow className="sage-header hover:bg-muted/50">
-                    <TableHead>Plant</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {lowStockItems.map((item) => (
-                    <TableRow key={item.id} className="hover:bg-muted/50">
-                      <TableCell>{item.plant_name}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">
-                          <AlertCircle className="h-3 w-3 mr-1" />
-                          Low Stock
-                        </Badge>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/50">
+                      <TableHead className="text-sm font-medium px-4 py-3">Plant</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Quantity</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {lowStockItems.map((item) => (
+                      <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
+                        <TableCell className="text-sm px-4 py-3 font-medium">{item.plant_name}</TableCell>
+                        <TableCell className="text-sm px-4 py-3">{item.quantity}</TableCell>
+                        <TableCell className="px-4 py-3">
+                          <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20 text-xs">
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            Low Stock
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

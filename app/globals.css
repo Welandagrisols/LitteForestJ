@@ -43,23 +43,23 @@
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Improved form inputs for mobile */
   input, select, textarea {
     font-size: 16px; /* Prevents zoom on iOS */
   }
-  
+
   /* Mobile-optimized cards */
   .mobile-card {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
-  
+
   /* Swipe indicators */
   .swipe-indicator {
     position: relative;
   }
-  
+
   .swipe-indicator::after {
     content: '';
     position: absolute;
@@ -82,7 +82,7 @@
     -webkit-touch-callout: none;
     user-select: none;
   }
-  
+
   /* Allow text selection in specific areas */
   input, textarea, [contenteditable] {
     -webkit-user-select: text;
@@ -283,4 +283,59 @@ h6 {
   transition-property: background-color, border-color, color, box-shadow, transform;
   transition-duration: 0.3s;
   transition-timing-function: ease;
+}
+
+--chart-5: 27 87% 67%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    /* Ensure minimum touch target size */
+    button, .button, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Improve table scrolling on mobile */
+    .table-container {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Better input sizing on mobile */
+    input, textarea, select {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+  }
+
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar styling */
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+    border-radius: 3px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+  }
 }
