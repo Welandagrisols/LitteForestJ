@@ -14,8 +14,13 @@ const hasValidKey = supabaseAnonKey && supabaseAnonKey.length > 50
 
 console.log("Is valid URL:", hasValidUrl)
 
-// We're in demo mode if we don't have valid Supabase configuration
-export const isDemoMode = !hasValidUrl || !hasValidKey
+// Check if we're in demo mode (missing required env vars)
+export const isDemoMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL || 
+  !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  !isValidUrl(process.env.NEXT_PUBLIC_SUPABASE_URL) ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL === 'your-project-url' ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'your-anon-key'
 
 console.log("Is Demo Mode:", isDemoMode)
 
