@@ -1,26 +1,33 @@
 import { createClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/supabase"
 
-// Get environment variables
+// Environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Debug logging
 console.log("Supabase URL:", supabaseUrl)
 console.log("Supabase Key:", supabaseAnonKey ? "Set" : "Not set")
-console.log("Is valid URL:", supabaseUrl ? isValidUrl(supabaseUrl) : false)
 
-// Check if we're in demo mode (no real Supabase config or invalid config)
-export const isDemoMode =
-  !supabaseUrl ||
-  !supabaseAnonKey ||
-  supabaseUrl === "" ||
-  supabaseAnonKey === "" ||
-  supabaseUrl === "your_supabase_project_url_here" ||
-  supabaseAnonKey === "your_supabase_anon_key_here" ||
-  !isValidUrl(supabaseUrl)
+// Check if we have valid Supabase configuration
+const isValidUrl = supabaseUrl && supabaseUrl.startsWith("https://") && supabaseUrl.includes(".supabase.co")
+const hasValidKey = supabaseAnonKey && supabaseAnonKey.length > 50
+
+console.log("Is valid URL:", isValidUrl)
+
+// We're in demo mode if we don't have valid Supabase configuration
+export const isDemoMode = !isValidUrl || !hasValidKey
 
 console.log("Is Demo Mode:", isDemoMode)
+
+// If in demo mode, log the reason
+if (isDemoMode) {
+  console.log("Demo mode reason:", {
+    hasUrl: !!supabaseUrl,
+    isValidUrl,
+    hasKey: !!supabaseAnonKey,
+    hasValidKey
+  })
+}
 
 // Helper function to validate URL format
 function isValidUrl(string: string): boolean {
@@ -47,7 +54,7 @@ export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAn
 // Helper function to check if a table exists
 export async function checkTableExists(tableName: string): Promise<boolean> {
   console.log(`Checking if table ${tableName} exists...`)
-  
+
   if (isDemoMode) {
     console.log(`Skipping table check - in demo mode`)
     return false
@@ -56,7 +63,7 @@ export async function checkTableExists(tableName: string): Promise<boolean> {
   try {
     // Try to select a single row to check if the table exists
     const { data, error } = await supabase.from(tableName).select("id").limit(1)
-    
+
     console.log(`Table ${tableName} check result:`, { data, error })
 
     // If the error contains "relation does not exist", the table doesn't exist
