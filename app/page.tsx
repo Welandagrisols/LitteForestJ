@@ -42,7 +42,7 @@ const tabs = [
   { value: "ops", label: "Operations", icon: Settings },
 ]
 
-export default function Home() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isMobile = useIsMobile()
@@ -70,100 +70,85 @@ export default function Home() {
     </SidebarMenu>
   )
 
-  if (isMobile) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        
-        {/* Mobile Header with Menu Button */}
-        <div className="sticky top-16 z-40 bg-background border-b px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-semibold capitalize">{activeTab}</h1>
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0">
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b">
-                  <h2 className="text-lg font-semibold">Navigation</h2>
-                </div>
-                <div className="flex-1 p-4">
-                  <NavigationItems onItemClick={() => setMobileMenuOpen(false)} />
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-
-        <main className="px-4 py-6 pb-20">
-          <ErrorBoundary>
-            <SupabaseProvider>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsContent value="dashboard" className="mt-0">
-                  <DashboardTab />
-                </TabsContent>
-                <TabsContent value="inventory" className="mt-0">
-                  <InventoryTab />
-                </TabsContent>
-                <TabsContent value="sales" className="mt-0">
-                  <SalesTab />
-                </TabsContent>
-                <TabsContent value="reports" className="mt-0">
-                  <ReportsTab />
-                </TabsContent>
-                <TabsContent value="ops" className="mt-0">
-                  <OpsTab />
-                </TabsContent>
-              </Tabs>
-            </SupabaseProvider>
-          </ErrorBoundary>
-        </main>
-      </div>
-    )
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return <DashboardTab />
+      case "inventory":
+        return <InventoryTab />
+      case "sales":
+        return <SalesTab />
+      case "reports":
+        return <ReportsTab />
+      case "ops":
+        return <OpsTab />
+      default:
+        return <DashboardTab />
+    }
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <Sidebar className="border-r">
-          <SidebarHeader className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-primary">Farm Management</h2>
-          </SidebarHeader>
-          <SidebarContent className="p-4">
-            <NavigationItems />
-          </SidebarContent>
-        </Sidebar>
-        
-        <SidebarInset className="flex-1">
+    <div className="min-h-screen bg-background">
+      {isMobile ? (
+        <div className="min-h-screen">
           <Header />
-          
-          <main className="flex-1 p-6">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h1 className="text-lg font-semibold">
+              {tabs.find(tab => tab.value === activeTab)?.label}
+            </h1>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0">
+                <div className="p-4">
+                  <h2 className="text-lg font-semibold mb-4">Menu</h2>
+                  <NavigationItems onItemClick={() => setMobileMenuOpen(false)} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+          <main className="p-4">
             <ErrorBoundary>
-              <SupabaseProvider>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsContent value="dashboard" className="mt-0">
-                    <DashboardTab />
-                  </TabsContent>
-                  <TabsContent value="inventory" className="mt-0">
-                    <InventoryTab />
-                  </TabsContent>
-                  <TabsContent value="sales" className="mt-0">
-                    <SalesTab />
-                  </TabsContent>
-                  <TabsContent value="reports" className="mt-0">
-                    <ReportsTab />
-                  </TabsContent>
-                  <TabsContent value="ops" className="mt-0">
-                    <OpsTab />
-                  </TabsContent>
-                </Tabs>
-              </SupabaseProvider>
+              {renderTabContent()}
             </ErrorBoundary>
           </main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+        </div>
+      ) : (
+        <div className="flex">
+          <Sidebar className="w-64 border-r">
+            <SidebarHeader className="p-4">
+              <div className="flex items-center space-x-2">
+                <div className="h-8 w-8 bg-primary rounded-lg"></div>
+                <span className="text-lg font-semibold">LittleForest</span>
+              </div>
+            </SidebarHeader>
+            <SidebarContent className="p-4">
+              <NavigationItems />
+            </SidebarContent>
+          </Sidebar>
+          <div className="flex-1">
+            <Header />
+            <main className="p-6">
+              <ErrorBoundary>
+                {renderTabContent()}
+              </ErrorBoundary>
+            </main>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <SupabaseProvider>
+      <SidebarProvider>
+        <AppContent />
+      </SidebarProvider>
+    </SupabaseProvider>
   )
 }
