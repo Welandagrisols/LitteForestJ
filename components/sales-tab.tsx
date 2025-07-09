@@ -170,44 +170,49 @@ export function SalesTab() {
         </Card>
       </div>
 
-      <div className="warm-card rounded-lg shadow-sm p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Sales Records</h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={handleExportToExcel}
-              disabled={exporting || sales.length === 0}
-            >
-              {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-              Export to Excel
-            </Button>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  className="bg-secondary hover:bg-secondary/90 text-white"
-                  disabled={isDemoMode || !tableExists}
-                  title={
-                    isDemoMode || !tableExists
-                      ? "Connect to Supabase and set up tables to enable recording sales"
-                      : "Record new sale"
-                  }
-                >
-                  Record New Sale
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Record New Sale</DialogTitle>
-                </DialogHeader>
-                <AddSaleForm onSuccess={() => fetchSales()} />
-              </DialogContent>
-            </Dialog>
+      <div className="warm-card rounded-lg shadow-sm overflow-hidden">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-10 bg-white border-b border-border p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 className="text-2xl font-bold">Sales Records</h2>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
+                onClick={handleExportToExcel}
+                disabled={exporting || sales.length === 0}
+              >
+                {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                Export to Excel
+              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    className="bg-secondary hover:bg-secondary/90 text-white w-full sm:w-auto"
+                    disabled={isDemoMode || !tableExists}
+                    title={
+                      isDemoMode || !tableExists
+                        ? "Connect to Supabase and set up tables to enable recording sales"
+                        : "Record new sale"
+                    }
+                  >
+                    Record New Sale
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Record New Sale</DialogTitle>
+                  </DialogHeader>
+                  <AddSaleForm onSuccess={() => fetchSales()} />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-md border border-border overflow-hidden">
+        {/* Scrollable Content */}
+        <div className="p-6">
+          <div className="rounded-md border border-border overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="sage-header hover:bg-muted/50">
@@ -256,6 +261,7 @@ export function SalesTab() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
       </div>
     </div>
