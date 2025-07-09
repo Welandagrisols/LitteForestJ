@@ -285,10 +285,6 @@ h6 {
   transition-timing-function: ease;
 }
 
---chart-5: 27 87% 67%;
-  }
-}
-
 @layer base {
   * {
     @apply border-border;
