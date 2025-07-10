@@ -132,10 +132,10 @@ function AppContent() {
           ) : (
         <div className="flex">
           <Sidebar className="w-64 border-r">
-            <SidebarHeader className="p-4">
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 bg-primary rounded-lg"></div>
-                <span className="text-lg font-semibold">LittleForest</span>
+            <SidebarHeader>
+              <div className="px-2">
+                <span className="text-lg font-semibold text-orange-500">Little</span>
+                <span className="text-lg font-semibold text-green-600">Forest</span>
               </div>
             </SidebarHeader>
             <SidebarContent className="p-4">
