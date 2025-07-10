@@ -18,7 +18,8 @@ console.log("Is valid URL:", hasValidUrl)
 export const isDemoMode =
   !process.env.NEXT_PUBLIC_SUPABASE_URL || 
   !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  !isValidUrl(process.env.NEXT_PUBLIC_SUPABASE_URL) ||
+  !hasValidUrl ||
+  !hasValidKey ||
   process.env.NEXT_PUBLIC_SUPABASE_URL === 'your-project-url' ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'your-anon-key'
 
