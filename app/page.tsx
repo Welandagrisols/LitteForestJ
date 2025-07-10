@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -88,35 +87,49 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {isMobile ? (
-        <div className="min-h-screen">
-          <Header />
-          <div className="flex items-center justify-between p-4 border-b">
-            <h1 className="text-lg font-semibold">
-              {tabs.find(tab => tab.value === activeTab)?.label}
-            </h1>
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64 p-0">
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold mb-4">Menu</h2>
-                  <NavigationItems onItemClick={() => setMobileMenuOpen(false)} />
+    <ErrorBoundary>
+      <SupabaseProvider>
+        <div className="min-h-screen bg-background">
+          {isMobile ? (
+            <div className="flex h-screen bg-background">
+              {/* Mobile Header */}
+              <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+                <div className="flex items-center justify-between px-4 py-3">
+                  <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                    <SheetTrigger asChild>
+                      <Button variant="ghost" size="icon" className="mobile-touch-target">
+                        <Menu className="h-5 w-5" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-72 p-0">
+                      <div className="flex h-full flex-col">
+                        <div className="flex items-center justify-center p-6 border-b">
+                          <h2 className="text-xl font-bold text-primary">Little Forest</h2>
+                        </div>
+                        <div className="flex-1 overflow-auto p-4">
+                          <NavigationItems onItemClick={() => setMobileMenuOpen(false)} />
+                        </div>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                  <h1 className="text-lg font-semibold truncate">
+                    {tabs.find(tab => tab.value === activeTab)?.label}
+                  </h1>
+                  <div className="w-10" /> {/* Spacer */}
                 </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-          <main className="p-4">
-            <ErrorBoundary>
-              {renderTabContent()}
-            </ErrorBoundary>
-          </main>
-        </div>
-      ) : (
+              </div>
+
+              {/* Mobile Content */}
+              <div className="flex-1 pt-16 overflow-auto">
+                <div className="mobile-content">
+                  <Header />
+                  <main className="mt-6">
+                    {renderTabContent()}
+                  </main>
+                </div>
+              </div>
+            </div>
+          ) : (
         <div className="flex">
           <Sidebar className="w-64 border-r">
             <SidebarHeader className="p-4">
@@ -140,6 +153,8 @@ function AppContent() {
         </div>
       )}
     </div>
+  </SupabaseProvider>
+</ErrorBoundary>
   )
 }
 

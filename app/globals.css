@@ -72,6 +72,158 @@
     border-radius: 2px;
     opacity: 0.5;
   }
+
+  /* Mobile table improvements */
+  .mobile-table-container {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-table {
+    display: block;
+    width: 100%;
+  }
+
+  .mobile-table thead {
+    display: none;
+  }
+
+  .mobile-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .mobile-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-table td {
+    display: block;
+    padding: 0.5rem 0;
+    border: none;
+    position: relative;
+    padding-left: 35%;
+  }
+
+  .mobile-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 30%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Mobile grid layouts */
+  .mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .mobile-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Mobile sidebar adjustments */
+  .mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .mobile-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Mobile content padding */
+  .mobile-content {
+    padding: 1rem;
+  }
+
+  /* Mobile button groups */
+  .mobile-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-button-group button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Mobile stats cards */
+  .mobile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .mobile-stats-card {
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .mobile-stats-card h3 {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .mobile-stats-card p {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  /* Mobile form improvements */
+  .mobile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .mobile-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-form-row.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* Mobile dialog improvements */
+  .mobile-dialog {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+
+  /* Mobile chart container */
+  .mobile-chart {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-chart .recharts-wrapper {
+    min-width: 300px;
+  }
 }
 
 /* PWA-specific styles */
