@@ -129,10 +129,11 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
   }
 
   return (
-    <div className="flex flex-col h-[70vh] max-h-[600px]">
-      {/* Scrollable form content */}
-      <div className="flex-1 overflow-y-auto pr-2">
-        <form id="add-consumable-form" onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex flex-col max-h-[80vh]">
+      {/* Scrollable form container */}
+      <div className="flex-1 overflow-y-auto px-1">
+        <div className="space-y-6">
+          <form id="add-consumable-form" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="item_name">Item Name *</Label>
@@ -258,6 +259,7 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
             </div>
           </div>
         </form>
+        </div>
       </div>
 
       {/* Sticky action buttons */}

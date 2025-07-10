@@ -154,8 +154,11 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
   const isMobile = useIsMobile()
 
   return (
-    <div className={`space-y-4 ${isMobile ? 'mobile-card p-4' : ''}`}>
-      <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-2 gap-4'}`}>
+    <div className="flex flex-col max-h-[80vh]">
+      {/* Scrollable form container */}
+      <div className="flex-1 overflow-y-auto px-1">
+        <div className="space-y-4">
+          <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-2 gap-4'}`}>
             <div className="space-y-2">
               <Label htmlFor="plant_name">Plant Name *</Label>
               <Input id="plant_name" name="plant_name" value={formData.plant_name} onChange={handleChange} required />
@@ -312,23 +315,28 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
 
 
           </div>
+        </div>
+      </div>
 
-      <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-end space-x-2'}`}>
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onClose}
-          className={isMobile ? 'mobile-touch-target w-full' : ''}
-        >
-          Cancel
-        </Button>
-        <Button 
-          type="submit" 
-          disabled={loading}
-          className={isMobile ? 'mobile-touch-target w-full' : ''}
-        >
-          {loading ? "Adding..." : "Add Item"}
-        </Button>
+      {/* Sticky action buttons */}
+      <div className="border-t border-border bg-white pt-4 mt-4 flex-shrink-0">
+        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-end space-x-2'}`}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className={isMobile ? 'mobile-touch-target w-full' : ''}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={loading}
+            className={isMobile ? 'mobile-touch-target w-full' : ''}
+          >
+            {loading ? "Adding..." : "Add Item"}
+          </Button>
+        </div>
       </div>
     </div>
   )

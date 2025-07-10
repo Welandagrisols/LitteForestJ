@@ -216,26 +216,18 @@ export function InventoryTab() {
 
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-white border-b border-border p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-          <h2 className="text-2xl font-bold">Inventory Management</h2>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Button
-              variant="outline"
-              className="flex items-center justify-center gap-2 w-full sm:w-auto"
-              onClick={handleExportToExcel}
-              disabled={
-                exporting || (activeTab === "plants" ? filteredPlants.length === 0 : filteredConsumables.length === 0)
-              }
-            >
-              {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-              Export to Excel
-            </Button>
-
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 className="text-2xl font-bold">Inventory Management</h2>
+          </div>
+          
+          {/* Action buttons - moved to left and more prominent */}
+          <div className="flex flex-col sm:flex-row gap-3 order-first sm:order-none">
             {activeTab === "plants" ? (
               <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto"
+                    className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg"
                     disabled={isDemoMode || !tableExists}
                     title={
                       isDemoMode || !tableExists
@@ -243,10 +235,10 @@ export function InventoryTab() {
                         : "Add new plant"
                     }
                   >
-                    <Plus className="h-4 w-4 mr-1" /> Add New Plant
+                    <Plus className="h-5 w-5" /> Add New Plant
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Add New Plant to Inventory</DialogTitle>
                   </DialogHeader>
@@ -260,7 +252,7 @@ export function InventoryTab() {
               <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto"
+                    className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg"
                     disabled={isDemoMode || !tableExists}
                     title={
                       isDemoMode || !tableExists
@@ -268,10 +260,10 @@ export function InventoryTab() {
                         : "Add new consumable"
                     }
                   >
-                    <Plus className="h-4 w-4 mr-1" /> Add New Consumable
+                    <Plus className="h-5 w-5" /> Add New Consumable
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Add New Consumable to Inventory</DialogTitle>
                   </DialogHeader>
@@ -282,7 +274,19 @@ export function InventoryTab() {
                 </DialogContent>
               </Dialog>
             )}
-        </div>
+            
+            <Button
+              variant="outline"
+              className="flex items-center justify-center gap-2 h-12 text-base font-medium border-2 hover:bg-accent/10"
+              onClick={handleExportToExcel}
+              disabled={
+                exporting || (activeTab === "plants" ? filteredPlants.length === 0 : filteredConsumables.length === 0)
+              }
+            >
+              {exporting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+              Export to Excel
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-4 mb-6 md:grid-cols-2">
