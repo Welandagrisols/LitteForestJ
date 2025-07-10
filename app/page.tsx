@@ -104,7 +104,10 @@ function AppContent() {
                     <SheetContent side="left" className="w-72 p-0">
                       <div className="flex h-full flex-col">
                         <div className="flex items-center justify-center p-6 border-b">
-                          <h2 className="text-xl font-bold text-primary">Little Forest</h2>
+                          <h2 className="text-xl font-bold">
+                            <span className="text-orange-500">Little</span>
+                            <span className="text-green-600">Forest</span>
+                          </h2>
                         </div>
                         <div className="flex-1 overflow-auto p-4">
                           <NavigationItems onItemClick={() => setMobileMenuOpen(false)} />
