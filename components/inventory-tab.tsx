@@ -214,105 +214,107 @@ export function InventoryTab() {
         </div>
       )}
 
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-border p-6">
-        <div className="flex flex-col gap-4">
+      {/* Header Section */}
+      <div className="p-6 border-b border-border bg-white">
+        <div className="space-y-6">
+          {/* Title and Action Buttons Row */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold">Inventory Management</h2>
-          </div>
-          
-          {/* Action buttons - moved to left and more prominent */}
-          <div className="flex flex-col sm:flex-row gap-3 order-first sm:order-none">
-            {activeTab === "plants" ? (
-              <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg"
-                    disabled={isDemoMode || !tableExists}
-                    title={
-                      isDemoMode || !tableExists
-                        ? "Connect to Supabase and set up tables to enable adding plants"
-                        : "Add new plant"
-                    }
-                  >
-                    <Plus className="h-5 w-5" /> Add New Plant
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Add New Plant to Inventory</DialogTitle>
-                  </DialogHeader>
-                  <AddInventoryForm 
-                    onSuccess={handleAddSuccess} 
-                    onClose={() => setAddPlantDialogOpen(false)}
-                  />
-                </DialogContent>
-              </Dialog>
-            ) : (
-              <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg"
-                    disabled={isDemoMode || !tableExists}
-                    title={
-                      isDemoMode || !tableExists
-                        ? "Connect to Supabase and set up tables to enable adding consumables"
-                        : "Add new consumable"
-                    }
-                  >
-                    <Plus className="h-5 w-5" /> Add New Consumable
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Add New Consumable to Inventory</DialogTitle>
-                  </DialogHeader>
-                  <AddConsumableForm 
-                    onSuccess={handleAddSuccess} 
-                    onClose={() => setAddConsumableDialogOpen(false)}
-                  />
-                </DialogContent>
-              </Dialog>
-            )}
             
-            <Button
-              variant="outline"
-              className="flex items-center justify-center gap-2 h-12 text-base font-medium border-2 hover:bg-accent/10"
-              onClick={handleExportToExcel}
-              disabled={
-                exporting || (activeTab === "plants" ? filteredPlants.length === 0 : filteredConsumables.length === 0)
-              }
-            >
-              {exporting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
-              Export to Excel
-            </Button>
+            {/* Action buttons - always visible on right */}
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              {activeTab === "plants" ? (
+                <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg w-full sm:w-auto"
+                      disabled={isDemoMode || !tableExists}
+                      title={
+                        isDemoMode || !tableExists
+                          ? "Connect to Supabase and set up tables to enable adding plants"
+                          : "Add new plant"
+                      }
+                    >
+                      <Plus className="h-5 w-5" /> Add New Plant
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Add New Plant to Inventory</DialogTitle>
+                    </DialogHeader>
+                    <AddInventoryForm 
+                      onSuccess={handleAddSuccess} 
+                      onClose={() => setAddPlantDialogOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg w-full sm:w-auto"
+                      disabled={isDemoMode || !tableExists}
+                      title={
+                        isDemoMode || !tableExists
+                          ? "Connect to Supabase and set up tables to enable adding consumables"
+                          : "Add new consumable"
+                      }
+                    >
+                      <Plus className="h-5 w-5" /> Add New Consumable
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Add New Consumable to Inventory</DialogTitle>
+                    </DialogHeader>
+                    <AddConsumableForm 
+                      onSuccess={handleAddSuccess} 
+                      onClose={() => setAddConsumableDialogOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              )}
+              
+              <Button
+                variant="outline"
+                className="flex items-center justify-center gap-2 h-12 text-base font-medium border-2 hover:bg-accent/10 w-full sm:w-auto"
+                onClick={handleExportToExcel}
+                disabled={
+                  exporting || (activeTab === "plants" ? filteredPlants.length === 0 : filteredConsumables.length === 0)
+                }
+              >
+                {exporting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
+                Export to Excel
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <div className="grid gap-4 mb-6 md:grid-cols-2">
-          <div>
-            <Input
-              placeholder={
-                activeTab === "plants" ? "Search plants by name or SKU..." : "Search consumables by name or SKU..."
-              }
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Search and Filter Controls */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <Input
+                placeholder={
+                  activeTab === "plants" ? "Search plants by name or SKU..." : "Search consumables by name or SKU..."
+                }
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
