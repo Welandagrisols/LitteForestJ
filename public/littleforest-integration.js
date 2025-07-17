@@ -50,38 +50,6 @@ class LittleForestAPI {
     }
   }
 
-  // Update inventory after purchase
-  async updateInventory(productId, quantitySold, customerInfo) {
-    try {
-      const response = await fetch(`${this.apiUrl}/api/update-inventory`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          product_id: productId,
-          quantity_sold: quantitySold,
-          customer_info: customerInfo
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        console.log('Inventory updated successfully');
-        return data;
-      } else {
-        console.error('Error updating inventory:', data.error);
-        alert('Error updating inventory: ' + data.error);
-        return null;
-      }
-    } catch (error) {
-      console.error('Network error:', error);
-      alert('Network error occurred while updating inventory');
-      return null;
-    }
-  }
-
   // Get availability status badge
   getAvailabilityBadge(status, quantity) {
     switch(status) {
@@ -250,15 +218,17 @@ async function processCheckout() {
     source: 'Website'
   };
 
-  // Update inventory for each item in cart
-  for (const item of shoppingCart) {
-    const result = await nurseryAPI.updateInventory(item.productId, item.quantity, customerInfo);
+  // Handle purchase (display only - no inventory update)
+    try {
+        // For now, just show a message since only the app should update inventory
+        alert(`Thank you for your interest in purchasing. Please contact us directly to complete your order.`);
 
-    if (!result) {
-      alert(`Failed to process ${item.plantName}. Please try again.`);
-      return;
+        // Optional: You could send an email notification or log the interest
+        console.log('Purchase interest:', { shoppingCart, customerInfo });
+    } catch (error) {
+        console.error('Purchase error:', error);
+        alert('Something went wrong. Please try again.');
     }
-  }
 
   // Clear cart and refresh products
   shoppingCart = [];
@@ -268,7 +238,7 @@ async function processCheckout() {
   const products = await nurseryAPI.fetchProducts();
   displayProducts(products);
 
-  alert('Order processed successfully! We will contact you soon to arrange delivery.');
+  alert('Thank you for your order request! We will contact you soon to arrange delivery.');
 
   // Clear form
   if (document.getElementById('customer-name')) document.getElementById('customer-name').value = '';

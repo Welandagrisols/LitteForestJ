@@ -20,6 +20,7 @@ export function SalesTab() {
   const [totalSales, setTotalSales] = useState(0)
   const [totalSeedlings, setTotalSeedlings] = useState(0)
   const [tableExists, setTableExists] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -185,7 +186,7 @@ export function SalesTab() {
                 {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                 Export to Excel
               </Button>
-              <Dialog>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
                     className="bg-secondary hover:bg-secondary/90 text-white w-full sm:w-auto"
@@ -203,7 +204,10 @@ export function SalesTab() {
                   <DialogHeader>
                     <DialogTitle>Record New Sale</DialogTitle>
                   </DialogHeader>
-                  <AddSaleForm onSuccess={() => fetchSales()} />
+                  <AddSaleForm onSuccess={() => {
+                    fetchSales()
+                    setDialogOpen(false)
+                  }} />
                 </DialogContent>
               </Dialog>
             </div>
