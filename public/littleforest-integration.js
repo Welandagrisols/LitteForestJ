@@ -1,7 +1,7 @@
 // Little Forest Nursery - Website Integration Script
 // Add this to your www.littleforest.co.ke website
 
-const NURSERY_API_URL = 'https://your-repl-name.replit.app'; // Replace with your actual Replit URL
+const NURSERY_API_URL = 'https://litteforest.vercel.app'; // Your Vercel deployment URL
 
 class LittleForestAPI {
   constructor() {
