@@ -1,4 +1,3 @@
-
 // Little Forest Nursery - Website Integration Script
 // Add this to your www.littleforest.co.ke website
 
@@ -15,7 +14,7 @@ class LittleForestAPI {
   async fetchProducts() {
     const cacheKey = 'products';
     const cached = this.cache.get(cacheKey);
-    
+
     if (cached && (Date.now() - cached.timestamp) < this.cacheTimeout) {
       return cached.data;
     }
@@ -33,7 +32,7 @@ class LittleForestAPI {
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         // Cache the results
         this.cache.set(cacheKey, {
@@ -51,7 +50,7 @@ class LittleForestAPI {
     }
   }
 
-  // Update inventory after sale
+  // Update inventory after purchase
   async updateInventory(productId, quantitySold, customerInfo) {
     try {
       const response = await fetch(`${this.apiUrl}/api/update-inventory`, {
@@ -66,354 +65,219 @@ class LittleForestAPI {
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-      
+
       if (data.success) {
-        // Clear products cache to force refresh
-        this.cache.delete('products');
+        console.log('Inventory updated successfully');
         return data;
       } else {
-        throw new Error(data.error || 'Failed to update inventory');
+        console.error('Error updating inventory:', data.error);
+        alert('Error updating inventory: ' + data.error);
+        return null;
       }
     } catch (error) {
-      console.error('Error updating inventory:', error);
-      throw error;
+      console.error('Network error:', error);
+      alert('Network error occurred while updating inventory');
+      return null;
     }
   }
 
-  // Get availability status badge HTML
+  // Get availability status badge
   getAvailabilityBadge(status, quantity) {
-    const badges = {
-      'Available': `<span class="badge bg-success">In Stock (${quantity})</span>`,
-      'Limited': `<span class="badge bg-warning text-dark">Limited Stock (${quantity})</span>`,
-      'Not Available': `<span class="badge bg-danger">Out of Stock</span>`
-    };
-    return badges[status] || `<span class="badge bg-secondary">Unknown</span>`;
-  }
-
-  // Format price for display
-  formatPrice(price) {
-    return `Ksh ${price.toLocaleString()}`;
+    switch(status) {
+      case 'Available':
+        return `<span class="badge bg-success">In Stock (${quantity})</span>`;
+      case 'Limited':
+        return `<span class="badge bg-warning">Limited Stock (${quantity})</span>`;
+      case 'Not Available':
+        return `<span class="badge bg-danger">Out of Stock</span>`;
+      default:
+        return `<span class="badge bg-secondary">Unknown</span>`;
+    }
   }
 }
 
-// Initialize the API
+// Initialize API
 const nurseryAPI = new LittleForestAPI();
 
 // Shopping cart management
-class ShoppingCart {
-  constructor() {
-    this.items = JSON.parse(localStorage.getItem('littleforest_cart') || '[]');
-    this.updateDisplay();
-  }
+let shoppingCart = [];
 
-  addItem(product, quantity) {
-    const existingItem = this.items.find(item => item.id === product.id);
-    
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      this.items.push({
-        id: product.id,
-        plant_name: product.plant_name,
-        price: product.price,
-        quantity: quantity,
-        max_quantity: product.quantity
-      });
-    }
-    
-    this.saveCart();
-    this.updateDisplay();
-    this.showNotification(`${quantity} ${product.plant_name} added to cart!`);
-  }
-
-  removeItem(productId) {
-    this.items = this.items.filter(item => item.id !== productId);
-    this.saveCart();
-    this.updateDisplay();
-  }
-
-  updateQuantity(productId, newQuantity) {
-    const item = this.items.find(item => item.id === productId);
-    if (item) {
-      if (newQuantity <= 0) {
-        this.removeItem(productId);
-      } else {
-        item.quantity = Math.min(newQuantity, item.max_quantity);
-        this.saveCart();
-        this.updateDisplay();
-      }
-    }
-  }
-
-  getTotal() {
-    return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-  }
-
-  getItemCount() {
-    return this.items.reduce((total, item) => total + item.quantity, 0);
-  }
-
-  clear() {
-    this.items = [];
-    this.saveCart();
-    this.updateDisplay();
-  }
-
-  saveCart() {
-    localStorage.setItem('littleforest_cart', JSON.stringify(this.items));
-  }
-
-  updateDisplay() {
-    // Update cart badge
-    const cartBadge = document.querySelector('.cart-badge');
-    if (cartBadge) {
-      cartBadge.textContent = this.getItemCount();
-    }
-
-    // Update cart total
-    const cartTotal = document.querySelector('.cart-total');
-    if (cartTotal) {
-      cartTotal.textContent = nurseryAPI.formatPrice(this.getTotal());
-    }
-
-    // Update cart dropdown/modal if exists
-    this.renderCartItems();
-  }
-
-  renderCartItems() {
-    const cartContainer = document.querySelector('.cart-items');
-    if (!cartContainer) return;
-
-    if (this.items.length === 0) {
-      cartContainer.innerHTML = '<p class="text-muted">Your cart is empty</p>';
-      return;
-    }
-
-    cartContainer.innerHTML = this.items.map(item => `
-      <div class="cart-item d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
-        <div>
-          <strong>${item.plant_name}</strong><br>
-          <small>${nurseryAPI.formatPrice(item.price)} × ${item.quantity}</small>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-secondary" onclick="cart.updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
-          <span class="mx-2">${item.quantity}</span>
-          <button class="btn btn-sm btn-outline-secondary" onclick="cart.updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
-          <button class="btn btn-sm btn-danger ms-2" onclick="cart.removeItem('${item.id}')">×</button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  showNotification(message) {
-    // Create a simple notification
-    const notification = document.createElement('div');
-    notification.className = 'alert alert-success position-fixed';
-    notification.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
-    notification.innerHTML = `
-      ${message}
-      <button type="button" class="btn-close float-end" onclick="this.parentElement.remove()"></button>
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      if (notification.parentElement) {
-        notification.remove();
-      }
-    }, 3000);
-  }
-
-  // Checkout process
-  async checkout(customerInfo) {
-    if (this.items.length === 0) {
-      throw new Error('Cart is empty');
-    }
-
-    const errors = [];
-    const successfulUpdates = [];
-
-    // Process each item
-    for (const item of this.items) {
-      try {
-        const result = await nurseryAPI.updateInventory(
-          item.id, 
-          item.quantity, 
-          customerInfo
-        );
-        successfulUpdates.push(item.plant_name);
-      } catch (error) {
-        errors.push(`${item.plant_name}: ${error.message}`);
-      }
-    }
-
-    if (errors.length > 0) {
-      throw new Error(`Some items failed to process:\n${errors.join('\n')}`);
-    }
-
-    // Clear cart on successful checkout
-    this.clear();
-    return successfulUpdates;
-  }
-}
-
-// Initialize shopping cart
-const cart = new ShoppingCart();
-
-// Product display functions
-async function loadProducts() {
-  const productsContainer = document.querySelector('#products-container');
-  if (!productsContainer) {
-    console.warn('Products container (#products-container) not found');
-    return;
-  }
-
-  // Show loading
-  productsContainer.innerHTML = '<div class="text-center p-4"><div class="spinner-border" role="status"></div><p>Loading products...</p></div>';
-
-  try {
-    const products = await nurseryAPI.fetchProducts();
-    displayProducts(products);
-  } catch (error) {
-    console.error('Error loading products:', error);
-    productsContainer.innerHTML = '<div class="alert alert-danger">Failed to load products. Please try again later.</div>';
-  }
-}
+// Load and display products on page load
+document.addEventListener('DOMContentLoaded', async function() {
+  const products = await nurseryAPI.fetchProducts();
+  displayProducts(products);
+});
 
 function displayProducts(products) {
-  const productsContainer = document.querySelector('#products-container');
-  if (!productsContainer) return;
+  const productContainer = document.getElementById('products-container');
 
-  if (products.length === 0) {
-    productsContainer.innerHTML = '<div class="alert alert-info">No products available at the moment.</div>';
+  if (!productContainer) {
+    console.error('Products container not found - add <div id="products-container"></div> to your HTML');
     return;
   }
 
-  productsContainer.innerHTML = products.map(product => createProductCard(product)).join('');
+  productContainer.innerHTML = '';
+
+  products.forEach(product => {
+    const productCard = createProductCard(product);
+    productContainer.appendChild(productCard);
+  });
 }
 
 function createProductCard(product) {
-  const isAvailable = product.availability_status !== 'Not Available';
-  
-  return `
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card h-100 product-card">
-        <img src="${product.image_url || '/placeholder.jpg'}" class="card-img-top" alt="${product.plant_name}" style="height: 200px; object-fit: cover;">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">${product.plant_name}</h5>
-          <p class="card-text flex-grow-1">${product.description || 'High quality seedling perfect for your garden'}</p>
-          ${product.scientific_name ? `<p class="text-muted small">${product.scientific_name}</p>` : ''}
-          <div class="mt-auto">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <strong class="text-primary">${nurseryAPI.formatPrice(product.price)}</strong>
-              ${nurseryAPI.getAvailabilityBadge(product.availability_status, product.quantity)}
-            </div>
-            ${isAvailable ? `
-              <div class="input-group mb-2">
-                <input type="number" class="form-control" id="qty-${product.id}" min="1" max="${product.quantity}" value="1">
-                <button class="btn btn-outline-secondary" type="button" onclick="adjustQuantity('${product.id}', -1)">-</button>
-                <button class="btn btn-outline-secondary" type="button" onclick="adjustQuantity('${product.id}', 1)">+</button>
-              </div>
-              <button class="btn btn-success w-100" onclick="addToCart('${product.id}')">
-                Add to Cart
-              </button>
-            ` : `
-              <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
-            `}
-          </div>
+  const card = document.createElement('div');
+  card.className = 'product-card col-md-4 mb-4';
+
+  card.innerHTML = `
+    <div class="card h-100">
+      <img src="${product.image_url || '/placeholder.jpg'}" class="card-img-top" alt="${product.plant_name}" style="height: 200px; object-fit: cover;">
+      <div class="card-body">
+        <h5 class="card-title">${product.plant_name}</h5>
+        <p class="card-text">${product.description || 'Beautiful plant for your garden'}</p>
+        <p class="text-muted">${product.scientific_name || ''}</p>
+        <p class="fw-bold">Ksh ${product.price.toLocaleString()}</p>
+        ${nurseryAPI.getAvailabilityBadge(product.availability_status, product.quantity)}
+        <div class="mt-3">
+          <input type="number" class="form-control mb-2" id="qty-${product.id}" min="1" max="${product.quantity}" value="1" ${product.availability_status === 'Not Available' ? 'disabled' : ''}>
+          <button class="btn btn-primary w-100" onclick="addToCart('${product.id}', '${product.plant_name}', ${product.price})" ${product.availability_status === 'Not Available' ? 'disabled' : ''}>
+            ${product.availability_status === 'Not Available' ? 'Out of Stock' : 'Add to Cart'}
+          </button>
         </div>
       </div>
     </div>
   `;
+
+  return card;
 }
 
-// Utility functions
-function adjustQuantity(productId, change) {
-  const input = document.getElementById(`qty-${productId}`);
-  if (input) {
-    const newValue = Math.max(1, Math.min(parseInt(input.max), parseInt(input.value) + change));
-    input.value = newValue;
-  }
-}
-
-function addToCart(productId) {
+function addToCart(productId, plantName, price) {
   const quantityInput = document.getElementById(`qty-${productId}`);
   const quantity = parseInt(quantityInput.value);
-  
-  // Find the product
-  nurseryAPI.fetchProducts().then(products => {
-    const product = products.find(p => p.id === productId);
-    if (product) {
-      cart.addItem(product, quantity);
-    }
-  });
+
+  if (quantity <= 0) {
+    alert('Please enter a valid quantity');
+    return;
+  }
+
+  // Add to cart array
+  const existingItem = shoppingCart.find(item => item.productId === productId);
+  if (existingItem) {
+    existingItem.quantity += quantity;
+  } else {
+    shoppingCart.push({
+      productId,
+      plantName,
+      price,
+      quantity
+    });
+  }
+
+  updateCartDisplay();
+  alert(`${quantity} ${plantName} added to cart!`);
+  quantityInput.value = 1; // Reset quantity
 }
 
-// Checkout modal functions
-function showCheckoutModal() {
-  const modal = document.getElementById('checkoutModal');
-  if (modal) {
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+function updateCartDisplay() {
+  const cartCount = shoppingCart.reduce((total, item) => total + item.quantity, 0);
+  const cartTotal = shoppingCart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+  // Update cart badge
+  const cartBadge = document.querySelector('.cart-badge');
+  if (cartBadge) {
+    cartBadge.textContent = cartCount;
+  }
+
+  // Update cart total
+  const cartTotalElement = document.querySelector('.cart-total');
+  if (cartTotalElement) {
+    cartTotalElement.textContent = `Ksh ${cartTotal.toLocaleString()}`;
   }
 }
 
+// Remove item from cart
+function removeFromCart(productId) {
+  shoppingCart = shoppingCart.filter(item => item.productId !== productId);
+  updateCartDisplay();
+  displayCart();
+}
+
+// Display cart contents
+function displayCart() {
+  const cartContainer = document.getElementById('cart-container');
+  if (!cartContainer) return;
+
+  if (shoppingCart.length === 0) {
+    cartContainer.innerHTML = '<p>Your cart is empty</p>';
+    return;
+  }
+
+  cartContainer.innerHTML = shoppingCart.map(item => `
+    <div class="cart-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+      <div>
+        <strong>${item.plantName}</strong><br>
+        <small>Qty: ${item.quantity} × Ksh ${item.price.toLocaleString()}</small>
+      </div>
+      <div>
+        <span class="fw-bold">Ksh ${(item.price * item.quantity).toLocaleString()}</span>
+        <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart('${item.productId}')">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Checkout process
 async function processCheckout() {
-  const customerName = document.getElementById('customerName')?.value || 'Website Customer';
-  const customerPhone = document.getElementById('customerPhone')?.value || '';
-  const customerEmail = document.getElementById('customerEmail')?.value || '';
-  
+  if (shoppingCart.length === 0) {
+    alert('Your cart is empty');
+    return;
+  }
+
+  // Get customer information
+  const customerName = document.getElementById('customer-name')?.value || 'Website Customer';
+  const customerContact = document.getElementById('customer-contact')?.value || '';
+  const customerEmail = document.getElementById('customer-email')?.value || '';
+
+  if (!customerName || !customerContact) {
+    alert('Please provide your name and contact information');
+    return;
+  }
+
   const customerInfo = {
     name: customerName,
-    contact: customerPhone,
-    email: customerEmail
+    contact: customerContact,
+    email: customerEmail,
+    source: 'Website'
   };
 
-  try {
-    const processButton = document.querySelector('#processCheckout');
-    if (processButton) {
-      processButton.disabled = true;
-      processButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing...';
-    }
+  // Update inventory for each item in cart
+  for (const item of shoppingCart) {
+    const result = await nurseryAPI.updateInventory(item.productId, item.quantity, customerInfo);
 
-    const successfulItems = await cart.checkout(customerInfo);
-    
-    // Show success message
-    alert(`Order processed successfully!\n\nItems purchased:\n• ${successfulItems.join('\n• ')}\n\nThank you for your purchase!`);
-    
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
-    if (modal) modal.hide();
-    
-    // Refresh products to show updated quantities
-    await loadProducts();
-    
-  } catch (error) {
-    alert(`Checkout failed: ${error.message}`);
-  } finally {
-    const processButton = document.querySelector('#processCheckout');
-    if (processButton) {
-      processButton.disabled = false;
-      processButton.innerHTML = 'Complete Purchase';
+    if (!result) {
+      alert(`Failed to process ${item.plantName}. Please try again.`);
+      return;
     }
   }
+
+  // Clear cart and refresh products
+  shoppingCart = [];
+  updateCartDisplay();
+
+  // Refresh product list to show updated quantities
+  const products = await nurseryAPI.fetchProducts();
+  displayProducts(products);
+
+  alert('Order processed successfully! We will contact you soon to arrange delivery.');
+
+  // Clear form
+  if (document.getElementById('customer-name')) document.getElementById('customer-name').value = '';
+  if (document.getElementById('customer-contact')) document.getElementById('customer-contact').value = '';
+  if (document.getElementById('customer-email')) document.getElementById('customer-email').value = '';
 }
 
 // Auto-refresh products every 5 minutes
-setInterval(loadProducts, 5 * 60 * 1000);
-
-// Load products when page loads
-document.addEventListener('DOMContentLoaded', loadProducts);
-
-// Export for global access
-window.nurseryAPI = nurseryAPI;
-window.cart = cart;
-window.loadProducts = loadProducts;
-window.addToCart = addToCart;
-window.adjustQuantity = adjustQuantity;
-window.showCheckoutModal = showCheckoutModal;
-window.processCheckout = processCheckout;
+setInterval(async () => {
+  const products = await nurseryAPI.fetchProducts();
+  displayProducts(products);
+}, 5 * 60 * 1000);
