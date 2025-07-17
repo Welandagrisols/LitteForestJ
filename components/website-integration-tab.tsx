@@ -427,129 +427,133 @@ export function WebsiteIntegrationTab() {
                               Edit
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
+                          <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+                            <DialogHeader className="flex-shrink-0">
                               <DialogTitle>Edit Website Listing - {item.plant_name}</DialogTitle>
                             </DialogHeader>
                             {editingItem && (
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                              <>
+                                {/* Scrollable content area */}
+                                <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <Label>Plant Name</Label>
+                                      <Input value={editingItem.plant_name} disabled />
+                                    </div>
+                                    <div>
+                                      <Label>Price (Ksh)</Label>
+                                      <Input value={editingItem.price} disabled />
+                                    </div>
+                                  </div>
+
                                   <div>
-                                    <Label>Plant Name</Label>
-                                    <Input value={editingItem.plant_name} disabled />
+                                    <Label htmlFor="description">Website Description</Label>
+                                    <Textarea
+                                      id="description"
+                                      placeholder="Enter a description for your website..."
+                                      value={editingItem.description}
+                                      onChange={(e) => setEditingItem({
+                                        ...editingItem,
+                                        description: e.target.value
+                                      })}
+                                      rows={3}
+                                    />
                                   </div>
+
                                   <div>
-                                    <Label>Price (Ksh)</Label>
-                                    <Input value={editingItem.price} disabled />
+                                    <Label>Plant Image</Label>
+                                    <div className="space-y-4">
+                                      {!imagePreview ? (
+                                        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                                          <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+                                          <div className="space-y-2">
+                                            <p className="text-sm text-muted-foreground">Upload a plant image</p>
+                                            <input
+                                              type="file"
+                                              accept="image/*"
+                                              onChange={handleFileSelect}
+                                              className="hidden"
+                                              id="image-upload"
+                                              disabled={uploadingImage || isDemoMode}
+                                            />
+                                            <label
+                                              htmlFor="image-upload"
+                                              className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
+                                                uploadingImage || isDemoMode
+                                                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                  : "bg-primary text-primary-foreground hover:bg-primary/90"
+                                              }`}
+                                            >
+                                              <Upload className="h-4 w-4" />
+                                              {uploadingImage ? "Uploading..." : "Choose Image"}
+                                            </label>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className="space-y-3">
+                                          <div className="relative inline-block">
+                                            <img
+                                              src={imagePreview}
+                                              alt="Plant preview"
+                                              className="h-32 w-32 object-cover rounded-lg border"
+                                            />
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setImagePreview(null)
+                                                setImageFile(null)
+                                                setEditingItem({
+                                                  ...editingItem,
+                                                  image_url: ""
+                                                })
+                                              }}
+                                              className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs hover:bg-destructive/90"
+                                            >
+                                              <X className="h-3 w-3" />
+                                            </button>
+                                          </div>
+                                          
+                                          <div>
+                                            <input
+                                              type="file"
+                                              accept="image/*"
+                                              onChange={handleFileSelect}
+                                              className="hidden"
+                                              id="image-replace"
+                                              disabled={uploadingImage || isDemoMode}
+                                            />
+                                            <label
+                                              htmlFor="image-replace"
+                                              className={`inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md cursor-pointer transition-colors ${
+                                                uploadingImage || isDemoMode
+                                                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                                              }`}
+                                            >
+                                              <Upload className="h-3 w-3" />
+                                              {uploadingImage ? "Uploading..." : "Replace Image"}
+                                            </label>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-2">
+                                    <Switch
+                                      checked={editingItem.ready_for_sale}
+                                      onCheckedChange={(checked) => setEditingItem({
+                                        ...editingItem,
+                                        ready_for_sale: checked
+                                      })}
+                                      disabled={isDemoMode || !tableExists}
+                                    />
+                                    <Label>List on Website</Label>
                                   </div>
                                 </div>
 
-                                <div>
-                                  <Label htmlFor="description">Website Description</Label>
-                                  <Textarea
-                                    id="description"
-                                    placeholder="Enter a description for your website..."
-                                    value={editingItem.description}
-                                    onChange={(e) => setEditingItem({
-                                      ...editingItem,
-                                      description: e.target.value
-                                    })}
-                                    rows={3}
-                                  />
-                                </div>
-
-                                <div>
-                                  <Label>Plant Image</Label>
-                                  <div className="space-y-4">
-                                    {!imagePreview ? (
-                                      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                                        <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
-                                        <div className="space-y-2">
-                                          <p className="text-sm text-muted-foreground">Upload a plant image</p>
-                                          <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleFileSelect}
-                                            className="hidden"
-                                            id="image-upload"
-                                            disabled={uploadingImage || isDemoMode}
-                                          />
-                                          <label
-                                            htmlFor="image-upload"
-                                            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
-                                              uploadingImage || isDemoMode
-                                                ? "bg-muted text-muted-foreground cursor-not-allowed"
-                                                : "bg-primary text-primary-foreground hover:bg-primary/90"
-                                            }`}
-                                          >
-                                            <Upload className="h-4 w-4" />
-                                            {uploadingImage ? "Uploading..." : "Choose Image"}
-                                          </label>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <div className="space-y-3">
-                                        <div className="relative inline-block">
-                                          <img
-                                            src={imagePreview}
-                                            alt="Plant preview"
-                                            className="h-32 w-32 object-cover rounded-lg border"
-                                          />
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              setImagePreview(null)
-                                              setImageFile(null)
-                                              setEditingItem({
-                                                ...editingItem,
-                                                image_url: ""
-                                              })
-                                            }}
-                                            className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs hover:bg-destructive/90"
-                                          >
-                                            <X className="h-3 w-3" />
-                                          </button>
-                                        </div>
-                                        
-                                        <div>
-                                          <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleFileSelect}
-                                            className="hidden"
-                                            id="image-replace"
-                                            disabled={uploadingImage || isDemoMode}
-                                          />
-                                          <label
-                                            htmlFor="image-replace"
-                                            className={`inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md cursor-pointer transition-colors ${
-                                              uploadingImage || isDemoMode
-                                                ? "bg-muted text-muted-foreground cursor-not-allowed"
-                                                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                                            }`}
-                                          >
-                                            <Upload className="h-3 w-3" />
-                                            {uploadingImage ? "Uploading..." : "Replace Image"}
-                                          </label>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  <Switch
-                                    checked={editingItem.ready_for_sale}
-                                    onCheckedChange={(checked) => setEditingItem({
-                                      ...editingItem,
-                                      ready_for_sale: checked
-                                    })}
-                                    disabled={isDemoMode || !tableExists}
-                                  />
-                                  <Label>List on Website</Label>
-                                </div>
-
-                                <div className="flex justify-end gap-2">
+                                {/* Fixed action buttons */}
+                                <div className="flex-shrink-0 border-t pt-4 mt-4 flex justify-end gap-2">
                                   <Button
                                     variant="outline"
                                     onClick={() => {
@@ -567,7 +571,7 @@ export function WebsiteIntegrationTab() {
                                     {uploadingImage ? "Uploading..." : "Save Changes"}
                                   </Button>
                                 </div>
-                              </div>
+                              </>
                             )}
                           </DialogContent>
                         </Dialog>
