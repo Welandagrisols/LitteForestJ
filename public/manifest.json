@@ -1,7 +1,7 @@
 {
-  "name": "LittleForest - Agrisols Farm Management System",
-  "short_name": "Agrisols Farm",
-  "description": "Comprehensive farm and nursery management system for inventory, sales, and customer management",
+  "name": "LittleForest - Nursery Management",
+  "short_name": "LittleForest",
+  "description": "Professional nursery management system for inventory, sales, and plant tracking",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
