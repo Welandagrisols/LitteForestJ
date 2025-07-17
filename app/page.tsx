@@ -7,6 +7,7 @@ import { InventoryTab } from "@/components/inventory-tab"
 import { SalesTab } from "@/components/sales-tab"
 import { ReportsTab } from "@/components/reports-tab"
 import { OpsTab } from "@/components/ops-tab"
+import { WebsiteIntegrationTab } from "@/components/website-integration-tab"
 import { Header } from "@/components/header"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
@@ -28,6 +29,7 @@ import {
   ShoppingCart, 
   FileText, 
   Settings,
+  Globe,
   Menu
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -38,6 +40,7 @@ const tabs = [
   { value: "inventory", label: "Inventory", icon: Package },
   { value: "sales", label: "Sales", icon: ShoppingCart },
   { value: "reports", label: "Reports", icon: FileText },
+  { value: "website", label: "Website", icon: Globe },
   { value: "ops", label: "Operations", icon: Settings },
 ]
 
@@ -79,6 +82,8 @@ function AppContent() {
         return <SalesTab />
       case "reports":
         return <ReportsTab />
+      case "website":
+        return <WebsiteIntegrationTab />
       case "ops":
         return <OpsTab />
       default:
