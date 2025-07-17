@@ -5,7 +5,7 @@ import { supabase, isDemoMode } from '@/lib/supabase'
 export async function POST(request: NextRequest) {
   // Add CORS headers for website integration
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://www.littleforest.co.ke',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   }
