@@ -35,7 +35,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Return success with product info (no inventory update)
-    return NextResponse.json({
+    const headers = {
+    'Access-Control-Allow-Origin': '*', // Allow all origins for now, restrict later if needed
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  }
+    return new NextResponse(
+      JSON.stringify({
       success: true,
       message: 'Order processed successfully',
       product: {
@@ -44,7 +50,8 @@ export async function POST(request: NextRequest) {
         available_quantity: product.quantity,
         price: product.price
       }
-    })
+    }), {status: 200, headers: headers}
+    )
 
   } catch (error) {
     console.error('API Error:', error)
