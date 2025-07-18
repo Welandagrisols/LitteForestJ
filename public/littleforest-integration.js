@@ -75,6 +75,24 @@ let shoppingCart = [];
 document.addEventListener('DOMContentLoaded', async function() {
   const products = await nurseryAPI.fetchProducts();
   displayProducts(products);
+
+  // Auto-refresh products every 30 seconds for real-time updates
+  setInterval(async () => {
+    console.log('Auto-refreshing products...');
+    const updatedProducts = await nurseryAPI.fetchProducts();
+    displayProducts(updatedProducts);
+  }, 30000); // 30 seconds
+
+  // Optional: Check for changes every 5 seconds for faster updates
+  let lastProductCount = products.length;
+  setInterval(async () => {
+    const quickCheck = await nurseryAPI.fetchProducts();
+    if (quickCheck.length !== lastProductCount) {
+      console.log('Product count changed, refreshing...');
+      displayProducts(quickCheck);
+      lastProductCount = quickCheck.length;
+    }
+  }, 5000); // 5 seconds for quick updates
 });
 
 function displayProducts(products) {
