@@ -50,32 +50,12 @@ const validSupabaseUrl = isDemoMode ? "https://demo.supabase.co" : supabaseUrl!
 const validSupabaseAnonKey = isDemoMode ? "demo-key" : supabaseAnonKey!
 
 // Create a single supabase client for the entire app
-// export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAnonKey, {
-//   auth: {
-//     persistSession: true,
-//     autoRefreshToken: true,
-//   },
-// })
-
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  console.warn('Missing Supabase environment variables - falling back to demo mode')
-}
-
-export const supabase = supabaseUrl && supabaseKey 
-  ? createClient<Database>(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-      realtime: {
-        params: {
-          eventsPerSecond: 2,
-        },
-      },
-    })
-  : null
+export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+})
 
 // Helper function to check if a table exists
 export async function checkTableExists(tableName: string): Promise<boolean> {
