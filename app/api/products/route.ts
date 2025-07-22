@@ -5,7 +5,7 @@ import { supabase, isDemoMode } from '@/lib/supabase'
 export async function GET(request: NextRequest) {
   // Add CORS headers for website integration
   const headers = {
-    'Access-Control-Allow-Origin': '*', // Allow all origins for now, restrict later if needed
+    'Access-Control-Allow-Origin': 'https://litteforest.vercel.app',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   }

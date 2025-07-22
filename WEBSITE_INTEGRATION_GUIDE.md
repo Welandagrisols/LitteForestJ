@@ -3,9 +3,9 @@
 
 This guide explains how to integrate your Little Forest website (https://littleforest.onrender.com/) with your Replit nursery management app.
 
-## Step 1: Get Your Replit App URL
+## Step 1: Your API URL
 
-Your Replit app URL will be: `https://[your-repl-name].replit.app`
+Your nursery management API is deployed at: `https://litteforest.vercel.app`
 
 ## Step 2: Website Integration Code
 

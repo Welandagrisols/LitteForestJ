@@ -4,8 +4,8 @@
 This document explains how to integrate your nursery inventory management app with your landing page website.
 
 ## Base URL
-When deployed on Replit: `https://your-repl-name.replit.app`
-For local development: `http://localhost:3001`
+Production deployment: `https://litteforest.vercel.app`
+For local development: `http://localhost:5000`
 
 ## API Endpoints
 

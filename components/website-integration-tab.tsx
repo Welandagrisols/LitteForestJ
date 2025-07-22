@@ -40,7 +40,7 @@ export function WebsiteIntegrationTab() {
   const { toast } = useToast()
   const [isMobile, setIsMobile] = useState(false);
 
-  const apiUrl = `${window.location.origin}/api/products`
+  const apiUrl = `https://litteforest.vercel.app/api/products`
 
   useEffect(() => {
     async function init() {
