@@ -9,10 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
-import { Upload, X, ImageIcon, Globe, Eye, Copy, ExternalLink, Loader2 } from "lucide-react"
+import { Upload, X, ImageIcon, Globe, Eye, Copy, ExternalLink, Loader2, Trash2 } from "lucide-react"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 
 interface InventoryItem {
@@ -256,6 +257,39 @@ export function WebsiteIntegrationTab() {
     })
   }
 
+  const deleteInventoryItem = async (item: InventoryItem) => {
+    if (isDemoMode || !tableExists) {
+      toast({
+        title: "Demo Mode",
+        description: "Connect to Supabase to enable deleting items",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from("inventory")
+        .delete()
+        .eq("id", item.id)
+
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: `${item.plant_name} has been deleted from inventory`,
+      })
+
+      fetchInventory()
+    } catch (error: any) {
+      toast({
+        title: "Error deleting item",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
+  }
+
   const copyApiUrl = () => {
     navigator.clipboard.writeText(apiUrl)
     toast({
@@ -411,21 +445,22 @@ export function WebsiteIntegrationTab() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setEditingItem(item)
-                                setImagePreview(item.image_url || null)
-                                setImageFile(null)
-                              }}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                          </DialogTrigger>
+                        <div className="flex items-center gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingItem(item)
+                                  setImagePreview(item.image_url || null)
+                                  setImageFile(null)
+                                }}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Edit
+                              </Button>
+                            </DialogTrigger>
                           <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
                             <DialogHeader className="flex-shrink-0">
                               <DialogTitle>Edit Website Listing - {item.plant_name}</DialogTitle>
@@ -574,6 +609,39 @@ export function WebsiteIntegrationTab() {
                             )}
                           </DialogContent>
                         </Dialog>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              disabled={isDemoMode || !tableExists}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete {item.plant_name}?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete "{item.plant_name}" 
+                                from your inventory and remove it from your website if it's currently listed.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteInventoryItem(item)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                       </TableCell>
                     </TableRow>
                   )
