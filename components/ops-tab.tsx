@@ -5,8 +5,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SalesTab } from "./sales-tab"
 import { TasksTab } from "./tasks-tab"
-import { DemoModeBanner } from "@/components/demo-mode-banner"
-import { ClearDataDialog } from "@/components/clear-data-dialog"
 
 export function OpsTab() {
   const isMobile = useIsMobile()
@@ -34,8 +32,6 @@ export function OpsTab() {
           <TasksTab />
         </TabsContent>
       </Tabs>
-      <ClearDataDialog />
     </div>
   )
 }
-`
