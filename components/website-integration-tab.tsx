@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -217,7 +216,7 @@ export function WebsiteIntegrationTab() {
       }
 
       setImageFile(file)
-      
+
       const reader = new FileReader()
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string)
@@ -495,7 +494,7 @@ export function WebsiteIntegrationTab() {
                                             <img
                                               src={imagePreview}
                                               alt="Plant preview"
-                                              className="h-32 w-32 object-cover rounded-lg border"
+                                              className="h-32 w-auto max-w-32 object-contain rounded-lg border bg-gray-50"
                                             />
                                             <button
                                               type="button"
@@ -512,7 +511,7 @@ export function WebsiteIntegrationTab() {
                                               <X className="h-3 w-3" />
                                             </button>
                                           </div>
-                                          
+
                                           <div>
                                             <input
                                               type="file"

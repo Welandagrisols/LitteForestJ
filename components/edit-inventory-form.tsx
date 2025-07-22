@@ -444,7 +444,7 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
                           <img
                             src={imagePreview || formData.image_url}
                             alt="Plant preview"
-                            className="h-32 w-32 object-cover rounded-lg border"
+                            className="h-32 w-auto max-w-32 object-contain rounded-lg border bg-gray-50"
                           />
                           <button
                             type="button"
