@@ -4,29 +4,42 @@ import Link from "next/link"
 
 interface DemoModeBannerProps {
   isDemoMode: boolean
-  tablesNotFound?: boolean
+  connectionStatus: 'connecting' | 'connected' | 'demo'
 }
 
-export function DemoModeBanner({ isDemoMode, tablesNotFound }: DemoModeBannerProps) {
+export function DemoModeBanner({ isDemoMode, connectionStatus }: DemoModeBannerProps) {
+  if (!isDemoMode && connectionStatus === 'connected') {
+    return (
+      <div className="bg-green-100 border border-green-300 p-3 rounded-lg mb-4">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+          <span className="text-green-800 text-sm font-medium">Connected to Supabase</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="bg-accent/10 border border-accent/20 rounded-lg p-4 mb-6">
+    <div className="bg-orange-100 border border-orange-300 p-4 rounded-lg mb-6">
       <div className="flex items-center gap-2">
-        <AlertCircle className="h-5 w-5 text-accent" />
-        <span className="text-accent font-medium">Demo Mode</span>
+        <AlertCircle className="h-5 w-5 text-orange-600" />
+        <h3 className="font-semibold text-orange-800">
+          {connectionStatus === 'connecting' ? 'Connecting to Database...' : 'Demo Mode Active'}
+        </h3>
       </div>
-      <p className="text-accent/80 text-sm mt-1">
-        {isDemoMode
-          ? "You're viewing demo data. Connect to Supabase to enable full functionality."
-          : "Database tables not found. Please run the setup script to create the necessary tables."}
+      <p className="text-orange-700 mt-2">
+        {connectionStatus === 'connecting' 
+          ? 'Attempting to connect to your Supabase database...'
+          : 'Using sample data. Connect to Supabase for real data persistence.'
+        }
       </p>
-      <div className="mt-2 flex gap-2">
-        <Button size="sm" className="bg-accent hover:bg-accent/90 text-white" asChild>
-          <Link href="/setup">
-            <Database className="h-4 w-4 mr-1" />
-            View Setup Guide
+      {isDemoMode && (
+        <div className="mt-3">
+          <Link href="/setup" className="text-orange-600 hover:text-orange-500 underline">
+            Set up your database →
           </Link>
-        </Button>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
