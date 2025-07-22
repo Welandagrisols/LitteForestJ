@@ -38,6 +38,7 @@ export function WebsiteIntegrationTab() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [tableExists, setTableExists] = useState(true)
   const { toast } = useToast()
+  const [isMobile, setIsMobile] = useState(false);
 
   const apiUrl = `${window.location.origin}/api/products`
 
@@ -88,6 +89,18 @@ export function WebsiteIntegrationTab() {
     }
 
     init()
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // Adjust the breakpoint as needed
+    };
+
+    handleResize(); // Set initial value
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, [])
 
   async function fetchInventory() {
@@ -362,7 +375,7 @@ export function WebsiteIntegrationTab() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
             {readyForSaleItems.map((item) => {
               const availability = getAvailabilityStatus(item.quantity)
               return (
@@ -469,7 +482,7 @@ export function WebsiteIntegrationTab() {
                               <>
                                 {/* Scrollable content area */}
                                 <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-                                  <div className="grid grid-cols-2 gap-4">
+                                  <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
                                     <div>
                                       <Label>Plant Name</Label>
                                       <Input value={editingItem.plant_name} disabled />
@@ -609,7 +622,7 @@ export function WebsiteIntegrationTab() {
                             )}
                           </DialogContent>
                         </Dialog>
-                        
+
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button

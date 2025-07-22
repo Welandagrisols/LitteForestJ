@@ -1,12 +1,13 @@
-
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SalesTab } from "./sales-tab"
 import { TasksTab } from "./tasks-tab"
 
 export function OpsTab() {
+  const isMobile = useIsMobile()
   return (
     <div className="space-y-6">
       <Tabs defaultValue="sales" className="w-full">

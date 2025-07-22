@@ -22,6 +22,10 @@ export function SalesTab() {
   const [tableExists, setTableExists] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const { toast } = useToast()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [dateFilter, setDateFilter] = useState("all")
+  const [isAddSaleOpen, setIsAddSaleOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     async function init() {
@@ -270,4 +274,28 @@ export function SalesTab() {
       </div>
     </div>
   )
+}
+
+// Custom hook to detect mobile devices
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768); // Adjust breakpoint as needed
+    };
+
+    // Set initial value
+    handleResize();
+
+    // Listen for window resize events
+    window.addEventListener("resize", handleResize);
+
+    // Clean up event listener on unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return isMobile;
 }
