@@ -14,9 +14,10 @@ import { Upload, X, ImageIcon } from "lucide-react"
 interface EditInventoryFormProps {
   item: any
   onSuccess: () => void
+  onCancel?: () => void
 }
 
-export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
+export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFormProps) {
   const [loading, setLoading] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -618,6 +619,16 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
       {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             type="submit"
             form="edit-inventory-form"

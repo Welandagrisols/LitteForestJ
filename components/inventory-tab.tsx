@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -7,14 +8,16 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AddInventoryForm } from "@/components/add-inventory-form"
+import { AddConsumableForm } from "@/components/add-consumable-form"
 import { EditInventoryForm } from "@/components/edit-inventory-form"
 import { useToast } from "@/components/ui/use-toast"
 import { demoInventory } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { exportToExcel, formatInventoryForExport } from "@/lib/excel-export"
-import { Download, Loader2, Plus, Edit, Trash2, Package, FileText, TrendingUp } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Download, Loader2, Plus, Edit, Trash2, Package, FileText, TrendingUp, ShoppingCart } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function InventoryTab() {
   const [inventory, setInventory] = useState<any[]>([])
@@ -30,7 +33,6 @@ export function InventoryTab() {
   const { toast } = useToast()
   const [plantStatusFilter, setPlantStatusFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [filteredInventory, setFilteredInventory] = useState<any[]>([])
 
   useEffect(() => {
     async function init() {
@@ -127,7 +129,8 @@ export function InventoryTab() {
   const isConsumable = (item: any) => {
     return (
       (item.category && item.category.startsWith("Consumable:")) ||
-      (item.scientific_name && item.scientific_name.startsWith("[Consumable]"))
+      (item.scientific_name && item.scientific_name.startsWith("[Consumable]")) ||
+      item.item_type === "Consumable"
     )
   }
 
@@ -135,7 +138,7 @@ export function InventoryTab() {
     if (item.scientific_name && item.scientific_name.startsWith("[Consumable]")) {
       return item.scientific_name.replace("[Consumable] ", "")
     }
-    return "Pieces"
+    return item.unit || "Pieces"
   }
 
   const getConsumableCategory = (item: any) => {
@@ -145,40 +148,28 @@ export function InventoryTab() {
     return item.category
   }
 
-  useEffect(() => {
-    let filtered = inventory
+  // Filter functions
+  const filteredPlants = inventory
+    .filter((item) => !isConsumable(item))
+    .filter((item) => {
+      const matchesSearch =
+        item.plant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.scientific_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.sku?.toLowerCase().includes(searchTerm.toLowerCase())
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (item) =>
-          item.plant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.scientific_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.sku?.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-    }
-
-    if (categoryFilter !== "All Categories") {
-      filtered = filtered.filter((item) => item.category === categoryFilter)
-    }
-
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((item) => item.status === statusFilter)
-    }
-
-    // Filter by plant status (Current vs Future)
-    if (plantStatusFilter !== "all") {
+      const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter
+      const matchesStatus = statusFilter === "all" || item.status === statusFilter
+      
+      let matchesPlantStatus = true
       if (plantStatusFilter === "current") {
-        filtered = filtered.filter((item) => item.ready_for_sale === true)
+        matchesPlantStatus = item.ready_for_sale === true
       } else if (plantStatusFilter === "future") {
-        filtered = filtered.filter((item) => item.ready_for_sale === false)
+        matchesPlantStatus = item.ready_for_sale === false
       }
-    }
 
-    setFilteredInventory(filtered)
-  }, [inventory, searchTerm, categoryFilter, statusFilter, plantStatusFilter])
-
-  const filteredPlants = filteredInventory.filter((item) => !isConsumable(item))
+      return matchesSearch && matchesCategory && matchesStatus && matchesPlantStatus
+    })
 
   const filteredConsumables = inventory
     .filter((item) => isConsumable(item))
@@ -186,9 +177,12 @@ export function InventoryTab() {
       const matchesSearch =
         item.plant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
+      
       const actualCategory = getConsumableCategory(item)
       const matchesCategory = categoryFilter === "All Categories" || actualCategory === categoryFilter
-      return matchesSearch && matchesCategory
+      const matchesStatus = statusFilter === "all" || item.status === statusFilter
+
+      return matchesSearch && matchesCategory && matchesStatus
     })
 
   const plantCategories = [
@@ -205,8 +199,6 @@ export function InventoryTab() {
         .filter(Boolean),
     ),
   ].filter(Boolean)
-
-  const categories = activeTab === "plants" ? plantCategories : consumableCategories
 
   const handleExportToExcel = async () => {
     try {
@@ -241,8 +233,10 @@ export function InventoryTab() {
     }
   }
 
+  // Summary calculations
   const currentPlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === true)
   const futurePlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === false)
+  const totalConsumables = inventory.filter((item) => isConsumable(item))
 
   return (
     <div className="space-y-6">
@@ -255,34 +249,13 @@ export function InventoryTab() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Plant Inventory</h2>
-          <p className="text-muted-foreground">Manage your current nursery stock and future planting plans</p>
-        </div>
-        <div className="flex gap-3">
-          <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90" disabled={isDemoMode || !tableExists}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Plant
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Plant</DialogTitle>
-              </DialogHeader>
-              <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
-
-          <Button variant="outline" onClick={handleExportToExcel} disabled={exporting || filteredPlants.length === 0}>
-            {exporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
-            Export
-          </Button>
+          <h2 className="text-2xl font-bold">Inventory Management</h2>
+          <p className="text-muted-foreground">Manage your plants and consumables inventory</p>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-green-50 border-green-200">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -290,7 +263,7 @@ export function InventoryTab() {
                 <Package className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-green-800">In Nursery</p>
+                <p className="text-sm font-medium text-green-800">Ready Plants</p>
                 <p className="text-2xl font-bold text-green-900">{currentPlants.length}</p>
               </div>
             </div>
@@ -304,8 +277,22 @@ export function InventoryTab() {
                 <FileText className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-blue-800">Future Plans</p>
+                <p className="text-sm font-medium text-blue-800">Future Plants</p>
                 <p className="text-2xl font-bold text-blue-900">{futurePlants.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-purple-50 border-purple-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-600 rounded-full">
+                <ShoppingCart className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-purple-800">Consumables</p>
+                <p className="text-2xl font-bold text-purple-900">{totalConsumables.length}</p>
               </div>
             </div>
           </CardContent>
@@ -318,200 +305,405 @@ export function InventoryTab() {
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">Total Plants</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {inventory.filter((item) => !isConsumable(item)).length}
-                </p>
+                <p className="text-sm font-medium text-gray-800">Total Items</p>
+                <p className="text-2xl font-bold text-gray-900">{inventory.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search plants by name, scientific name, or SKU..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={plantStatusFilter} onValueChange={setPlantStatusFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Plants</SelectItem>
-                  <SelectItem value="current">In Nursery</SelectItem>
-                  <SelectItem value="future">Future Plans</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Main Inventory Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="plants" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Plants ({filteredPlants.length})
+            </TabsTrigger>
+            <TabsTrigger value="consumables" className="flex items-center gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              Consumables ({filteredConsumables.length})
+            </TabsTrigger>
+          </TabsList>
 
-      {/* Plant Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Package className="h-8 w-8 animate-pulse mx-auto mb-2 text-muted-foreground" />
-            <p className="text-muted-foreground">Loading plants...</p>
+          <div className="flex gap-2">
+            <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant={activeTab === "plants" ? "default" : "outline"}
+                  disabled={isDemoMode || !tableExists || activeTab !== "plants"}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Plant
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add New Plant</DialogTitle>
+                </DialogHeader>
+                <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant={activeTab === "consumables" ? "default" : "outline"}
+                  disabled={isDemoMode || !tableExists || activeTab !== "consumables"}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Consumable
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add New Consumable</DialogTitle>
+                </DialogHeader>
+                <AddConsumableForm onSuccess={handleAddSuccess} onClose={() => setAddConsumableDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+
+            <Button variant="outline" onClick={handleExportToExcel} disabled={exporting}>
+              {exporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+              Export
+            </Button>
           </div>
         </div>
-      ) : filteredPlants.length === 0 ? (
-        <div className="text-center py-12">
-          <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No plants found</h3>
-          <p className="text-muted-foreground mb-4">
-            {searchTerm || categoryFilter !== "All Categories" || plantStatusFilter !== "all"
-              ? "Try adjusting your search or filters"
-              : "Start by adding your first plant"}
-          </p>
-          <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Plant
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle>Add New Plant</DialogTitle>
-              </DialogHeader>
-              <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredPlants.map((item) => {
-            const isCurrentPlant = item.ready_for_sale === true
 
-            return (
-              <Card
-                key={item.id}
-                className={`transition-all hover:shadow-md ${
-                  isCurrentPlant ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"
-                }`}
-              >
-                <CardContent className="p-4">
-                  {/* Status Badge */}
-                  <div className="flex justify-between items-start mb-3">
-                    <Badge
-                      className={
-                        isCurrentPlant
-                          ? "bg-green-600 hover:bg-green-700 text-white"
-                          : "bg-blue-600 hover:bg-blue-700 text-white"
-                      }
-                    >
-                      {isCurrentPlant ? "🌱 In Nursery" : "📋 Future Plan"}
-                    </Badge>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => setEditItem(item)} className="h-8 w-8 p-0">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          if (confirm("Are you sure you want to delete this plant?")) {
-                            deleteInventoryItem(item.id)
-                          }
-                        }}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+        {/* Filters */}
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <Input
+                  placeholder={`Search ${activeTab === "plants" ? "plants" : "consumables"}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(activeTab === "plants" ? plantCategories : consumableCategories).map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                  {/* Plant Info */}
-                  <div className="space-y-3">
-                    <div>
-                      <h3 className="font-semibold text-lg">{item.plant_name}</h3>
-                      {item.scientific_name && (
-                        <p className="text-sm text-muted-foreground italic">{item.scientific_name}</p>
-                      )}
-                    </div>
+                {activeTab === "plants" && (
+                  <Select value={plantStatusFilter} onValueChange={setPlantStatusFilter}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Plants</SelectItem>
+                      <SelectItem value="current">Ready for Sale</SelectItem>
+                      <SelectItem value="future">Future Plans</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
 
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Quantity:</span>
-                        <p className="font-medium">{item.quantity}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Price:</span>
-                        <p className="font-medium">Ksh {item.price}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Category:</span>
-                        <p className="font-medium text-xs">{item.category}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Status:</span>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    {activeTab === "plants" ? (
+                      <>
+                        <SelectItem value="Healthy">Healthy</SelectItem>
+                        <SelectItem value="Attention">Needs Attention</SelectItem>
+                        <SelectItem value="Critical">Critical</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="Available">Available</SelectItem>
+                        <SelectItem value="Low Stock">Low Stock</SelectItem>
+                        <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Plants Tab */}
+        <TabsContent value="plants" className="space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <Package className="h-8 w-8 animate-pulse mx-auto mb-2 text-muted-foreground" />
+                <p className="text-muted-foreground">Loading plants...</p>
+              </div>
+            </div>
+          ) : filteredPlants.length === 0 ? (
+            <div className="text-center py-12">
+              <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No plants found</h3>
+              <p className="text-muted-foreground mb-4">
+                {searchTerm || categoryFilter !== "All Categories" || plantStatusFilter !== "all"
+                  ? "Try adjusting your search or filters"
+                  : "Start by adding your first plant"}
+              </p>
+              <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button disabled={isDemoMode || !tableExists}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Your First Plant
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Plant</DialogTitle>
+                  </DialogHeader>
+                  <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredPlants.map((item) => {
+                const isCurrentPlant = item.ready_for_sale === true
+
+                return (
+                  <Card
+                    key={item.id}
+                    className={`transition-all hover:shadow-md ${
+                      isCurrentPlant ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"
+                    }`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-3">
                         <Badge
-                          variant="outline"
                           className={
-                            item.status === "Healthy"
-                              ? "bg-green-100 text-green-800 border-green-200"
-                              : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                            isCurrentPlant
+                              ? "bg-green-600 hover:bg-green-700 text-white"
+                              : "bg-blue-600 hover:bg-blue-700 text-white"
                           }
                         >
-                          {item.status}
+                          {isCurrentPlant ? "🌱 Ready for Sale" : "📋 Future Plan"}
                         </Badge>
+                        <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => setEditItem(item)} 
+                            className="h-8 w-8 p-0"
+                            disabled={isDemoMode || !tableExists}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this plant?")) {
+                                deleteInventoryItem(item.id)
+                              }
+                            }}
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            disabled={isDemoMode || !tableExists}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="font-semibold text-lg">{item.plant_name}</h3>
+                          {item.scientific_name && (
+                            <p className="text-sm text-muted-foreground italic">{item.scientific_name}</p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">Quantity:</span>
+                            <p className="font-medium">{item.quantity}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Price:</span>
+                            <p className="font-medium">Ksh {item.price}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Category:</span>
+                            <p className="font-medium text-xs">{item.category}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Status:</span>
+                            <Badge
+                              variant="outline"
+                              className={
+                                item.status === "Healthy"
+                                  ? "bg-green-100 text-green-800 border-green-200"
+                                  : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                              }
+                            >
+                              {item.status}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {(item.age || item.section || item.source) && (
+                          <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
+                            {item.age && <p>Age: {item.age}</p>}
+                            {item.section && (
+                              <p>
+                                Location: Section {item.section}
+                                {item.row ? `, Row ${item.row}` : ""}
+                              </p>
+                            )}
+                            {item.source && <p>Source: {item.source}</p>}
+                          </div>
+                        )}
+
+                        {item.description && (
+                          <div className="pt-2 border-t">
+                            <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Consumables Tab */}
+        <TabsContent value="consumables" className="space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <ShoppingCart className="h-8 w-8 animate-pulse mx-auto mb-2 text-muted-foreground" />
+                <p className="text-muted-foreground">Loading consumables...</p>
+              </div>
+            </div>
+          ) : filteredConsumables.length === 0 ? (
+            <div className="text-center py-12">
+              <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No consumables found</h3>
+              <p className="text-muted-foreground mb-4">
+                {searchTerm || categoryFilter !== "All Categories"
+                  ? "Try adjusting your search or filters"
+                  : "Start by adding your first consumable"}
+              </p>
+              <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button disabled={isDemoMode || !tableExists}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Your First Consumable
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Consumable</DialogTitle>
+                  </DialogHeader>
+                  <AddConsumableForm onSuccess={handleAddSuccess} onClose={() => setAddConsumableDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredConsumables.map((item) => (
+                <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <Badge className="bg-purple-600 hover:bg-purple-700 text-white">
+                        🛒 {getConsumableCategory(item)}
+                      </Badge>
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setEditItem(item)} 
+                          className="h-8 w-8 p-0"
+                          disabled={isDemoMode || !tableExists}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm("Are you sure you want to delete this consumable?")) {
+                              deleteInventoryItem(item.id)
+                            }
+                          }}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          disabled={isDemoMode || !tableExists}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
 
-                    {/* Additional Info */}
-                    {(item.age || item.section || item.source) && (
-                      <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
-                        {item.age && <p>Age: {item.age}</p>}
-                        {item.section && (
-                          <p>
-                            Location: Section {item.section}
-                            {item.row ? `, Row ${item.row}` : ""}
-                          </p>
-                        )}
-                        {item.source && <p>Source: {item.source}</p>}
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="font-semibold text-lg">{item.plant_name}</h3>
+                        <p className="text-sm text-muted-foreground">Unit: {getConsumableUnit(item)}</p>
                       </div>
-                    )}
 
-                    {/* Description */}
-                    {item.description && (
-                      <div className="pt-2 border-t">
-                        <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Quantity:</span>
+                          <p className="font-medium">{item.quantity}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Price per Unit:</span>
+                          <p className="font-medium">Ksh {item.price}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">SKU:</span>
+                          <p className="font-medium text-xs">{item.sku}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Status:</span>
+                          <Badge
+                            variant="outline"
+                            className={
+                              item.status === "Available"
+                                ? "bg-green-100 text-green-800 border-green-200"
+                                : item.status === "Low Stock"
+                                ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                                : "bg-red-100 text-red-800 border-red-200"
+                            }
+                          >
+                            {item.status}
+                          </Badge>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-      )}
+
+                      {(item.section || item.source) && (
+                        <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
+                          {item.section && <p>Storage: {item.section}</p>}
+                          {item.source && <p>Supplier: {item.source}</p>}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Edit Dialog */}
       {editItem && (
         <Dialog open={!!editItem} onOpenChange={() => setEditItem(null)}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit {editItem.plant_name}</DialogTitle>
             </DialogHeader>
