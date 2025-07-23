@@ -10,6 +10,8 @@ import { WebsiteIntegrationTab } from "@/components/website-integration-tab"
 import { Header } from "@/components/header"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
+import { AuthProvider } from "@/contexts/auth-context"
+import { AuthGuard } from "@/components/auth-guard"
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
   SidebarProvider,
@@ -158,9 +160,13 @@ function AppContent() {
 export default function Home() {
   return (
     <SupabaseProvider>
-      <SidebarProvider>
-        <AppContent />
-      </SidebarProvider>
+      <AuthProvider>
+        <AuthGuard>
+          <SidebarProvider>
+            <AppContent />
+          </SidebarProvider>
+        </AuthGuard>
+      </AuthProvider>
     </SupabaseProvider>
   )
 }
