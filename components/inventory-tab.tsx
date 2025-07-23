@@ -8,14 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AddInventoryForm } from "@/components/add-inventory-form"
-import { AddConsumableForm } from "@/components/add-consumable-form"
 import { EditInventoryForm } from "@/components/edit-inventory-form"
 import { useToast } from "@/components/ui/use-toast"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { demoInventory } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { exportToExcel, formatInventoryForExport } from "@/lib/excel-export"
-import { Download, Loader2, Plus } from "lucide-react"
+import { Download, Loader2, Plus, Edit, Trash2, Package, FileText, TrendingUp, Search } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function InventoryTab() {
   const [inventory, setInventory] = useState<any[]>([])
@@ -25,10 +25,11 @@ export function InventoryTab() {
   const [categoryFilter, setCategoryFilter] = useState("All Categories")
   const [editItem, setEditItem] = useState<any>(null)
   const [tableExists, setTableExists] = useState(true)
-  const [activeTab, setActiveTab] = useState("plants")
   const [addPlantDialogOpen, setAddPlantDialogOpen] = useState(false)
-  const [addConsumableDialogOpen, setAddConsumableDialogOpen] = useState(false)
   const { toast } = useToast()
+  const [plantStatusFilter, setPlantStatusFilter] = useState("all")
+  const [filteredInventory, setFilteredInventory] = useState<any[]>([])
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     async function init() {
@@ -60,7 +61,7 @@ export function InventoryTab() {
   async function fetchInventory() {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("inventory").select("*").order("plant_name", { ascending: true })
+      const { data, error } = await supabase.from("inventory").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
       setInventory(data || [])
@@ -111,7 +112,6 @@ export function InventoryTab() {
     try {
       await fetchInventory()
       setAddPlantDialogOpen(false)
-      setAddConsumableDialogOpen(false)
     } catch (error) {
       console.error("Error refreshing inventory:", error)
     }
@@ -124,69 +124,48 @@ export function InventoryTab() {
     )
   }
 
-  const getConsumableUnit = (item: any) => {
-    if (item.scientific_name && item.scientific_name.startsWith("[Consumable]")) {
-      return item.scientific_name.replace("[Consumable] ", "")
+  useEffect(() => {
+    let filtered = inventory
+
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (item) =>
+          item.plant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.scientific_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.sku?.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
     }
-    return "Pieces"
-  }
 
-  const getConsumableCategory = (item: any) => {
-    if (item.category && item.category.startsWith("Consumable:")) {
-      return item.category.replace("Consumable: ", "")
+    if (categoryFilter !== "All Categories") {
+      filtered = filtered.filter((item) => item.category === categoryFilter)
     }
-    return item.category
-  }
 
-  const filteredPlants = inventory
-    .filter((item) => !isConsumable(item))
-    .filter((item) => {
-      const matchesSearch =
-        item.plant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-      const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter
-      return matchesSearch && matchesCategory
-    })
+    // Filter by plant status (Current vs Future)
+    if (plantStatusFilter !== "all") {
+      if (plantStatusFilter === "current") {
+        filtered = filtered.filter((item) => item.ready_for_sale === true)
+      } else if (plantStatusFilter === "future") {
+        filtered = filtered.filter((item) => item.ready_for_sale === false)
+      }
+    }
 
-  const filteredConsumables = inventory
-    .filter((item) => isConsumable(item))
-    .filter((item) => {
-      const matchesSearch =
-        item.plant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-      const actualCategory = getConsumableCategory(item)
-      const matchesCategory = categoryFilter === "All Categories" || actualCategory === categoryFilter
-      return matchesSearch && matchesCategory
-    })
+    setFilteredInventory(filtered)
+  }, [inventory, searchTerm, categoryFilter, plantStatusFilter])
+
+  const filteredPlants = filteredInventory.filter((item) => !isConsumable(item))
 
   const plantCategories = [
     "All Categories",
     ...new Set(inventory.filter((item) => !isConsumable(item) && item.category).map((item) => item.category)),
   ].filter(Boolean)
 
-  const consumableCategories = [
-    "All Categories",
-    ...new Set(
-      inventory
-        .filter((item) => isConsumable(item))
-        .map((item) => getConsumableCategory(item))
-        .filter(Boolean),
-    ),
-  ].filter(Boolean)
-
-  const categories = activeTab === "plants" ? plantCategories : consumableCategories
-
   const handleExportToExcel = async () => {
     try {
       setExporting(true)
 
-      const dataToExport = activeTab === "plants" ? filteredPlants : filteredConsumables
-      const exportData = formatInventoryForExport(dataToExport, activeTab === "consumables")
-
-      const fileName =
-        activeTab === "plants"
-          ? `Plants_Export_${new Date().toISOString().split("T")[0]}`
-          : `Consumables_Export_${new Date().toISOString().split("T")[0]}`
+      const exportData = formatInventoryForExport(filteredPlants, false)
+      const fileName = `Plants_Export_${new Date().toISOString().split("T")[0]}`
 
       const success = exportToExcel(exportData, fileName)
 
@@ -209,356 +188,329 @@ export function InventoryTab() {
     }
   }
 
+  const currentPlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === true)
+  const futurePlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === false)
+
+  if (loading) {
+    return (
+      <div className={`flex items-center justify-center h-64 ${isMobile ? "mobile-loading" : ""}`}>
+        <div className="text-center">
+          <Package className={`${isMobile ? "h-8 w-8" : "h-8 w-8"} animate-pulse mx-auto mb-2 text-muted-foreground`} />
+          <p className="text-muted-foreground">Loading plants...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="warm-card rounded-lg shadow-sm overflow-hidden">
+    <div className={`space-y-6 ${isMobile ? "mobile-content" : ""}`}>
       {(isDemoMode || !tableExists) && (
-        <div className="p-6 border-b">
+        <div className={`${isMobile ? "mobile-section" : "p-6 border-b"}`}>
           <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />
         </div>
       )}
 
-      <div className="p-6 border-b border-border bg-white">
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-2xl font-bold">Inventory Management</h2>
-
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              {activeTab === "plants" ? (
-                <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg w-full sm:w-auto"
-                      disabled={isDemoMode || !tableExists}
-                      onClick={() => {
-                        console.log("Add Plant button clicked")
-                        setAddPlantDialogOpen(true)
-                      }}
-                    >
-                      <Plus className="h-5 w-5" /> Add New Plant
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Add New Plant to Inventory</DialogTitle>
-                    </DialogHeader>
-                    <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-              ) : (
-                <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg w-full sm:w-auto"
-                      disabled={isDemoMode || !tableExists}
-                      onClick={() => {
-                        console.log("Add Consumable button clicked")
-                        setAddConsumableDialogOpen(true)
-                      }}
-                    >
-                      <Plus className="h-5 w-5" /> Add New Consumable
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Add New Consumable to Inventory</DialogTitle>
-                    </DialogHeader>
-                    <AddConsumableForm onSuccess={handleAddSuccess} onClose={() => setAddConsumableDialogOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-              )}
-
+      {/* Header */}
+      <div
+        className={`${isMobile ? "mobile-section" : "flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"}`}
+      >
+        <div className={isMobile ? "mb-4" : ""}>
+          <h2 className={`${isMobile ? "text-xl" : "text-2xl"} font-bold`}>Plant Inventory</h2>
+          <p className={`text-muted-foreground ${isMobile ? "text-sm" : ""}`}>
+            Manage your current nursery stock and future planting plans
+          </p>
+        </div>
+        <div className={`${isMobile ? "mobile-button-group" : "flex gap-3"}`}>
+          <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
+            <DialogTrigger asChild>
               <Button
-                variant="outline"
-                className="flex items-center justify-center gap-2 h-12 text-base font-medium border-2 hover:bg-accent/10 w-full sm:w-auto bg-transparent"
-                onClick={handleExportToExcel}
-                disabled={
-                  exporting || (activeTab === "plants" ? filteredPlants.length === 0 : filteredConsumables.length === 0)
-                }
+                className={`bg-primary hover:bg-primary/90 ${isMobile ? "mobile-touch-target" : ""}`}
+                disabled={isDemoMode || !tableExists}
               >
-                {exporting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
-                Export to Excel
+                <Plus className="h-4 w-4 mr-2" />
+                Add Plant
               </Button>
-            </div>
-          </div>
+            </DialogTrigger>
+            <DialogContent
+              className={`${isMobile ? "mobile-dialog" : "sm:max-w-[600px] max-h-[90vh] overflow-y-auto"}`}
+            >
+              <DialogHeader>
+                <DialogTitle>Add New Plant</DialogTitle>
+              </DialogHeader>
+              <div className={isMobile ? "mobile-dialog-content" : ""}>
+                <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
+              </div>
+            </DialogContent>
+          </Dialog>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
+          <Button
+            variant="outline"
+            onClick={handleExportToExcel}
+            disabled={exporting || filteredPlants.length === 0}
+            className={isMobile ? "mobile-touch-target" : ""}
+          >
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+            Export
+          </Button>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className={`${isMobile ? "mobile-stats-grid" : "grid grid-cols-1 md:grid-cols-3 gap-4"}`}>
+        <Card className={`bg-green-50 border-green-200 ${isMobile ? "mobile-stats-card" : ""}`}>
+          <CardContent className={isMobile ? "p-4" : "p-4"}>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-600 rounded-full">
+                <Package className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className={`${isMobile ? "text-xs" : "text-sm"} font-medium text-green-800`}>In Nursery</p>
+                <p className={`${isMobile ? "text-xl" : "text-2xl"} font-bold text-green-900`}>
+                  {currentPlants.length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={`bg-blue-50 border-blue-200 ${isMobile ? "mobile-stats-card" : ""}`}>
+          <CardContent className={isMobile ? "p-4" : "p-4"}>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-600 rounded-full">
+                <FileText className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className={`${isMobile ? "text-xs" : "text-sm"} font-medium text-blue-800`}>Future Plans</p>
+                <p className={`${isMobile ? "text-xl" : "text-2xl"} font-bold text-blue-900`}>{futurePlants.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={`bg-gray-50 border-gray-200 ${isMobile ? "mobile-stats-card" : ""}`}>
+          <CardContent className={isMobile ? "p-4" : "p-4"}>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gray-600 rounded-full">
+                <TrendingUp className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className={`${isMobile ? "text-xs" : "text-sm"} font-medium text-gray-800`}>Total Plants</p>
+                <p className={`${isMobile ? "text-xl" : "text-2xl"} font-bold text-gray-900`}>
+                  {inventory.filter((item) => !isConsumable(item)).length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card className={isMobile ? "mobile-search-container" : ""}>
+        <CardContent className={isMobile ? "p-4" : "p-4"}>
+          <div className={`${isMobile ? "mobile-filter-row" : "flex flex-col sm:flex-row gap-4"}`}>
+            <div className={`${isMobile ? "relative" : "flex-1"}`}>
+              {isMobile && (
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              )}
               <Input
-                placeholder={
-                  activeTab === "plants" ? "Search plants by name or SKU..." : "Search consumables by name or SKU..."
-                }
+                placeholder="Search plants by name, scientific name, or SKU..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
+                className={`${isMobile ? "pl-10 mobile-touch-target" : "w-full"}`}
               />
             </div>
-            <div>
+            <div className={`${isMobile ? "grid grid-cols-2 gap-2" : "flex gap-2"}`}>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by category" />
+                <SelectTrigger className={`${isMobile ? "mobile-touch-target" : "w-40"}`}>
+                  <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
+                  {plantCategories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={plantStatusFilter} onValueChange={setPlantStatusFilter}>
+                <SelectTrigger className={`${isMobile ? "mobile-touch-target" : "w-32"}`}>
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Plants</SelectItem>
+                  <SelectItem value="current">In Nursery</SelectItem>
+                  <SelectItem value="future">Future Plans</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Plant Grid */}
+      {filteredPlants.length === 0 ? (
+        <div className={`${isMobile ? "mobile-empty-state" : "text-center py-12"}`}>
+          <Package className={`${isMobile ? "h-12 w-12" : "h-12 w-12"} mx-auto text-muted-foreground mb-4`} />
+          <h3 className={`${isMobile ? "text-lg" : "text-lg"} font-semibold mb-2`}>No plants found</h3>
+          <p className={`text-muted-foreground mb-4 ${isMobile ? "text-sm" : ""}`}>
+            {searchTerm || categoryFilter !== "All Categories" || plantStatusFilter !== "all"
+              ? "Try adjusting your search or filters"
+              : "Start by adding your first plant"}
+          </p>
+          <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className={isMobile ? "mobile-touch-target" : ""}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Your First Plant
+              </Button>
+            </DialogTrigger>
+            <DialogContent className={`${isMobile ? "mobile-dialog" : "sm:max-w-[600px]"}`}>
+              <DialogHeader>
+                <DialogTitle>Add New Plant</DialogTitle>
+              </DialogHeader>
+              <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
         </div>
-      </div>
+      ) : (
+        <div className={`${isMobile ? "mobile-plant-grid" : "grid gap-4 md:grid-cols-2 lg:grid-cols-3"}`}>
+          {filteredPlants.map((item) => {
+            const isCurrentPlant = item.ready_for_sale === true
 
-      <div className="p-6">
-        <Tabs defaultValue="plants" onValueChange={setActiveTab}>
-          <TabsList className="mb-4 bg-muted">
-            <TabsTrigger value="plants" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-              Plants & Trees
-            </TabsTrigger>
-            <TabsTrigger value="consumables" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-              Nursery Consumables
-            </TabsTrigger>
-          </TabsList>
+            return (
+              <Card
+                key={item.id}
+                className={`transition-all hover:shadow-md ${
+                  isCurrentPlant ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"
+                } ${isMobile ? "mobile-product-card" : ""}`}
+              >
+                <CardContent className={isMobile ? "p-4" : "p-4"}>
+                  {/* Status Badge */}
+                  <div className={`${isMobile ? "product-header" : "flex justify-between items-start"} mb-3`}>
+                    <Badge
+                      className={
+                        isCurrentPlant
+                          ? "bg-green-600 hover:bg-green-700 text-white"
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                      }
+                    >
+                      {isCurrentPlant ? "🌱 In Nursery" : "📋 Future Plan"}
+                    </Badge>
+                    <div className={`${isMobile ? "product-actions" : "flex gap-1"}`}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditItem(item)}
+                        className={`${isMobile ? "flex-1" : "h-8 w-8 p-0"}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                        {isMobile && <span className="ml-1">Edit</span>}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this plant?")) {
+                            deleteInventoryItem(item.id)
+                          }
+                        }}
+                        className={`${isMobile ? "flex-1 text-destructive hover:text-destructive" : "h-8 w-8 p-0 text-destructive hover:text-destructive"}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {isMobile && <span className="ml-1">Delete</span>}
+                      </Button>
+                    </div>
+                  </div>
 
-          <TabsContent value="plants">
-            {loading ? (
-              <div className="text-center py-8">Loading inventory...</div>
-            ) : filteredPlants.length === 0 ? (
-              <div className="text-center py-8">No plants found</div>
-            ) : (
-              <div className="space-y-4">
-                {filteredPlants.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <div className="font-medium text-foreground">{item.plant_name}</div>
-                        <div className="text-sm text-muted-foreground">{item.scientific_name}</div>
-                        <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
+                  {/* Plant Info */}
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className={`${isMobile ? "text-base" : "text-lg"} font-semibold`}>{item.plant_name}</h3>
+                      {item.scientific_name && (
+                        <p className={`${isMobile ? "text-xs" : "text-sm"} text-muted-foreground italic`}>
+                          {item.scientific_name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className={`grid grid-cols-2 gap-2 ${isMobile ? "text-xs" : "text-sm"}`}>
+                      <div>
+                        <span className="text-muted-foreground">Quantity:</span>
+                        <p className="font-medium">{item.quantity}</p>
                       </div>
+                      <div>
+                        <span className="text-muted-foreground">Price:</span>
+                        <p className="font-medium">Ksh {item.price}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-muted-foreground">Category:</span>
+                        <p className={`font-medium ${isMobile ? "text-xs" : "text-xs"}`}>{item.category}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-muted-foreground">Status:</span>
+                        <Badge
+                          variant="outline"
+                          className={`ml-2 ${
+                            item.status === "Healthy"
+                              ? "bg-green-100 text-green-800 border-green-200"
+                              : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                          }`}
+                        >
+                          {item.status}
+                        </Badge>
+                      </div>
+                    </div>
 
-                      <div className="space-y-2">
-                        <div className="text-sm">
-                          <span className="font-medium">Category:</span> {item.category}
-                        </div>
+                    {/* Additional Info */}
+                    {(item.age || item.section || item.source) && (
+                      <div
+                        className={`pt-2 border-t ${isMobile ? "text-xs" : "text-xs"} text-muted-foreground space-y-1`}
+                      >
+                        {item.age && <p>Age: {item.age}</p>}
                         {item.section && (
-                          <div className="text-sm text-muted-foreground">
-                            Section {item.section}
+                          <p>
+                            Location: Section {item.section}
                             {item.row ? `, Row ${item.row}` : ""}
-                          </div>
+                          </p>
                         )}
+                        {item.source && <p>Source: {item.source}</p>}
                       </div>
+                    )}
 
-                      <div className="space-y-2">
-                        <div className="text-sm">
-                          <span className="font-medium">Quantity:</span> {item.quantity}
-                        </div>
-                        <div className="text-sm">
-                          <span className="font-medium">Age:</span> {item.age || "-"}
-                        </div>
+                    {/* Description */}
+                    {item.description && (
+                      <div className="pt-2 border-t">
+                        <p className={`${isMobile ? "text-xs" : "text-xs"} text-muted-foreground line-clamp-2`}>
+                          {item.description}
+                        </p>
                       </div>
-
-                      <div className="space-y-2">
-                        <div className="text-sm">
-                          <span className="font-medium">Date Planted:</span>{" "}
-                          {item.date_planted ? new Date(item.date_planted).toLocaleDateString() : "-"}
-                        </div>
-                        {item.source && <div className="text-sm text-muted-foreground">Source: {item.source}</div>}
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">Status:</span>
-                          <Badge
-                            variant={item.status === "Healthy" ? "default" : "outline"}
-                            className={
-                              item.status === "Healthy"
-                                ? "bg-primary hover:bg-primary"
-                                : item.status === "Attention"
-                                  ? "bg-secondary hover:bg-secondary"
-                                  : "bg-destructive hover:bg-destructive"
-                            }
-                          >
-                            {item.status}
-                          </Badge>
-                        </div>
-                        <div className="text-sm">
-                          <span className="font-medium">Price:</span> Ksh {item.price.toLocaleString()}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">Website:</span>
-                          <Badge
-                            variant={item.ready_for_sale ? "default" : "outline"}
-                            className={item.ready_for_sale ? "bg-primary hover:bg-primary" : "bg-muted hover:bg-muted"}
-                          >
-                            {item.ready_for_sale ? "Listed" : "Not Listed"}
-                          </Badge>
-                        </div>
-                        {item.ready_for_sale && (
-                          <Badge
-                            variant="outline"
-                            className={
-                              item.quantity >= 100
-                                ? "bg-green-50 text-green-700 border-green-200"
-                                : item.quantity >= 10
-                                  ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                                  : "bg-red-50 text-red-700 border-red-200"
-                            }
-                          >
-                            {item.quantity >= 100 ? "Available" : item.quantity >= 10 ? "Limited" : "Not Available"}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 mt-4 pt-4 border-t border-border">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditItem(item)}
-                            disabled={isDemoMode || !tableExists}
-                          >
-                            Edit
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Plant</DialogTitle>
-                          </DialogHeader>
-                          {editItem && <EditInventoryForm item={editItem} onSuccess={() => fetchInventory()} />}
-                        </DialogContent>
-                      </Dialog>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
-                        disabled={isDemoMode || !tableExists}
-                        onClick={() => {
-                          if (confirm("Are you sure you want to delete this item?")) {
-                            deleteInventoryItem(item.id)
-                          }
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+      )}
 
-          <TabsContent value="consumables">
-            {loading ? (
-              <div className="text-center py-8">Loading consumables...</div>
-            ) : filteredConsumables.length === 0 ? (
-              <div className="text-center py-8">No consumables found</div>
-            ) : (
-              <div className="space-y-4">
-                {filteredConsumables.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <div className="font-medium text-foreground">{item.plant_name}</div>
-                        <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="text-sm">
-                          <span className="font-medium">Category:</span> {getConsumableCategory(item)}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="text-sm">
-                          <span className="font-medium">Quantity:</span> {item.quantity}
-                        </div>
-                        <div className="text-sm">
-                          <span className="font-medium">Unit:</span> {getConsumableUnit(item)}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="text-sm">
-                          <span className="font-medium">Purchase Date:</span>{" "}
-                          {item.date_planted ? new Date(item.date_planted).toLocaleDateString() : "-"}
-                        </div>
-                        {item.source && <div className="text-sm text-muted-foreground">Supplier: {item.source}</div>}
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">Status:</span>
-                          <Badge
-                            variant={item.status === "Available" ? "default" : "outline"}
-                            className={
-                              item.status === "Available"
-                                ? "bg-primary hover:bg-primary"
-                                : item.status === "Low Stock"
-                                  ? "bg-secondary hover:bg-secondary"
-                                  : "bg-destructive hover:bg-destructive"
-                            }
-                          >
-                            {item.status}
-                          </Badge>
-                        </div>
-                        <div className="text-sm">
-                          <span className="font-medium">Price:</span> Ksh {item.price.toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 mt-4 pt-4 border-t border-border">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditItem(item)}
-                            disabled={isDemoMode || !tableExists}
-                          >
-                            Edit
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Consumable</DialogTitle>
-                          </DialogHeader>
-                          {editItem && <EditInventoryForm item={editItem} onSuccess={() => fetchInventory()} />}
-                        </DialogContent>
-                      </Dialog>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
-                        disabled={isDemoMode || !tableExists}
-                        onClick={() => {
-                          if (confirm("Are you sure you want to delete this item?")) {
-                            deleteInventoryItem(item.id)
-                          }
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
+      {/* Edit Dialog */}
+      {editItem && (
+        <Dialog open={!!editItem} onOpenChange={() => setEditItem(null)}>
+          <DialogContent className={`${isMobile ? "mobile-dialog" : "max-w-2xl"}`}>
+            <DialogHeader>
+              <DialogTitle>Edit {editItem.plant_name}</DialogTitle>
+            </DialogHeader>
+            <EditInventoryForm
+              item={editItem}
+              onSuccess={() => {
+                setEditItem(null)
+                fetchInventory()
+              }}
+              onCancel={() => setEditItem(null)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

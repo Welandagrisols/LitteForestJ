@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DashboardTab } from "@/components/dashboard-tab"
 import { InventoryTab } from "@/components/inventory-tab"
 import { SalesTab } from "@/components/sales-tab"
@@ -12,33 +11,25 @@ import { Header } from "@/components/header"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { 
-  SidebarProvider, 
-  Sidebar, 
-  SidebarContent, 
-  SidebarHeader, 
-  SidebarMenu, 
-  SidebarMenuItem, 
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
-  SidebarInset
 } from "@/components/ui/sidebar"
-import { 
-  BarChart3, 
-  Package, 
-  ShoppingCart, 
-  FileText, 
-  Settings,
-  Globe,
-  Menu
-} from "lucide-react"
+import { BarChart3, Package, ShoppingCart, FileText, Settings, Globe, Menu, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { CustomersTab } from "@/components/customers-tab"
 
 const tabs = [
   { value: "dashboard", label: "Dashboard", icon: BarChart3 },
   { value: "inventory", label: "Inventory", icon: Package },
   { value: "sales", label: "Sales", icon: ShoppingCart },
+  { value: "customers", label: "Customers", icon: Users },
   { value: "reports", label: "Reports", icon: FileText },
   { value: "website", label: "Website", icon: Globe },
   { value: "ops", label: "Operations", icon: Settings },
@@ -80,6 +71,8 @@ function AppContent() {
         return <InventoryTab />
       case "sales":
         return <SalesTab />
+      case "customers":
+        return <CustomersTab />
       case "reports":
         return <ReportsTab />
       case "website":
@@ -121,7 +114,7 @@ function AppContent() {
                     </SheetContent>
                   </Sheet>
                   <h1 className="text-lg font-semibold truncate">
-                    {tabs.find(tab => tab.value === activeTab)?.label}
+                    {tabs.find((tab) => tab.value === activeTab)?.label}
                   </h1>
                   <div className="w-10" /> {/* Spacer */}
                 </div>
@@ -131,38 +124,34 @@ function AppContent() {
               <div className="flex-1 pt-16 overflow-auto">
                 <div className="mobile-content">
                   <Header />
-                  <main className="mt-6">
-                    {renderTabContent()}
-                  </main>
+                  <main className="mt-6">{renderTabContent()}</main>
                 </div>
               </div>
             </div>
           ) : (
-        <div className="flex">
-          <Sidebar className="w-64 border-r">
-            <SidebarHeader>
-              <div className="px-2">
-                <span className="text-lg font-semibold text-orange-500">Little</span>
-                <span className="text-lg font-semibold text-green-600">Forest</span>
+            <div className="flex">
+              <Sidebar className="w-64 border-r">
+                <SidebarHeader>
+                  <div className="px-2">
+                    <span className="text-lg font-semibold text-orange-500">Little</span>
+                    <span className="text-lg font-semibold text-green-600">Forest</span>
+                  </div>
+                </SidebarHeader>
+                <SidebarContent className="p-4">
+                  <NavigationItems />
+                </SidebarContent>
+              </Sidebar>
+              <div className="flex-1">
+                <Header />
+                <main className="p-6">
+                  <ErrorBoundary>{renderTabContent()}</ErrorBoundary>
+                </main>
               </div>
-            </SidebarHeader>
-            <SidebarContent className="p-4">
-              <NavigationItems />
-            </SidebarContent>
-          </Sidebar>
-          <div className="flex-1">
-            <Header />
-            <main className="p-6">
-              <ErrorBoundary>
-                {renderTabContent()}
-              </ErrorBoundary>
-            </main>
-          </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  </SupabaseProvider>
-</ErrorBoundary>
+      </SupabaseProvider>
+    </ErrorBoundary>
   )
 }
 

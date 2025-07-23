@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
@@ -9,7 +11,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
@@ -38,7 +50,7 @@ export function WebsiteIntegrationTab() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [tableExists, setTableExists] = useState(true)
   const { toast } = useToast()
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(false)
 
   const apiUrl = `https://litteforest.vercel.app/api/products`
 
@@ -57,7 +69,7 @@ export function WebsiteIntegrationTab() {
             ready_for_sale: true,
             description: "Beautiful indigenous tree perfect for landscaping",
             image_url: "",
-            sku: "IND001"
+            sku: "IND001",
           },
           {
             id: "2",
@@ -69,8 +81,8 @@ export function WebsiteIntegrationTab() {
             ready_for_sale: false,
             description: "",
             image_url: "",
-            sku: "ORN002"
-          }
+            sku: "ORN002",
+          },
         ]
         setInventory(demoData)
         setLoading(false)
@@ -91,16 +103,16 @@ export function WebsiteIntegrationTab() {
     init()
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // Adjust the breakpoint as needed
-    };
+      setIsMobile(window.innerWidth < 768) // Adjust the breakpoint as needed
+    }
 
-    handleResize(); // Set initial value
+    handleResize() // Set initial value
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize)
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+      window.removeEventListener("resize", handleResize)
+    }
   }, [])
 
   async function fetchInventory() {
@@ -108,7 +120,9 @@ export function WebsiteIntegrationTab() {
       setLoading(true)
       const { data, error } = await supabase
         .from("inventory")
-        .select("id, plant_name, scientific_name, category, quantity, price, ready_for_sale, description, image_url, sku")
+        .select(
+          "id, plant_name, scientific_name, category, quantity, price, ready_for_sale, description, image_url, sku",
+        )
         .order("plant_name", { ascending: true })
 
       if (error) throw error
@@ -140,7 +154,7 @@ export function WebsiteIntegrationTab() {
         .from("inventory")
         .update({
           ...updates,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq("id", id)
 
@@ -174,29 +188,27 @@ export function WebsiteIntegrationTab() {
     try {
       setUploadingImage(true)
 
-      const fileExt = file.name.split('.').pop()
+      const fileExt = file.name.split(".").pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
       const filePath = `plants/${fileName}`
 
-      const { data, error } = await supabase.storage
-        .from('plant-images')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+      const { data, error } = await supabase.storage.from("plant-images").upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      })
 
       if (error) {
-        console.error('Upload error:', error)
+        console.error("Upload error:", error)
         throw error
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('plant-images')
-        .getPublicUrl(filePath)
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("plant-images").getPublicUrl(filePath)
 
       return publicUrl
     } catch (error: any) {
-      console.error('Error uploading image:', error)
+      console.error("Error uploading image:", error)
       toast({
         title: "Upload failed",
         description: error.message || "Failed to upload image",
@@ -211,7 +223,7 @@ export function WebsiteIntegrationTab() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         toast({
           title: "Invalid file type",
           description: "Please select an image file",
@@ -256,7 +268,7 @@ export function WebsiteIntegrationTab() {
     await updateWebsiteSettings(editingItem.id, {
       description: editingItem.description,
       image_url: imageUrl,
-      ready_for_sale: editingItem.ready_for_sale
+      ready_for_sale: editingItem.ready_for_sale,
     })
 
     setEditingItem(null)
@@ -266,7 +278,7 @@ export function WebsiteIntegrationTab() {
 
   const toggleReadyForSale = async (item: InventoryItem) => {
     await updateWebsiteSettings(item.id, {
-      ready_for_sale: !item.ready_for_sale
+      ready_for_sale: !item.ready_for_sale,
     })
   }
 
@@ -281,10 +293,7 @@ export function WebsiteIntegrationTab() {
     }
 
     try {
-      const { error } = await supabase
-        .from("inventory")
-        .delete()
-        .eq("id", item.id)
+      const { error } = await supabase.from("inventory").delete().eq("id", item.id)
 
       if (error) throw error
 
@@ -317,7 +326,7 @@ export function WebsiteIntegrationTab() {
     return { status: "Not Available", color: "bg-red-500" }
   }
 
-  const readyForSaleItems = inventory.filter(item => item.ready_for_sale)
+  const readyForSaleItems = inventory.filter((item) => item.ready_for_sale)
 
   if (loading) {
     return (
@@ -338,9 +347,7 @@ export function WebsiteIntegrationTab() {
             <Globe className="h-5 w-5" />
             Website Integration API
           </CardTitle>
-          <CardDescription>
-            Use this API endpoint to integrate your inventory with your website
-          </CardDescription>
+          <CardDescription>Use this API endpoint to integrate your inventory with your website</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -360,7 +367,9 @@ export function WebsiteIntegrationTab() {
             </div>
             <div className="text-sm text-muted-foreground">
               <p>This endpoint returns all products marked as "ready for sale" with their availability status.</p>
-              <p>See the <code>API_INTEGRATION.md</code> file for full documentation.</p>
+              <p>
+                See the <code>API_INTEGRATION.md</code> file for full documentation.
+              </p>
             </div>
           </div>
         </CardContent>
@@ -370,21 +379,17 @@ export function WebsiteIntegrationTab() {
       <Card>
         <CardHeader>
           <CardTitle>Website Products ({readyForSaleItems.length})</CardTitle>
-          <CardDescription>
-            Products currently available on your website
-          </CardDescription>
+          <CardDescription>Products currently available on your website</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+          <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
             {readyForSaleItems.map((item) => {
               const availability = getAvailabilityStatus(item.quantity)
               return (
                 <div key={item.id} className="border rounded-lg p-4 space-y-2">
                   <div className="flex justify-between items-start">
                     <h3 className="font-medium">{item.plant_name}</h3>
-                    <Badge className={`${availability.color} text-white`}>
-                      {availability.status}
-                    </Badge>
+                    <Badge className={`${availability.color} text-white`}>{availability.status}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">{item.scientific_name}</p>
                   <p className="text-sm">{item.description || "No description"}</p>
@@ -403,9 +408,7 @@ export function WebsiteIntegrationTab() {
       <Card>
         <CardHeader>
           <CardTitle>Manage Website Listings</CardTitle>
-          <CardDescription>
-            Configure which products appear on your website and their details
-          </CardDescription>
+          <CardDescription>Configure which products appear on your website and their details</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -447,15 +450,11 @@ export function WebsiteIntegrationTab() {
                             onCheckedChange={() => toggleReadyForSale(item)}
                             disabled={isDemoMode || !tableExists}
                           />
-                          <span className="text-sm">
-                            {item.ready_for_sale ? "Listed" : "Not Listed"}
-                          </span>
+                          <span className="text-sm">{item.ready_for_sale ? "Listed" : "Not Listed"}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-xs truncate">
-                          {item.description || "No description"}
-                        </div>
+                        <div className="max-w-xs truncate">{item.description || "No description"}</div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -474,187 +473,193 @@ export function WebsiteIntegrationTab() {
                                 Edit
                               </Button>
                             </DialogTrigger>
-                          <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-                            <DialogHeader className="flex-shrink-0">
-                              <DialogTitle>Edit Website Listing - {item.plant_name}</DialogTitle>
-                            </DialogHeader>
-                            {editingItem && (
-                              <>
-                                {/* Scrollable content area */}
-                                <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-                                  <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+                            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+                              <DialogHeader className="flex-shrink-0">
+                                <DialogTitle>Edit Website Listing - {item.plant_name}</DialogTitle>
+                              </DialogHeader>
+                              {editingItem && (
+                                <>
+                                  {/* Scrollable content area */}
+                                  <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+                                    <div
+                                      className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}
+                                    >
+                                      <div>
+                                        <Label>Plant Name</Label>
+                                        <Input value={editingItem.plant_name} disabled />
+                                      </div>
+                                      <div>
+                                        <Label>Price (Ksh)</Label>
+                                        <Input value={editingItem.price} disabled />
+                                      </div>
+                                    </div>
+
                                     <div>
-                                      <Label>Plant Name</Label>
-                                      <Input value={editingItem.plant_name} disabled />
+                                      <Label htmlFor="description">Website Description</Label>
+                                      <Textarea
+                                        id="description"
+                                        placeholder="Enter a description for your website..."
+                                        value={editingItem.description}
+                                        onChange={(e) =>
+                                          setEditingItem({
+                                            ...editingItem,
+                                            description: e.target.value,
+                                          })
+                                        }
+                                        rows={3}
+                                      />
                                     </div>
+
                                     <div>
-                                      <Label>Price (Ksh)</Label>
-                                      <Input value={editingItem.price} disabled />
+                                      <Label>Plant Image</Label>
+                                      <div className="space-y-4">
+                                        {!imagePreview ? (
+                                          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                                            <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+                                            <div className="space-y-2">
+                                              <p className="text-sm text-muted-foreground">Upload a plant image</p>
+                                              <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileSelect}
+                                                className="hidden"
+                                                id="image-upload"
+                                                disabled={uploadingImage || isDemoMode}
+                                              />
+                                              <label
+                                                htmlFor="image-upload"
+                                                className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
+                                                  uploadingImage || isDemoMode
+                                                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                    : "bg-primary text-primary-foreground hover:bg-primary/90"
+                                                }`}
+                                              >
+                                                <Upload className="h-4 w-4" />
+                                                {uploadingImage ? "Uploading..." : "Choose Image"}
+                                              </label>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <div className="space-y-3">
+                                            <div className="relative inline-block">
+                                              <img
+                                                src={imagePreview || "/placeholder.svg"}
+                                                alt="Plant preview"
+                                                className="h-32 w-auto max-w-32 object-contain rounded-lg border bg-gray-50"
+                                              />
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setImagePreview(null)
+                                                  setImageFile(null)
+                                                  setEditingItem({
+                                                    ...editingItem,
+                                                    image_url: "",
+                                                  })
+                                                }}
+                                                className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs hover:bg-destructive/90"
+                                              >
+                                                <X className="h-3 w-3" />
+                                              </button>
+                                            </div>
+
+                                            <div>
+                                              <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileSelect}
+                                                className="hidden"
+                                                id="image-replace"
+                                                disabled={uploadingImage || isDemoMode}
+                                              />
+                                              <label
+                                                htmlFor="image-replace"
+                                                className={`inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md cursor-pointer transition-colors ${
+                                                  uploadingImage || isDemoMode
+                                                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                                                }`}
+                                              >
+                                                <Upload className="h-3 w-3" />
+                                                {uploadingImage ? "Uploading..." : "Replace Image"}
+                                              </label>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <Switch
+                                        checked={editingItem.ready_for_sale}
+                                        onCheckedChange={(checked) =>
+                                          setEditingItem({
+                                            ...editingItem,
+                                            ready_for_sale: checked,
+                                          })
+                                        }
+                                        disabled={isDemoMode || !tableExists}
+                                      />
+                                      <Label>List on Website</Label>
                                     </div>
                                   </div>
 
-                                  <div>
-                                    <Label htmlFor="description">Website Description</Label>
-                                    <Textarea
-                                      id="description"
-                                      placeholder="Enter a description for your website..."
-                                      value={editingItem.description}
-                                      onChange={(e) => setEditingItem({
-                                        ...editingItem,
-                                        description: e.target.value
-                                      })}
-                                      rows={3}
-                                    />
+                                  {/* Fixed action buttons */}
+                                  <div className="flex-shrink-0 border-t pt-4 mt-4 flex justify-end gap-2">
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => {
+                                        setEditingItem(null)
+                                        setImageFile(null)
+                                        setImagePreview(null)
+                                      }}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      onClick={handleSaveWebsiteSettings}
+                                      disabled={uploadingImage || isDemoMode || !tableExists}
+                                    >
+                                      {uploadingImage ? "Uploading..." : "Save Changes"}
+                                    </Button>
                                   </div>
+                                </>
+                              )}
+                            </DialogContent>
+                          </Dialog>
 
-                                  <div>
-                                    <Label>Plant Image</Label>
-                                    <div className="space-y-4">
-                                      {!imagePreview ? (
-                                        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                                          <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
-                                          <div className="space-y-2">
-                                            <p className="text-sm text-muted-foreground">Upload a plant image</p>
-                                            <input
-                                              type="file"
-                                              accept="image/*"
-                                              onChange={handleFileSelect}
-                                              className="hidden"
-                                              id="image-upload"
-                                              disabled={uploadingImage || isDemoMode}
-                                            />
-                                            <label
-                                              htmlFor="image-upload"
-                                              className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
-                                                uploadingImage || isDemoMode
-                                                  ? "bg-muted text-muted-foreground cursor-not-allowed"
-                                                  : "bg-primary text-primary-foreground hover:bg-primary/90"
-                                              }`}
-                                            >
-                                              <Upload className="h-4 w-4" />
-                                              {uploadingImage ? "Uploading..." : "Choose Image"}
-                                            </label>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <div className="space-y-3">
-                                          <div className="relative inline-block">
-                                            <img
-                                              src={imagePreview}
-                                              alt="Plant preview"
-                                              className="h-32 w-auto max-w-32 object-contain rounded-lg border bg-gray-50"
-                                            />
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                setImagePreview(null)
-                                                setImageFile(null)
-                                                setEditingItem({
-                                                  ...editingItem,
-                                                  image_url: ""
-                                                })
-                                              }}
-                                              className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs hover:bg-destructive/90"
-                                            >
-                                              <X className="h-3 w-3" />
-                                            </button>
-                                          </div>
-
-                                          <div>
-                                            <input
-                                              type="file"
-                                              accept="image/*"
-                                              onChange={handleFileSelect}
-                                              className="hidden"
-                                              id="image-replace"
-                                              disabled={uploadingImage || isDemoMode}
-                                            />
-                                            <label
-                                              htmlFor="image-replace"
-                                              className={`inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md cursor-pointer transition-colors ${
-                                                uploadingImage || isDemoMode
-                                                  ? "bg-muted text-muted-foreground cursor-not-allowed"
-                                                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                                              }`}
-                                            >
-                                              <Upload className="h-3 w-3" />
-                                              {uploadingImage ? "Uploading..." : "Replace Image"}
-                                            </label>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    <Switch
-                                      checked={editingItem.ready_for_sale}
-                                      onCheckedChange={(checked) => setEditingItem({
-                                        ...editingItem,
-                                        ready_for_sale: checked
-                                      })}
-                                      disabled={isDemoMode || !tableExists}
-                                    />
-                                    <Label>List on Website</Label>
-                                  </div>
-                                </div>
-
-                                {/* Fixed action buttons */}
-                                <div className="flex-shrink-0 border-t pt-4 mt-4 flex justify-end gap-2">
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      setEditingItem(null)
-                                      setImageFile(null)
-                                      setImagePreview(null)
-                                    }}
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    onClick={handleSaveWebsiteSettings}
-                                    disabled={uploadingImage || isDemoMode || !tableExists}
-                                  >
-                                    {uploadingImage ? "Uploading..." : "Save Changes"}
-                                  </Button>
-                                </div>
-                              </>
-                            )}
-                          </DialogContent>
-                        </Dialog>
-
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                              disabled={isDemoMode || !tableExists}
-                            >
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Delete
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete {item.plant_name}?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete "{item.plant_name}" 
-                                from your inventory and remove it from your website if it's currently listed.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => deleteInventoryItem(item)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10 bg-transparent"
+                                disabled={isDemoMode || !tableExists}
                               >
+                                <Trash2 className="h-4 w-4 mr-1" />
                                 Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete {item.plant_name}?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete "{item.plant_name}" from
+                                  your inventory and remove it from your website if it's currently listed.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deleteInventoryItem(item)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )

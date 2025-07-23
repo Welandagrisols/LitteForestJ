@@ -1,3 +1,12 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/components/ui/use-toast"
+import { supabase, isDemoMode } from "@/lib/supabase"
+import { Database, Package, Users, TrendingUp, Loader2 } from "lucide-react"
+
 // Demo data for when Supabase is not configured
 export const demoInventory = [
   {
@@ -152,3 +161,150 @@ export const demoCustomers = [
     created_at: "2024-01-15T00:00:00Z",
   },
 ]
+
+interface DemoDataProps {
+  onDataChange: () => void
+}
+
+export function DemoData({ onDataChange }: DemoDataProps) {
+  const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
+
+  const loadDemoData = async () => {
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode Active",
+        description: "Demo data is already loaded in demo mode",
+        variant: "default",
+      })
+      return
+    }
+
+    setLoading(true)
+    try {
+      // Clear existing data first
+      await supabase.from("sales").delete().neq("id", "")
+      await supabase.from("inventory").delete().neq("id", "")
+      await supabase.from("customers").delete().neq("id", "")
+
+      // Insert demo customers
+      const { error: customersError } = await supabase.from("customers").insert(demoCustomers)
+      if (customersError) throw customersError
+
+      // Insert demo inventory
+      const { error: inventoryError } = await supabase.from("inventory").insert(demoInventory)
+      if (inventoryError) throw inventoryError
+
+      // Insert demo sales
+      const { error: salesError } = await supabase.from("sales").insert(demoSales)
+      if (salesError) throw salesError
+
+      toast({
+        title: "Demo data loaded successfully",
+        description: "Your nursery now has sample plants, customers, and sales data",
+      })
+
+      onDataChange()
+    } catch (error) {
+      console.error("Error loading demo data:", error)
+      toast({
+        title: "Error loading demo data",
+        description: "Failed to load demo data. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Package className="h-4 w-4" />
+              Plants & Inventory
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{demoInventory.length}</p>
+            <p className="text-xs text-muted-foreground">
+              Sample plants including indigenous trees, fruits, and ornamentals
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="h-4 w-4" />
+              Customers
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{demoCustomers.length}</p>
+            <p className="text-xs text-muted-foreground">Sample customer records with contact information</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <TrendingUp className="h-4 w-4" />
+              Sales Records
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{demoSales.length}</p>
+            <p className="text-xs text-muted-foreground">Sample sales transactions and revenue data</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5" />
+            Load Demo Data
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Load sample data to test the system features. This will replace any existing data with demo content
+            including:
+          </p>
+
+          <ul className="text-sm text-muted-foreground space-y-1 ml-4">
+            <li>• Indigenous trees (African Olive, Baobab, Moringa)</li>
+            <li>• Fruit trees and ornamental plants</li>
+            <li>• Consumables (fertilizers, pots, soil)</li>
+            <li>• Sample customers and sales records</li>
+          </ul>
+
+          <div className="pt-4">
+            <Button onClick={loadDemoData} disabled={loading || isDemoMode} className="w-full sm:w-auto">
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Loading Demo Data...
+                </>
+              ) : (
+                <>
+                  <Database className="h-4 w-4 mr-2" />
+                  Load Demo Data
+                </>
+              )}
+            </Button>
+
+            {isDemoMode && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Demo data is already active. Connect to Supabase to load fresh demo data.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
