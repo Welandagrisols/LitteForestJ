@@ -91,6 +91,16 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       return
     }
 
+    // Validate required fields
+    if (!formData.plant_name || !formData.category || formData.quantity <= 0 || formData.price <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields with valid values",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -106,30 +116,36 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       const calculatedCostPerSeedling = finalFormData.quantity > 0 ? finalFormData.batch_cost / finalFormData.quantity : 0
 
       const insertData = {
-        plant_name: finalFormData.plant_name,
-        scientific_name: finalFormData.scientific_name,
+        plant_name: finalFormData.plant_name.trim(),
+        scientific_name: finalFormData.scientific_name?.trim() || null,
         category: finalFormData.category,
-        quantity: finalFormData.quantity,
-        age: finalFormData.age,
+        quantity: Number(finalFormData.quantity),
+        age: finalFormData.age?.trim() || null,
         date_planted: finalFormData.date_planted || null,
         status: finalFormData.status,
-        price: finalFormData.price,
-        batch_cost: finalFormData.batch_cost,
+        price: Number(finalFormData.price),
+        batch_cost: Number(finalFormData.batch_cost),
         cost_per_seedling: calculatedCostPerSeedling,
         sku: finalFormData.sku,
-        section: finalFormData.section,
-        row: finalFormData.row,
-        source: finalFormData.source,
+        section: finalFormData.section?.trim() || null,
+        row: finalFormData.row?.trim() || null,
+        source: finalFormData.source?.trim() || null,
         item_type: 'Plant',
+        ready_for_sale: false,
+        description: null,
+        image_url: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
 
       console.log('Inserting data:', insertData)
 
-      const { error } = await supabase.from("inventory").insert([insertData])
+      const { data, error } = await supabase.from("inventory").insert([insertData]).select()
 
-      if (error) throw error
+      if (error) {
+        console.error('Insert error:', error)
+        throw error
+      }
 
       toast({
         title: "Success",
@@ -141,9 +157,10 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       onSuccess()
       if (onClose) onClose()
     } catch (error: any) {
+      console.error('Error adding plant:', error)
       toast({
         title: "Error adding plant",
-        description: error.message,
+        description: error.message || "Failed to add plant to inventory",
         variant: "destructive",
       })
     } finally {
@@ -157,7 +174,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     <div className="flex flex-col max-h-[80vh]">
       {/* Scrollable form container */}
       <div className="flex-1 overflow-y-auto px-1">
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-2 gap-4'}`}>
             <div className="space-y-2">
               <Label htmlFor="plant_name">Plant Name *</Label>
@@ -315,7 +332,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
 
 
           </div>
-        </div>
+        </form>
       </div>
 
       {/* Sticky action buttons */}
@@ -331,8 +348,10 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
           </Button>
           <Button
             type="submit"
+            form="add-inventory-form"
             disabled={loading}
             className={isMobile ? 'mobile-touch-target w-full' : ''}
+            onClick={handleSubmit}
           >
             {loading ? "Adding..." : "Add Item"}
           </Button>

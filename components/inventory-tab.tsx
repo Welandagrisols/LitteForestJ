@@ -79,7 +79,7 @@ export function InventoryTab() {
     if (isDemoMode || !tableExists) {
       toast({
         title: "Demo Mode",
-        description: "Connect to Supabase and set up tables to enable editing functionality",
+        description: "Connect to Supabase to enable deleting items",
         variant: "destructive",
       })
       return
@@ -88,18 +88,23 @@ export function InventoryTab() {
     try {
       const { error } = await supabase.from("inventory").delete().eq("id", id)
 
-      if (error) throw error
+      if (error) {
+        console.error('Delete error:', error)
+        throw error
+      }
 
       toast({
-        title: "Item deleted",
-        description: "Inventory item has been removed",
+        title: "Success",
+        description: "Item deleted successfully",
       })
 
-      fetchInventory()
+      // Refresh inventory after successful delete
+      await fetchInventory()
     } catch (error: any) {
+      console.error('Error deleting item:', error)
       toast({
         title: "Error deleting item",
-        description: error.message,
+        description: error.message || "Failed to delete item",
         variant: "destructive",
       })
     }
@@ -220,7 +225,7 @@ export function InventoryTab() {
           {/* Title and Action Buttons Row */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold">Inventory Management</h2>
-            
+
             {/* Action buttons - always visible on right */}
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               {activeTab === "plants" ? (
@@ -243,7 +248,10 @@ export function InventoryTab() {
                       <DialogTitle>Add New Plant to Inventory</DialogTitle>
                     </DialogHeader>
                     <AddInventoryForm 
-                      onSuccess={handleAddSuccess} 
+                      onSuccess={async () => {
+                        await fetchInventory()
+                        setAddPlantDialogOpen(false)
+                      }} 
                       onClose={() => setAddPlantDialogOpen(false)}
                     />
                   </DialogContent>
@@ -268,13 +276,16 @@ export function InventoryTab() {
                       <DialogTitle>Add New Consumable to Inventory</DialogTitle>
                     </DialogHeader>
                     <AddConsumableForm 
-                      onSuccess={handleAddSuccess} 
+                      onSuccess={async () => {
+                        await fetchInventory()
+                        setAddConsumableDialogOpen(false)
+                      }} 
                       onClose={() => setAddConsumableDialogOpen(false)}
                     />
                   </DialogContent>
                 </Dialog>
               )}
-              
+
               <Button
                 variant="outline"
                 className="flex items-center justify-center gap-2 h-12 text-base font-medium border-2 hover:bg-accent/10 w-full sm:w-auto"
