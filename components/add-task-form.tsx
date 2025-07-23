@@ -227,6 +227,23 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         description: "Task added successfully!",
       })
 
+      // Reset all form state
+      setFormData({
+        task_name: "",
+        task_type: "Watering",
+        custom_task_type: "",
+        description: "",
+        task_date: new Date().toISOString().split("T")[0],
+        batch_sku: "",
+        labor_hours: "",
+        labor_rate: "",
+        labor_cost: "",
+        status: "Completed",
+        assigned_to: "",
+      })
+      
+      setConsumableUsages([])
+
       onSuccess()
     } catch (error: any) {
       console.error("Error adding task:", error)

@@ -181,7 +181,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
         description: "Sale recorded successfully",
       })
 
-      // Reset form data
+      // Reset all form state completely
       setFormData({
         inventory_id: "",
         quantity: 1,
@@ -196,6 +196,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       setSelectedItem(null)
       setIsNewCustomer(false)
       
+      // Call success callback to refresh data and close dialog
       onSuccess()
     } catch (error: any) {
       toast({

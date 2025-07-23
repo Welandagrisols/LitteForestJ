@@ -75,6 +75,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       row: "",
       source: "",
     })
+    setImageFile(null)
+    setImagePreview(null)
   }
 
 
@@ -152,10 +154,16 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         description: `New plant batch added to inventory. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
       })
 
-      // Reset form and close dialog
+      // Reset form first, then trigger callbacks
       resetForm()
+      
+      // Call success callback to refresh data
       onSuccess()
-      if (onClose) onClose()
+      
+      // Close dialog
+      if (onClose) {
+        onClose()
+      }
     } catch (error: any) {
       console.error('Error adding plant:', error)
       toast({

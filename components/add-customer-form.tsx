@@ -60,17 +60,17 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
 
       toast({
         title: "Success",
-        description: "New customer added",
+        description: "Customer added successfully",
       })
 
-      onSuccess()
-
-      // Reset form
+      // Reset form data
       setFormData({
         name: "",
         contact: "",
         email: "",
       })
+
+      onSuccess()
     } catch (error: any) {
       toast({
         title: "Error adding customer",

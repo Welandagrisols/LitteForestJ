@@ -129,13 +129,30 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
 
       toast({
         title: "Success",
-        description: `New consumable added to inventory`,
+        description: "New consumable added to inventory",
       })
 
-      // Reset form and close dialog
-      resetForm()
+      // Reset form completely
+      setFormData({
+        plant_name: "",
+        scientific_name: "",
+        category: "",
+        quantity: 0,
+        status: "Available",
+        price: 0,
+        sku: "",
+        section: "",
+        source: "",
+        unit: "Pieces",
+      })
+
+      // Call success callback to refresh data
       onSuccess()
-      if (onClose) onClose()
+
+      // Close dialog
+      if (onClose) {
+        onClose()
+      }
     } catch (error: any) {
       console.error('Error adding consumable:', error)
       toast({
