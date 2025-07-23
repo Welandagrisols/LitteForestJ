@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { supabase, isDemoMode } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -78,31 +78,29 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
       setUploadingImage(true)
 
       // Generate unique filename
-      const fileExt = file.name.split('.').pop()
+      const fileExt = file.name.split(".").pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
       const filePath = `plants/${fileName}`
 
       // Upload file to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('plant-images')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+      const { data, error } = await supabase.storage.from("plant-images").upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      })
 
       if (error) {
-        console.error('Upload error:', error)
+        console.error("Upload error:", error)
         throw error
       }
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('plant-images')
-        .getPublicUrl(filePath)
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("plant-images").getPublicUrl(filePath)
 
       return publicUrl
     } catch (error: any) {
-      console.error('Error uploading image:', error)
+      console.error("Error uploading image:", error)
       toast({
         title: "Upload failed",
         description: error.message || "Failed to upload image",
@@ -118,7 +116,7 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
     const file = e.target.files?.[0]
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         toast({
           title: "Invalid file type",
           description: "Please select an image file",
@@ -151,7 +149,7 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
   const removeImage = () => {
     setImageFile(null)
     setImagePreview(null)
-    setFormData(prev => ({ ...prev, image_url: "" }))
+    setFormData((prev) => ({ ...prev, image_url: "" }))
   }
 
   const handleSelectChange = (name: string, value: string) => {
@@ -163,10 +161,7 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
 
   const autoFillFromExisting = async (plantName: string, scientificName: string) => {
     // Fetch data from Supabase based on plantName or scientificName
-    let query = supabase
-      .from("inventory")
-      .select("description, image_url")
-      .limit(1)
+    let query = supabase.from("inventory").select("description, image_url").limit(1)
 
     if (plantName) {
       query = query.ilike("plant_name", plantName)
@@ -217,6 +212,16 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
       return
     }
 
+    // Validate required fields
+    if (!formData.plant_name || !formData.category || formData.quantity < 0 || formData.price < 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields with valid values",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -236,33 +241,49 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
         }
       }
 
-      const { error } = await supabase
-        .from("inventory")
-        .update({
-          ...formData,
-          image_url: imageUrl,
-          cost_per_seedling: calculatedCostPerSeedling,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", item.id)
+      const updateData = {
+        plant_name: formData.plant_name.trim(),
+        scientific_name: formData.scientific_name?.trim() || null,
+        category: formData.category,
+        quantity: Number(formData.quantity),
+        age: formData.age?.trim() || null,
+        date_planted: formData.date_planted || null,
+        status: formData.status,
+        price: Number(formData.price),
+        batch_cost: Number(formData.batch_cost),
+        cost_per_seedling: calculatedCostPerSeedling,
+        sku: formData.sku,
+        section: formData.section?.trim() || null,
+        row: formData.row?.trim() || null,
+        source: formData.source?.trim() || null,
+        description: formData.description?.trim() || null,
+        image_url: imageUrl,
+        ready_for_sale: formData.ready_for_sale,
+        updated_at: new Date().toISOString(),
+      }
 
-      if (error) throw error
+      const { error } = await supabase.from("inventory").update(updateData).eq("id", item.id)
+
+      if (error) {
+        console.error("Update error:", error)
+        throw error
+      }
 
       toast({
         title: "Success",
         description: isConsumable
-          ? "Consumable updated"
-          : `Plant batch updated. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
+          ? "Consumable updated successfully"
+          : `Plant updated successfully. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
       })
 
       onSuccess()
     } catch (error: any) {
+      console.error("Error updating item:", error)
       toast({
         title: "Error updating item",
-        description: error.message,
+        description: error.message || "Failed to update item",
         variant: "destructive",
       })
-      console.error("Error details:", error)
     } finally {
       setLoading(false)
     }
@@ -432,9 +453,7 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
                             <Upload className="h-4 w-4" />
                             {uploadingImage ? "Uploading..." : "Choose Image"}
                           </label>
-                          <p className="text-xs text-muted-foreground">
-                            Supports JPG, PNG, WebP (max 5MB)
-                          </p>
+                          <p className="text-xs text-muted-foreground">Supports JPG, PNG, WebP (max 5MB)</p>
                         </div>
                       </div>
                     ) : (
@@ -509,7 +528,7 @@ export function EditInventoryForm({ item, onSuccess }: EditInventoryFormProps) {
                       type="checkbox"
                       id="ready_for_sale"
                       checked={formData.ready_for_sale}
-                      onChange={(e) => setFormData(prev => ({ ...prev, ready_for_sale: e.target.checked }))}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, ready_for_sale: e.target.checked }))}
                       className="rounded"
                     />
                     Ready for Sale on Website

@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast"
 import { useIsMobile } from "@/hooks/use-mobile"
 
-
 interface AddInventoryFormProps {
   onSuccess: () => void
   onClose?: () => void
@@ -38,8 +37,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     row: "",
     source: "",
   })
-
-
 
   // Calculate cost per seedling
   const costPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
@@ -79,8 +76,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     setImagePreview(null)
   }
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -115,7 +110,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       }
 
       // Calculate cost per seedling
-      const calculatedCostPerSeedling = finalFormData.quantity > 0 ? finalFormData.batch_cost / finalFormData.quantity : 0
+      const calculatedCostPerSeedling =
+        finalFormData.quantity > 0 ? finalFormData.batch_cost / finalFormData.quantity : 0
 
       const insertData = {
         plant_name: finalFormData.plant_name.trim(),
@@ -132,7 +128,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         section: finalFormData.section?.trim() || null,
         row: finalFormData.row?.trim() || null,
         source: finalFormData.source?.trim() || null,
-        item_type: 'Plant',
+        item_type: "Plant",
         ready_for_sale: false,
         description: null,
         image_url: null,
@@ -140,12 +136,12 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         updated_at: new Date().toISOString(),
       }
 
-      console.log('Inserting data:', insertData)
+      console.log("Inserting data:", insertData)
 
       const { data, error } = await supabase.from("inventory").insert([insertData]).select()
 
       if (error) {
-        console.error('Insert error:', error)
+        console.error("Insert error:", error)
         throw error
       }
 
@@ -156,16 +152,16 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
 
       // Reset form first, then trigger callbacks
       resetForm()
-      
+
       // Call success callback to refresh data
       onSuccess()
-      
+
       // Close dialog
       if (onClose) {
         onClose()
       }
     } catch (error: any) {
-      console.error('Error adding plant:', error)
+      console.error("Error adding plant:", error)
       toast({
         title: "Error adding plant",
         description: error.message || "Failed to add plant to inventory",
@@ -183,7 +179,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       {/* Scrollable form container */}
       <div className="flex-1 overflow-y-auto px-1">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-2 gap-4'}`}>
+          <div className={`grid grid-cols-1 ${isMobile ? "gap-6" : "md:grid-cols-2 gap-4"}`}>
             <div className="space-y-2">
               <Label htmlFor="plant_name">Plant Name *</Label>
               <Input id="plant_name" name="plant_name" value={formData.plant_name} onChange={handleChange} required />
@@ -337,30 +333,22 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
                 onChange={handleChange}
               />
             </div>
-
-
           </div>
         </form>
       </div>
 
       {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4 flex-shrink-0">
-        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-end space-x-2'}`}>
+        <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-end space-x-2"}`}>
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
-            className={isMobile ? 'mobile-touch-target w-full' : ''}
+            className={isMobile ? "mobile-touch-target w-full" : ""}
           >
             Cancel
           </Button>
-          <Button
-            type="submit"
-            form="add-inventory-form"
-            disabled={loading}
-            className={isMobile ? 'mobile-touch-target w-full' : ''}
-            onClick={handleSubmit}
-          >
+          <Button type="submit" disabled={loading} className={isMobile ? "mobile-touch-target w-full" : ""}>
             {loading ? "Adding..." : "Add Item"}
           </Button>
         </div>

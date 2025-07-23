@@ -16,12 +16,12 @@ console.log("Is valid URL:", hasValidUrl)
 
 // Check if we're in demo mode (missing required env vars)
 export const isDemoMode =
-  !process.env.NEXT_PUBLIC_SUPABASE_URL || 
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
   !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   !hasValidUrl ||
   !hasValidKey ||
-  process.env.NEXT_PUBLIC_SUPABASE_URL === 'your-project-url' ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'your-anon-key'
+  process.env.NEXT_PUBLIC_SUPABASE_URL === "your-project-url" ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === "your-anon-key"
 
 console.log("Is Demo Mode:", isDemoMode)
 
@@ -31,7 +31,7 @@ if (isDemoMode) {
     hasUrl: !!supabaseUrl,
     hasValidUrl,
     hasKey: !!supabaseAnonKey,
-    hasValidKey
+    hasValidKey,
   })
 }
 

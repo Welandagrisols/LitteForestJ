@@ -1,4 +1,3 @@
-
 # Website Integration Guide for Little Forest
 
 This guide explains how to integrate your Little Forest website (https://littleforest.onrender.com/) with your Replit nursery management app.
@@ -12,7 +11,7 @@ Your nursery management API is deployed at: `https://litteforest.vercel.app`
 Add this JavaScript code to your website to fetch and display products from your nursery app:
 
 ### Fetch Products Function
-```javascript
+\`\`\`javascript
 // Add this to your website's JavaScript
 const NURSERY_API_URL = 'https://[your-repl-name].replit.app'; // Replace with your actual Replit URL
 
@@ -205,13 +204,13 @@ async function processCheckout() {
   
   alert('Order processed successfully! Inventory has been updated.');
 }
-```
+\`\`\`
 
 ## Step 3: HTML Structure
 
 Make sure your website has these elements:
 
-```html
+\`\`\`html
 <!-- Products container -->
 <div id="products-container" class="row">
   <!-- Products will be loaded here -->
@@ -229,13 +228,13 @@ Make sure your website has these elements:
   <input type="tel" id="customer-contact" placeholder="Phone Number">
   <button type="button" onclick="processCheckout()">Complete Purchase</button>
 </form>
-```
+\`\`\`
 
 ## Step 4: CSS Styling
 
 Add these CSS classes for better appearance:
 
-```css
+\`\`\`css
 .product-card {
   transition: transform 0.2s;
 }
@@ -253,7 +252,7 @@ Add these CSS classes for better appearance:
 .bg-warning { background-color: #ffc107; color: black; }
 .bg-danger { background-color: #dc3545; color: white; }
 .bg-secondary { background-color: #6c757d; color: white; }
-```
+\`\`\`
 
 ## Step 5: Testing the Integration
 
@@ -267,13 +266,13 @@ Add these CSS classes for better appearance:
 
 Consider setting up a regular sync to keep your website updated:
 
-```javascript
+\`\`\`javascript
 // Refresh products every 5 minutes
 setInterval(async () => {
   const products = await fetchNurseryProducts();
   displayProducts(products);
 }, 5 * 60 * 1000);
-```
+\`\`\`
 
 ## Error Handling
 

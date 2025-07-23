@@ -107,6 +107,11 @@ export function SalesTab() {
     }
   }
 
+  const handleAddSaleSuccess = async () => {
+    await fetchSales()
+    setDialogOpen(false)
+  }
+
   const handleExportToExcel = async () => {
     try {
       setExporting(true)
@@ -183,7 +188,7 @@ export function SalesTab() {
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
-                className="flex items-center justify-center gap-2 w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto bg-transparent"
                 onClick={handleExportToExcel}
                 disabled={exporting || sales.length === 0}
               >
@@ -208,10 +213,7 @@ export function SalesTab() {
                   <DialogHeader>
                     <DialogTitle>Record New Sale</DialogTitle>
                   </DialogHeader>
-                  <AddSaleForm onSuccess={() => {
-                    fetchSales()
-                    setDialogOpen(false)
-                  }} />
+                  <AddSaleForm onSuccess={handleAddSaleSuccess} />
                 </DialogContent>
               </Dialog>
             </div>
@@ -221,54 +223,54 @@ export function SalesTab() {
         {/* Scrollable Content */}
         <div className="p-6">
           <div className="rounded-md border border-border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="sage-header hover:bg-muted/50">
-                <TableHead>Date</TableHead>
-                <TableHead>Plant</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Customer</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
-                    Loading sales records...
-                  </TableCell>
+            <Table>
+              <TableHeader>
+                <TableRow className="sage-header hover:bg-muted/50">
+                  <TableHead>Date</TableHead>
+                  <TableHead>Plant</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Customer</TableHead>
                 </TableRow>
-              ) : sales.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
-                    No sales records found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                sales.map((sale) => (
-                  <TableRow key={sale.id} className="hover:bg-muted/50">
-                    <TableCell>{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <div className="font-medium">{sale.inventory?.plant_name || "Unknown Plant"}</div>
-                      <div className="text-sm text-muted-foreground">{sale.inventory?.category || ""}</div>
-                    </TableCell>
-                    <TableCell>{sale.quantity}</TableCell>
-                    <TableCell>Ksh {sale.total_amount.toLocaleString()}</TableCell>
-                    <TableCell>
-                      {sale.customer ? (
-                        <>
-                          <div>{sale.customer.name}</div>
-                          <div className="text-sm text-muted-foreground">{sale.customer.contact}</div>
-                        </>
-                      ) : (
-                        "Walk-in Customer"
-                      )}
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8">
+                      Loading sales records...
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : sales.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8">
+                      No sales records found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  sales.map((sale) => (
+                    <TableRow key={sale.id} className="hover:bg-muted/50">
+                      <TableCell>{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <div className="font-medium">{sale.inventory?.plant_name || "Unknown Plant"}</div>
+                        <div className="text-sm text-muted-foreground">{sale.inventory?.category || ""}</div>
+                      </TableCell>
+                      <TableCell>{sale.quantity}</TableCell>
+                      <TableCell>Ksh {sale.total_amount.toLocaleString()}</TableCell>
+                      <TableCell>
+                        {sale.customer ? (
+                          <>
+                            <div>{sale.customer.name}</div>
+                            <div className="text-sm text-muted-foreground">{sale.customer.contact}</div>
+                          </>
+                        ) : (
+                          "Walk-in Customer"
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>
@@ -278,24 +280,24 @@ export function SalesTab() {
 
 // Custom hook to detect mobile devices
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Adjust breakpoint as needed
-    };
+      setIsMobile(window.innerWidth <= 768) // Adjust breakpoint as needed
+    }
 
     // Set initial value
-    handleResize();
+    handleResize()
 
     // Listen for window resize events
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize)
 
     // Clean up event listener on unmount
     return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
 
-  return isMobile;
+  return isMobile
 }

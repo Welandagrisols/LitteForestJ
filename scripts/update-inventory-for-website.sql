@@ -1,4 +1,3 @@
-
 -- Add new columns for website integration
 ALTER TABLE IF EXISTS public.inventory 
 ADD COLUMN IF NOT EXISTS ready_for_sale BOOLEAN DEFAULT false,

@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { useIsMobile } from "@/hooks/use-mobile"
 
 interface AddConsumableFormProps {
   onSuccess: () => void
@@ -21,15 +20,15 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
 
   const [formData, setFormData] = useState({
     plant_name: "",
-    scientific_name: "",
     category: "",
     quantity: 0,
+    unit: "Pieces",
+    date_planted: "",
     status: "Available",
     price: 0,
     sku: "",
     section: "",
     source: "",
-    unit: "Pieces",
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,15 +49,15 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
   const resetForm = () => {
     setFormData({
       plant_name: "",
-      scientific_name: "",
       category: "",
       quantity: 0,
+      unit: "Pieces",
+      date_planted: "",
       status: "Available",
       price: 0,
       sku: "",
       section: "",
       source: "",
-      unit: "Pieces",
     })
   }
 
@@ -92,7 +91,7 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
       if (!finalFormData.sku) {
         const prefix = finalFormData.category.replace("Consumable: ", "").substring(0, 3).toUpperCase()
         const randomNum = Math.floor(1000 + Math.random() * 9000)
-        finalFormData.sku = `${prefix}${randomNum}`
+        finalFormData.sku = `CON${prefix}${randomNum}`
       }
 
       const insertData = {
@@ -101,7 +100,7 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         category: finalFormData.category,
         quantity: Number(finalFormData.quantity),
         age: null,
-        date_planted: null,
+        date_planted: finalFormData.date_planted || null,
         status: finalFormData.status,
         price: Number(finalFormData.price),
         batch_cost: 0,
@@ -110,7 +109,7 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         section: finalFormData.section?.trim() || null,
         row: null,
         source: finalFormData.source?.trim() || null,
-        item_type: 'Consumable',
+        item_type: "Consumable",
         ready_for_sale: false,
         description: null,
         image_url: null,
@@ -118,12 +117,10 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         updated_at: new Date().toISOString(),
       }
 
-      console.log('Inserting consumable data:', insertData)
-
       const { data, error } = await supabase.from("inventory").insert([insertData]).select()
 
       if (error) {
-        console.error('Insert error:', error)
+        console.error("Insert error:", error)
         throw error
       }
 
@@ -132,29 +129,12 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         description: "New consumable added to inventory",
       })
 
-      // Reset form completely
-      setFormData({
-        plant_name: "",
-        scientific_name: "",
-        category: "",
-        quantity: 0,
-        status: "Available",
-        price: 0,
-        sku: "",
-        section: "",
-        source: "",
-        unit: "Pieces",
-      })
-
-      // Call success callback to refresh data
+      // Reset form and close dialog
+      resetForm()
       onSuccess()
-
-      // Close dialog
-      if (onClose) {
-        onClose()
-      }
+      if (onClose) onClose()
     } catch (error: any) {
-      console.error('Error adding consumable:', error)
+      console.error("Error adding consumable:", error)
       toast({
         title: "Error adding consumable",
         description: error.message || "Failed to add consumable to inventory",
@@ -165,34 +145,14 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
     }
   }
 
-  const isMobile = useIsMobile()
-
   return (
-    <div className="flex flex-col max-h-[80vh]">
-      {/* Scrollable form container */}
-      <div className="flex-1 overflow-y-auto px-1">
+    <div className="flex flex-col h-[70vh] max-h-[600px]">
+      <div className="flex-1 overflow-y-auto pr-2">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className={`grid grid-cols-1 ${isMobile ? 'gap-6' : 'md:grid-cols-2 gap-4'}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="plant_name">Item Name *</Label>
               <Input id="plant_name" name="plant_name" value={formData.plant_name} onChange={handleChange} required />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="unit">Unit *</Label>
-              <Select value={formData.unit} onValueChange={(value) => handleSelectChange("unit", value)} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select unit" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Pieces">Pieces</SelectItem>
-                  <SelectItem value="Kg">Kilograms</SelectItem>
-                  <SelectItem value="Liters">Liters</SelectItem>
-                  <SelectItem value="Bags">Bags</SelectItem>
-                  <SelectItem value="Bottles">Bottles</SelectItem>
-                  <SelectItem value="Packets">Packets</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <div className="space-y-2">
@@ -231,6 +191,25 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="unit">Unit *</Label>
+              <Select value={formData.unit} onValueChange={(value) => handleSelectChange("unit", value)} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Pieces">Pieces</SelectItem>
+                  <SelectItem value="Kilograms">Kilograms</SelectItem>
+                  <SelectItem value="Grams">Grams</SelectItem>
+                  <SelectItem value="Litres">Litres</SelectItem>
+                  <SelectItem value="Millilitres">Millilitres</SelectItem>
+                  <SelectItem value="Packets">Packets</SelectItem>
+                  <SelectItem value="Bottles">Bottles</SelectItem>
+                  <SelectItem value="Bags">Bags</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="price">Price per Unit (Ksh) *</Label>
               <Input
                 id="price"
@@ -241,6 +220,17 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
                 value={formData.price}
                 onChange={handleChange}
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date_planted">Purchase Date</Label>
+              <Input
+                id="date_planted"
+                name="date_planted"
+                type="date"
+                value={formData.date_planted}
+                onChange={handleChange}
               />
             </div>
 
@@ -268,7 +258,7 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
               <Input
                 id="section"
                 name="section"
-                placeholder="e.g. Shed A"
+                placeholder="e.g. Warehouse A"
                 value={formData.section}
                 onChange={handleChange}
               />
@@ -288,22 +278,18 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         </form>
       </div>
 
-      {/* Sticky action buttons */}
-      <div className="border-t border-border bg-white pt-4 mt-4 flex-shrink-0">
-        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-end space-x-2'}`}>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            className={isMobile ? 'mobile-touch-target w-full' : ''}
-          >
-            Cancel
-          </Button>
+      <div className="border-t border-border bg-white pt-4 mt-4">
+        <div className="flex justify-end gap-2">
+          {onClose && (
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+          )}
           <Button
             type="submit"
-            disabled={loading}
-            className={isMobile ? 'mobile-touch-target w-full' : ''}
             onClick={handleSubmit}
+            className="bg-primary hover:bg-primary/90 text-white"
+            disabled={loading}
           >
             {loading ? "Adding..." : "Add Consumable"}
           </Button>

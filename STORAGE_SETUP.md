@@ -1,4 +1,3 @@
-
 # Storage Setup for Plant Images
 
 This guide explains how to set up Supabase Storage for uploading plant images directly from the app.
@@ -17,7 +16,7 @@ In your Supabase dashboard:
 
 Run the following SQL in your Supabase SQL Editor:
 
-```sql
+\`\`\`sql
 -- Enable RLS for storage.objects if not already enabled
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
@@ -36,7 +35,7 @@ FOR UPDATE USING (bucket_id = 'plant-images');
 -- Allow authenticated users to delete plant images
 CREATE POLICY "Allow authenticated users to delete plant images" ON storage.objects
 FOR DELETE USING (bucket_id = 'plant-images');
-```
+\`\`\`
 
 ## 3. Features
 
@@ -59,12 +58,12 @@ With this setup, your app now supports:
 ## 5. File Organization
 
 Images are stored in the following structure:
-```
+\`\`\`
 plant-images/
 ├── plants/
 │   ├── 1734567890-abc123.jpg
 │   ├── 1734567891-def456.png
 │   └── ...
-```
+\`\`\`
 
 Each file gets a unique timestamp-based name to prevent conflicts.

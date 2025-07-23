@@ -124,6 +124,25 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       return
     }
 
+    // Validate required fields
+    if (!formData.inventory_id || formData.quantity <= 0 || formData.total_amount <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an item and enter a valid quantity",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (isNewCustomer && (!formData.customer_name || !formData.customer_contact)) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in customer name and contact for new customer",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -135,9 +154,9 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
           .from("customers")
           .insert([
             {
-              name: formData.customer_name,
-              contact: formData.customer_contact,
-              email: formData.customer_email || null,
+              name: formData.customer_name.trim(),
+              contact: formData.customer_contact.trim(),
+              email: formData.customer_email?.trim() || null,
               created_at: new Date().toISOString(),
             },
           ])
@@ -154,10 +173,10 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       const { error: saleError } = await supabase.from("sales").insert([
         {
           inventory_id: formData.inventory_id,
-          quantity: formData.quantity,
+          quantity: Number(formData.quantity),
           sale_date: formData.sale_date,
           customer_id: customerId || null,
-          total_amount: formData.total_amount,
+          total_amount: Number(formData.total_amount),
           created_at: new Date().toISOString(),
         },
       ])
@@ -192,16 +211,17 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
         customer_email: "",
         total_amount: 0,
       })
-      
+
       setSelectedItem(null)
       setIsNewCustomer(false)
-      
-      // Call success callback to refresh data and close dialog
+
+      // Call success callback to refresh data
       onSuccess()
     } catch (error: any) {
+      console.error("Error recording sale:", error)
       toast({
         title: "Error recording sale",
-        description: error.message,
+        description: error.message || "Failed to record sale",
         variant: "destructive",
       })
     } finally {

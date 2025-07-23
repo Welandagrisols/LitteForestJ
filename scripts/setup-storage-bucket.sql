@@ -1,4 +1,3 @@
-
 -- Create storage bucket for plant images
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('plant-images', 'plant-images', true)

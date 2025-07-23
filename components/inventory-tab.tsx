@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -89,7 +88,7 @@ export function InventoryTab() {
       const { error } = await supabase.from("inventory").delete().eq("id", id)
 
       if (error) {
-        console.error('Delete error:', error)
+        console.error("Delete error:", error)
         throw error
       }
 
@@ -101,7 +100,7 @@ export function InventoryTab() {
       // Refresh inventory after successful delete
       await fetchInventory()
     } catch (error: any) {
-      console.error('Error deleting item:', error)
+      console.error("Error deleting item:", error)
       toast({
         title: "Error deleting item",
         description: error.message || "Failed to delete item",
@@ -110,8 +109,8 @@ export function InventoryTab() {
     }
   }
 
-  const handleAddSuccess = () => {
-    fetchInventory()
+  const handleAddSuccess = async () => {
+    await fetchInventory()
     setAddPlantDialogOpen(false)
     setAddConsumableDialogOpen(false)
   }
@@ -171,7 +170,12 @@ export function InventoryTab() {
 
   const consumableCategories = [
     "All Categories",
-    ...new Set(inventory.filter((item) => isConsumable(item)).map((item) => getConsumableCategory(item)).filter(Boolean)),
+    ...new Set(
+      inventory
+        .filter((item) => isConsumable(item))
+        .map((item) => getConsumableCategory(item))
+        .filter(Boolean),
+    ),
   ].filter(Boolean) // Remove any empty/null values
 
   const categories = activeTab === "plants" ? plantCategories : consumableCategories
@@ -247,11 +251,11 @@ export function InventoryTab() {
                     <DialogHeader>
                       <DialogTitle>Add New Plant to Inventory</DialogTitle>
                     </DialogHeader>
-                    <AddInventoryForm 
+                    <AddInventoryForm
                       onSuccess={async () => {
                         await fetchInventory()
                         setAddPlantDialogOpen(false)
-                      }} 
+                      }}
                       onClose={() => setAddPlantDialogOpen(false)}
                     />
                   </DialogContent>
@@ -275,11 +279,11 @@ export function InventoryTab() {
                     <DialogHeader>
                       <DialogTitle>Add New Consumable to Inventory</DialogTitle>
                     </DialogHeader>
-                    <AddConsumableForm 
+                    <AddConsumableForm
                       onSuccess={async () => {
                         await fetchInventory()
                         setAddConsumableDialogOpen(false)
-                      }} 
+                      }}
                       onClose={() => setAddConsumableDialogOpen(false)}
                     />
                   </DialogContent>
@@ -288,7 +292,7 @@ export function InventoryTab() {
 
               <Button
                 variant="outline"
-                className="flex items-center justify-center gap-2 h-12 text-base font-medium border-2 hover:bg-accent/10 w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 h-12 text-base font-medium border-2 hover:bg-accent/10 w-full sm:w-auto bg-transparent"
                 onClick={handleExportToExcel}
                 disabled={
                   exporting || (activeTab === "plants" ? filteredPlants.length === 0 : filteredConsumables.length === 0)
@@ -333,288 +337,286 @@ export function InventoryTab() {
       {/* Scrollable Content */}
       <div className="p-6">
         <Tabs defaultValue="plants" onValueChange={setActiveTab}>
-        <TabsList className="mb-4 bg-muted">
-          <TabsTrigger value="plants" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-            Plants & Trees
-          </TabsTrigger>
-          <TabsTrigger value="consumables" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-            Nursery Consumables
-          </TabsTrigger>
-        </TabsList>
+          <TabsList className="mb-4 bg-muted">
+            <TabsTrigger value="plants" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              Plants & Trees
+            </TabsTrigger>
+            <TabsTrigger value="consumables" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              Nursery Consumables
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Plants Tab */}
-        <TabsContent value="plants">
-          {loading ? (
-            <div className="text-center py-8">Loading inventory...</div>
-          ) : filteredPlants.length === 0 ? (
-            <div className="text-center py-8">No plants found</div>
-          ) : (
-            <div className="space-y-4">
-              {filteredPlants.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Plant Information */}
-                    <div className="space-y-2">
-                      <div className="font-medium text-foreground">{item.plant_name}</div>
-                      <div className="text-sm text-muted-foreground">{item.scientific_name}</div>
-                      <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
-                    </div>
-
-                    {/* Category & Location */}
-                    <div className="space-y-2">
-                      <div className="text-sm">
-                        <span className="font-medium">Category:</span> {item.category}
+          {/* Plants Tab */}
+          <TabsContent value="plants">
+            {loading ? (
+              <div className="text-center py-8">Loading inventory...</div>
+            ) : filteredPlants.length === 0 ? (
+              <div className="text-center py-8">No plants found</div>
+            ) : (
+              <div className="space-y-4">
+                {filteredPlants.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {/* Plant Information */}
+                      <div className="space-y-2">
+                        <div className="font-medium text-foreground">{item.plant_name}</div>
+                        <div className="text-sm text-muted-foreground">{item.scientific_name}</div>
+                        <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
                       </div>
-                      {item.section && (
-                        <div className="text-sm text-muted-foreground">
-                          Section {item.section}
-                          {item.row ? `, Row ${item.row}` : ""}
+
+                      {/* Category & Location */}
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Category:</span> {item.category}
                         </div>
-                      )}
+                        {item.section && (
+                          <div className="text-sm text-muted-foreground">
+                            Section {item.section}
+                            {item.row ? `, Row ${item.row}` : ""}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Quantity & Age */}
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Quantity:</span> {item.quantity}
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-medium">Age:</span> {item.age || "-"}
+                        </div>
+                      </div>
+
+                      {/* Date & Source */}
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Date Planted:</span>{" "}
+                          {item.date_planted ? new Date(item.date_planted).toLocaleDateString() : "-"}
+                        </div>
+                        {item.source && <div className="text-sm text-muted-foreground">Source: {item.source}</div>}
+                      </div>
+
+                      {/* Status & Price */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Status:</span>
+                          <Badge
+                            variant={item.status === "Healthy" ? "default" : "outline"}
+                            className={
+                              item.status === "Healthy"
+                                ? "bg-primary hover:bg-primary"
+                                : item.status === "Attention"
+                                  ? "bg-secondary hover:bg-secondary"
+                                  : "bg-destructive hover:bg-destructive"
+                            }
+                          >
+                            {item.status}
+                          </Badge>
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-medium">Price:</span> Ksh {item.price.toLocaleString()}
+                        </div>
+                      </div>
+
+                      {/* Website Status */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Website:</span>
+                          <Badge
+                            variant={item.ready_for_sale ? "default" : "outline"}
+                            className={item.ready_for_sale ? "bg-primary hover:bg-primary" : "bg-muted hover:bg-muted"}
+                          >
+                            {item.ready_for_sale ? "Listed" : "Not Listed"}
+                          </Badge>
+                        </div>
+                        {item.ready_for_sale && (
+                          <Badge
+                            variant="outline"
+                            className={
+                              item.quantity >= 100
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : item.quantity >= 10
+                                  ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                  : "bg-red-50 text-red-700 border-red-200"
+                            }
+                          >
+                            {item.quantity >= 100 ? "Available" : item.quantity >= 10 ? "Limited" : "Not Available"}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Quantity & Age */}
-                    <div className="space-y-2">
-                      <div className="text-sm">
-                        <span className="font-medium">Quantity:</span> {item.quantity}
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium">Age:</span> {item.age || "-"}
-                      </div>
-                    </div>
-
-                    {/* Date & Source */}
-                    <div className="space-y-2">
-                      <div className="text-sm">
-                        <span className="font-medium">Date Planted:</span>{" "}
-                        {item.date_planted ? new Date(item.date_planted).toLocaleDateString() : "-"}
-                      </div>
-                      {item.source && (
-                        <div className="text-sm text-muted-foreground">Source: {item.source}</div>
-                      )}
-                    </div>
-
-                    {/* Status & Price */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">Status:</span>
-                        <Badge
-                          variant={item.status === "Healthy" ? "default" : "outline"}
-                          className={
-                            item.status === "Healthy"
-                              ? "bg-primary hover:bg-primary"
-                              : item.status === "Attention"
-                                ? "bg-secondary hover:bg-secondary"
-                                : "bg-destructive hover:bg-destructive"
-                          }
-                        >
-                          {item.status}
-                        </Badge>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium">Price:</span> Ksh {item.price.toLocaleString()}
-                      </div>
-                    </div>
-
-                    {/* Website Status */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">Website:</span>
-                        <Badge
-                          variant={item.ready_for_sale ? "default" : "outline"}
-                          className={
-                            item.ready_for_sale
-                              ? "bg-primary hover:bg-primary"
-                              : "bg-muted hover:bg-muted"
-                          }
-                        >
-                          {item.ready_for_sale ? "Listed" : "Not Listed"}
-                        </Badge>
-                      </div>
-                      {item.ready_for_sale && (
-                        <Badge
-                          variant="outline"
-                          className={
-                            item.quantity >= 100
-                              ? "bg-green-50 text-green-700 border-green-200"
-                              : item.quantity >= 10
-                                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                                : "bg-red-50 text-red-700 border-red-200"
-                          }
-                        >
-                          {item.quantity >= 100 ? "Available" : item.quantity >= 10 ? "Limited" : "Not Available"}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-border">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditItem(item)}
-                          disabled={isDemoMode || !tableExists}
-                          title={
-                            isDemoMode || !tableExists
-                              ? "Connect to Supabase and set up tables to enable editing"
-                              : "Edit plant"
-                          }
-                        >
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[600px]">
-                        <DialogHeader>
-                          <DialogTitle>Edit Plant</DialogTitle>
-                        </DialogHeader>
-                        {editItem && <EditInventoryForm item={editItem} onSuccess={() => fetchInventory()} />}
-                      </DialogContent>
-                    </Dialog>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      disabled={isDemoMode || !tableExists}
-                      title={
-                        isDemoMode || !tableExists
-                          ? "Connect to Supabase and set up tables to enable deleting"
-                          : "Delete plant"
-                      }
-                      onClick={() => {
-                        if (confirm("Are you sure you want to delete this item?")) {
-                          deleteInventoryItem(item.id)
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-4 pt-4 border-t border-border">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditItem(item)}
+                            disabled={isDemoMode || !tableExists}
+                            title={
+                              isDemoMode || !tableExists
+                                ? "Connect to Supabase and set up tables to enable editing"
+                                : "Edit plant"
+                            }
+                          >
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[600px]">
+                          <DialogHeader>
+                            <DialogTitle>Edit Plant</DialogTitle>
+                          </DialogHeader>
+                          {editItem && <EditInventoryForm item={editItem} onSuccess={() => fetchInventory()} />}
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
+                        disabled={isDemoMode || !tableExists}
+                        title={
+                          isDemoMode || !tableExists
+                            ? "Connect to Supabase and set up tables to enable deleting"
+                            : "Delete plant"
                         }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        {/* Consumables Tab */}
-        <TabsContent value="consumables">
-          {loading ? (
-            <div className="text-center py-8">Loading consumables...</div>
-          ) : filteredConsumables.length === 0 ? (
-            <div className="text-center py-8">No consumables found</div>
-          ) : (
-            <div className="space-y-4">
-              {filteredConsumables.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Item Information */}
-                    <div className="space-y-2">
-                      <div className="font-medium text-foreground">{item.plant_name}</div>
-                      <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
-                    </div>
-
-                    {/* Category */}
-                    <div className="space-y-2">
-                      <div className="text-sm">
-                        <span className="font-medium">Category:</span> {getConsumableCategory(item)}
-                      </div>
-                    </div>
-
-                    {/* Quantity & Unit */}
-                    <div className="space-y-2">
-                      <div className="text-sm">
-                        <span className="font-medium">Quantity:</span> {item.quantity}
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium">Unit:</span> {getConsumableUnit(item)}
-                      </div>
-                    </div>
-
-                    {/* Purchase Date & Supplier */}
-                    <div className="space-y-2">
-                      <div className="text-sm">
-                        <span className="font-medium">Purchase Date:</span>{" "}
-                        {item.date_planted ? new Date(item.date_planted).toLocaleDateString() : "-"}
-                      </div>
-                      {item.source && (
-                        <div className="text-sm text-muted-foreground">Supplier: {item.source}</div>
-                      )}
-                    </div>
-
-                    {/* Status & Price */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">Status:</span>
-                        <Badge
-                          variant={item.status === "Available" ? "default" : "outline"}
-                          className={
-                            item.status === "Available"
-                              ? "bg-primary hover:bg-primary"
-                              : item.status === "Low Stock"
-                                ? "bg-secondary hover:bg-secondary"
-                                : "bg-destructive hover:bg-destructive"
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this item?")) {
+                            deleteInventoryItem(item.id)
                           }
-                        >
-                          {item.status}
-                        </Badge>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium">Price:</span> Ksh {item.price.toLocaleString()}
-                      </div>
+                        }}
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
 
-                  {/* Actions */}
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-border">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditItem(item)}
-                          disabled={isDemoMode || !tableExists}
-                          title={
-                            isDemoMode || !tableExists
-                              ? "Connect to Supabase and set up tables to enable editing"
-                              : "Edit consumable"
-                          }
-                        >
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[600px]">
-                        <DialogHeader>
-                          <DialogTitle>Edit Consumable</DialogTitle>
-                        </DialogHeader>
-                        {editItem && <EditInventoryForm item={editItem} onSuccess={() => fetchInventory()} />}
-                      </DialogContent>
-                    </Dialog>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      disabled={isDemoMode || !tableExists}
-                      title={
-                        isDemoMode || !tableExists
-                          ? "Connect to Supabase and set up tables to enable deleting"
-                          : "Delete consumable"
-                      }
-                      onClick={() => {
-                        if (confirm("Are you sure you want to delete this item?")) {
-                          deleteInventoryItem(item.id)
+          {/* Consumables Tab */}
+          <TabsContent value="consumables">
+            {loading ? (
+              <div className="text-center py-8">Loading consumables...</div>
+            ) : filteredConsumables.length === 0 ? (
+              <div className="text-center py-8">No consumables found</div>
+            ) : (
+              <div className="space-y-4">
+                {filteredConsumables.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {/* Item Information */}
+                      <div className="space-y-2">
+                        <div className="font-medium text-foreground">{item.plant_name}</div>
+                        <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
+                      </div>
+
+                      {/* Category */}
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Category:</span> {getConsumableCategory(item)}
+                        </div>
+                      </div>
+
+                      {/* Quantity & Unit */}
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Quantity:</span> {item.quantity}
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-medium">Unit:</span> {getConsumableUnit(item)}
+                        </div>
+                      </div>
+
+                      {/* Purchase Date & Supplier */}
+                      <div className="space-y-2">
+                        <div className="text-sm">
+                          <span className="font-medium">Purchase Date:</span>{" "}
+                          {item.date_planted ? new Date(item.date_planted).toLocaleDateString() : "-"}
+                        </div>
+                        {item.source && <div className="text-sm text-muted-foreground">Supplier: {item.source}</div>}
+                      </div>
+
+                      {/* Status & Price */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Status:</span>
+                          <Badge
+                            variant={item.status === "Available" ? "default" : "outline"}
+                            className={
+                              item.status === "Available"
+                                ? "bg-primary hover:bg-primary"
+                                : item.status === "Low Stock"
+                                  ? "bg-secondary hover:bg-secondary"
+                                  : "bg-destructive hover:bg-destructive"
+                            }
+                          >
+                            {item.status}
+                          </Badge>
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-medium">Price:</span> Ksh {item.price.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-4 pt-4 border-t border-border">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditItem(item)}
+                            disabled={isDemoMode || !tableExists}
+                            title={
+                              isDemoMode || !tableExists
+                                ? "Connect to Supabase and set up tables to enable editing"
+                                : "Edit consumable"
+                            }
+                          >
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[600px]">
+                          <DialogHeader>
+                            <DialogTitle>Edit Consumable</DialogTitle>
+                          </DialogHeader>
+                          {editItem && <EditInventoryForm item={editItem} onSuccess={() => fetchInventory()} />}
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
+                        disabled={isDemoMode || !tableExists}
+                        title={
+                          isDemoMode || !tableExists
+                            ? "Connect to Supabase and set up tables to enable deleting"
+                            : "Delete consumable"
                         }
-                      }}
-                    >
-                      Delete
-                    </Button>
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this item?")) {
+                            deleteInventoryItem(item.id)
+                          }
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </TabsContent>
+                ))}
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </div>
     </div>

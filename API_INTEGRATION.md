@@ -1,4 +1,3 @@
-
 # Website Integration API Documentation
 
 This document explains how to integrate your nursery inventory management app with your landing page website.
@@ -15,7 +14,7 @@ For local development: `http://localhost:5000`
 **Description:** Fetches all products that are marked as "ready for sale" with their availability status.
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "products": [
@@ -35,7 +34,7 @@ For local development: `http://localhost:5000`
   ],
   "total_count": 1
 }
-```
+\`\`\`
 
 ### 2. Update Inventory After Sale
 **Endpoint:** `POST /api/update-inventory`
@@ -43,7 +42,7 @@ For local development: `http://localhost:5000`
 **Description:** Updates inventory quantity when a sale is made on the website.
 
 **Request Body:**
-```json
+\`\`\`json
 {
   "product_id": "uuid",
   "quantity_sold": 5,
@@ -52,24 +51,24 @@ For local development: `http://localhost:5000`
     "contact": "+254700000000"
   }
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Inventory updated successfully",
   "new_quantity": 40,
   "availability_status": "Limited"
 }
-```
+\`\`\`
 
 ## Integration Steps for Your Landing Page
 
 ### 1. Fetch Products
 Use this JavaScript code to fetch available products:
 
-```javascript
+\`\`\`javascript
 async function fetchProducts() {
   try {
     const response = await fetch('https://your-repl-name.replit.app/api/products');
@@ -86,10 +85,10 @@ async function fetchProducts() {
     return [];
   }
 }
-```
+\`\`\`
 
 ### 2. Update Inventory After Purchase
-```javascript
+\`\`\`javascript
 async function updateInventoryAfterSale(productId, quantitySold, customerInfo) {
   try {
     const response = await fetch('https://your-repl-name.replit.app/api/update-inventory', {
@@ -118,12 +117,12 @@ async function updateInventoryAfterSale(productId, quantitySold, customerInfo) {
     return null;
   }
 }
-```
+\`\`\`
 
 ### 3. Display Availability Status
 Use the `availability_status` field to show customers the stock level:
 
-```javascript
+\`\`\`javascript
 function getStatusBadge(status) {
   switch(status) {
     case 'Available':
@@ -136,7 +135,7 @@ function getStatusBadge(status) {
       return '<span class="badge badge-secondary">Unknown</span>';
   }
 }
-```
+\`\`\`
 
 ## Managing Products in the Nursery App
 
