@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Return success with product info (no inventory update)
     const headers = {
-    'Access-Control-Allow-Origin': 'https://litteforest.vercel.app',
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   }
