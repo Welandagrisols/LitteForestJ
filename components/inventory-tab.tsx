@@ -470,37 +470,37 @@ export function InventoryTab() {
               </Dialog>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredPlants.map((item) => {
                 const isCurrentPlant = item.ready_for_sale === true
 
                 return (
                   <Card
                     key={item.id}
-                    className={`transition-all hover:shadow-md ${
+                    className={`transition-all hover:shadow-md h-fit max-w-sm mx-auto w-full ${
                       isCurrentPlant ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"
                     }`}
                   >
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-3">
                         <Badge
-                          className={
+                          className={`text-xs truncate max-w-[140px] ${
                             isCurrentPlant
                               ? "bg-green-600 hover:bg-green-700 text-white"
                               : "bg-blue-600 hover:bg-blue-700 text-white"
-                          }
+                          }`}
                         >
-                          {isCurrentPlant ? "🌱 Ready for Sale" : "📋 Future Plan"}
+                          {isCurrentPlant ? "🌱 Ready" : "📋 Future"}
                         </Badge>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-shrink-0">
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => setEditItem(item)} 
-                            className="h-8 w-8 p-0"
+                            className="h-7 w-7 p-0"
                             disabled={isDemoMode || !tableExists}
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-3 w-3" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -510,44 +510,44 @@ export function InventoryTab() {
                                 deleteInventoryItem(item.id)
                               }
                             }}
-                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            className="h-7 w-7 p-0 text-destructive hover:text-destructive"
                             disabled={isDemoMode || !tableExists}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
 
                       <div className="space-y-3">
                         <div>
-                          <h3 className="font-semibold text-lg">{item.plant_name}</h3>
+                          <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
                           {item.scientific_name && (
-                            <p className="text-sm text-muted-foreground italic">{item.scientific_name}</p>
+                            <p className="text-xs text-muted-foreground italic truncate">{item.scientific_name}</p>
                           )}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
-                            <span className="text-muted-foreground">Quantity:</span>
-                            <p className="font-medium">{item.quantity}</p>
+                            <span className="text-muted-foreground block">Qty:</span>
+                            <p className="font-medium truncate">{item.quantity}</p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Price:</span>
-                            <p className="font-medium">Ksh {item.price}</p>
+                            <span className="text-muted-foreground block">Price:</span>
+                            <p className="font-medium truncate">Ksh {item.price}</p>
                           </div>
-                          <div>
-                            <span className="text-muted-foreground">Category:</span>
-                            <p className="font-medium text-xs">{item.category}</p>
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground block">Category:</span>
+                            <p className="font-medium text-xs truncate">{item.category}</p>
                           </div>
-                          <div>
-                            <span className="text-muted-foreground">Status:</span>
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground block">Status:</span>
                             <Badge
                               variant="outline"
-                              className={
+                              className={`text-xs h-5 ${
                                 item.status === "Healthy"
                                   ? "bg-green-100 text-green-800 border-green-200"
                                   : "bg-yellow-100 text-yellow-800 border-yellow-200"
-                              }
+                              }`}
                             >
                               {item.status}
                             </Badge>
@@ -556,14 +556,14 @@ export function InventoryTab() {
 
                         {(item.age || item.section || item.source) && (
                           <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
-                            {item.age && <p>Age: {item.age}</p>}
+                            {item.age && <p className="truncate">Age: {item.age}</p>}
                             {item.section && (
-                              <p>
+                              <p className="truncate">
                                 Location: Section {item.section}
                                 {item.row ? `, Row ${item.row}` : ""}
                               </p>
                             )}
-                            {item.source && <p>Source: {item.source}</p>}
+                            {item.source && <p className="truncate">Source: {item.source}</p>}
                           </div>
                         )}
 
@@ -615,23 +615,23 @@ export function InventoryTab() {
               </Dialog>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredConsumables.map((item) => (
-                <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200">
+                <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200 h-fit max-w-sm mx-auto w-full">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <Badge className="bg-purple-600 hover:bg-purple-700 text-white">
+                      <Badge className="bg-purple-600 hover:bg-purple-700 text-white text-xs truncate max-w-[140px]">
                         🛒 {getConsumableCategory(item)}
                       </Badge>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-shrink-0">
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={() => setEditItem(item)} 
-                          className="h-8 w-8 p-0"
+                          className="h-7 w-7 p-0"
                           disabled={isDemoMode || !tableExists}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3 w-3" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -641,44 +641,44 @@ export function InventoryTab() {
                               deleteInventoryItem(item.id)
                             }
                           }}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          className="h-7 w-7 p-0 text-destructive hover:text-destructive"
                           disabled={isDemoMode || !tableExists}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
                     </div>
 
                     <div className="space-y-3">
                       <div>
-                        <h3 className="font-semibold text-lg">{item.plant_name}</h3>
-                        <p className="text-sm text-muted-foreground">Unit: {getConsumableUnit(item)}</p>
+                        <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
+                        <p className="text-xs text-muted-foreground truncate">Unit: {getConsumableUnit(item)}</p>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
-                          <span className="text-muted-foreground">Quantity:</span>
-                          <p className="font-medium">{item.quantity}</p>
+                          <span className="text-muted-foreground block">Qty:</span>
+                          <p className="font-medium truncate">{item.quantity}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Price per Unit:</span>
-                          <p className="font-medium">Ksh {item.price}</p>
+                          <span className="text-muted-foreground block">Price/Unit:</span>
+                          <p className="font-medium truncate">Ksh {item.price}</p>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">SKU:</span>
-                          <p className="font-medium text-xs">{item.sku}</p>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground block">SKU:</span>
+                          <p className="font-medium text-xs truncate">{item.sku}</p>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Status:</span>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground block">Status:</span>
                           <Badge
                             variant="outline"
-                            className={
+                            className={`text-xs h-5 ${
                               item.status === "Available"
                                 ? "bg-green-100 text-green-800 border-green-200"
                                 : item.status === "Low Stock"
                                 ? "bg-yellow-100 text-yellow-800 border-yellow-200"
                                 : "bg-red-100 text-red-800 border-red-200"
-                            }
+                            }`}
                           >
                             {item.status}
                           </Badge>
@@ -687,8 +687,8 @@ export function InventoryTab() {
 
                       {(item.section || item.source) && (
                         <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
-                          {item.section && <p>Storage: {item.section}</p>}
-                          {item.source && <p>Supplier: {item.source}</p>}
+                          {item.section && <p className="truncate">Storage: {item.section}</p>}
+                          {item.source && <p className="truncate">Supplier: {item.source}</p>}
                         </div>
                       )}
                     </div>
