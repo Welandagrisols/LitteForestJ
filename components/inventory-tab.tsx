@@ -38,7 +38,6 @@ export function InventoryTab() {
         return
       }
 
-      // Check if the inventory table exists
       const exists = await checkTableExists("inventory")
       setTableExists(exists)
 
@@ -48,7 +47,6 @@ export function InventoryTab() {
         return
       }
 
-      // If table exists, fetch data
       fetchInventory().catch((error) => {
         console.log("Falling back to demo mode due to:", error.message)
         setInventory(demoInventory)
@@ -97,7 +95,6 @@ export function InventoryTab() {
         description: "Item deleted successfully",
       })
 
-      // Refresh inventory after successful delete
       await fetchInventory()
     } catch (error: any) {
       console.error("Error deleting item:", error)
@@ -110,21 +107,23 @@ export function InventoryTab() {
   }
 
   const handleAddSuccess = async () => {
-    await fetchInventory()
-    setAddPlantDialogOpen(false)
-    setAddConsumableDialogOpen(false)
+    console.log("handleAddSuccess called")
+    try {
+      await fetchInventory()
+      setAddPlantDialogOpen(false)
+      setAddConsumableDialogOpen(false)
+    } catch (error) {
+      console.error("Error refreshing inventory:", error)
+    }
   }
 
-  // Helper function to determine if an item is a consumable
   const isConsumable = (item: any) => {
-    // Check if category starts with "Consumable:" or if scientific_name starts with "[Consumable]"
     return (
       (item.category && item.category.startsWith("Consumable:")) ||
       (item.scientific_name && item.scientific_name.startsWith("[Consumable]"))
     )
   }
 
-  // Extract unit from scientific_name if it's a consumable
   const getConsumableUnit = (item: any) => {
     if (item.scientific_name && item.scientific_name.startsWith("[Consumable]")) {
       return item.scientific_name.replace("[Consumable] ", "")
@@ -132,7 +131,6 @@ export function InventoryTab() {
     return "Pieces"
   }
 
-  // Extract real category from prefixed category
   const getConsumableCategory = (item: any) => {
     if (item.category && item.category.startsWith("Consumable:")) {
       return item.category.replace("Consumable: ", "")
@@ -140,7 +138,6 @@ export function InventoryTab() {
     return item.category
   }
 
-  // Filter inventory based on item type and search/category filters
   const filteredPlants = inventory
     .filter((item) => !isConsumable(item))
     .filter((item) => {
@@ -162,11 +159,10 @@ export function InventoryTab() {
       return matchesSearch && matchesCategory
     })
 
-  // Get all unique categories for the filter dropdown
   const plantCategories = [
     "All Categories",
     ...new Set(inventory.filter((item) => !isConsumable(item) && item.category).map((item) => item.category)),
-  ].filter(Boolean) // Remove any empty/null values
+  ].filter(Boolean)
 
   const consumableCategories = [
     "All Categories",
@@ -176,7 +172,7 @@ export function InventoryTab() {
         .map((item) => getConsumableCategory(item))
         .filter(Boolean),
     ),
-  ].filter(Boolean) // Remove any empty/null values
+  ].filter(Boolean)
 
   const categories = activeTab === "plants" ? plantCategories : consumableCategories
 
@@ -184,11 +180,9 @@ export function InventoryTab() {
     try {
       setExporting(true)
 
-      // Format the data for export based on active tab
       const dataToExport = activeTab === "plants" ? filteredPlants : filteredConsumables
       const exportData = formatInventoryForExport(dataToExport, activeTab === "consumables")
 
-      // Export to Excel
       const fileName =
         activeTab === "plants"
           ? `Plants_Export_${new Date().toISOString().split("T")[0]}`
@@ -223,14 +217,11 @@ export function InventoryTab() {
         </div>
       )}
 
-      {/* Header Section */}
       <div className="p-6 border-b border-border bg-white">
         <div className="space-y-6">
-          {/* Title and Action Buttons Row */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold">Inventory Management</h2>
 
-            {/* Action buttons - always visible on right */}
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               {activeTab === "plants" ? (
                 <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
@@ -238,11 +229,10 @@ export function InventoryTab() {
                     <Button
                       className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg w-full sm:w-auto"
                       disabled={isDemoMode || !tableExists}
-                      title={
-                        isDemoMode || !tableExists
-                          ? "Connect to Supabase and set up tables to enable adding plants"
-                          : "Add new plant"
-                      }
+                      onClick={() => {
+                        console.log("Add Plant button clicked")
+                        setAddPlantDialogOpen(true)
+                      }}
                     >
                       <Plus className="h-5 w-5" /> Add New Plant
                     </Button>
@@ -251,13 +241,7 @@ export function InventoryTab() {
                     <DialogHeader>
                       <DialogTitle>Add New Plant to Inventory</DialogTitle>
                     </DialogHeader>
-                    <AddInventoryForm
-                      onSuccess={async () => {
-                        await fetchInventory()
-                        setAddPlantDialogOpen(false)
-                      }}
-                      onClose={() => setAddPlantDialogOpen(false)}
-                    />
+                    <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
                   </DialogContent>
                 </Dialog>
               ) : (
@@ -266,11 +250,10 @@ export function InventoryTab() {
                     <Button
                       className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 h-12 text-base font-medium shadow-lg w-full sm:w-auto"
                       disabled={isDemoMode || !tableExists}
-                      title={
-                        isDemoMode || !tableExists
-                          ? "Connect to Supabase and set up tables to enable adding consumables"
-                          : "Add new consumable"
-                      }
+                      onClick={() => {
+                        console.log("Add Consumable button clicked")
+                        setAddConsumableDialogOpen(true)
+                      }}
                     >
                       <Plus className="h-5 w-5" /> Add New Consumable
                     </Button>
@@ -279,13 +262,7 @@ export function InventoryTab() {
                     <DialogHeader>
                       <DialogTitle>Add New Consumable to Inventory</DialogTitle>
                     </DialogHeader>
-                    <AddConsumableForm
-                      onSuccess={async () => {
-                        await fetchInventory()
-                        setAddConsumableDialogOpen(false)
-                      }}
-                      onClose={() => setAddConsumableDialogOpen(false)}
-                    />
+                    <AddConsumableForm onSuccess={handleAddSuccess} onClose={() => setAddConsumableDialogOpen(false)} />
                   </DialogContent>
                 </Dialog>
               )}
@@ -304,7 +281,6 @@ export function InventoryTab() {
             </div>
           </div>
 
-          {/* Search and Filter Controls */}
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <Input
@@ -334,7 +310,6 @@ export function InventoryTab() {
         </div>
       </div>
 
-      {/* Scrollable Content */}
       <div className="p-6">
         <Tabs defaultValue="plants" onValueChange={setActiveTab}>
           <TabsList className="mb-4 bg-muted">
@@ -346,7 +321,6 @@ export function InventoryTab() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Plants Tab */}
           <TabsContent value="plants">
             {loading ? (
               <div className="text-center py-8">Loading inventory...</div>
@@ -360,14 +334,12 @@ export function InventoryTab() {
                     className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {/* Plant Information */}
                       <div className="space-y-2">
                         <div className="font-medium text-foreground">{item.plant_name}</div>
                         <div className="text-sm text-muted-foreground">{item.scientific_name}</div>
                         <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
                       </div>
 
-                      {/* Category & Location */}
                       <div className="space-y-2">
                         <div className="text-sm">
                           <span className="font-medium">Category:</span> {item.category}
@@ -380,7 +352,6 @@ export function InventoryTab() {
                         )}
                       </div>
 
-                      {/* Quantity & Age */}
                       <div className="space-y-2">
                         <div className="text-sm">
                           <span className="font-medium">Quantity:</span> {item.quantity}
@@ -390,7 +361,6 @@ export function InventoryTab() {
                         </div>
                       </div>
 
-                      {/* Date & Source */}
                       <div className="space-y-2">
                         <div className="text-sm">
                           <span className="font-medium">Date Planted:</span>{" "}
@@ -399,7 +369,6 @@ export function InventoryTab() {
                         {item.source && <div className="text-sm text-muted-foreground">Source: {item.source}</div>}
                       </div>
 
-                      {/* Status & Price */}
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">Status:</span>
@@ -421,7 +390,6 @@ export function InventoryTab() {
                         </div>
                       </div>
 
-                      {/* Website Status */}
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">Website:</span>
@@ -449,7 +417,6 @@ export function InventoryTab() {
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                       <Dialog>
                         <DialogTrigger asChild>
@@ -458,11 +425,6 @@ export function InventoryTab() {
                             size="sm"
                             onClick={() => setEditItem(item)}
                             disabled={isDemoMode || !tableExists}
-                            title={
-                              isDemoMode || !tableExists
-                                ? "Connect to Supabase and set up tables to enable editing"
-                                : "Edit plant"
-                            }
                           >
                             Edit
                           </Button>
@@ -479,11 +441,6 @@ export function InventoryTab() {
                         size="sm"
                         className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
                         disabled={isDemoMode || !tableExists}
-                        title={
-                          isDemoMode || !tableExists
-                            ? "Connect to Supabase and set up tables to enable deleting"
-                            : "Delete plant"
-                        }
                         onClick={() => {
                           if (confirm("Are you sure you want to delete this item?")) {
                             deleteInventoryItem(item.id)
@@ -499,7 +456,6 @@ export function InventoryTab() {
             )}
           </TabsContent>
 
-          {/* Consumables Tab */}
           <TabsContent value="consumables">
             {loading ? (
               <div className="text-center py-8">Loading consumables...</div>
@@ -513,20 +469,17 @@ export function InventoryTab() {
                     className="bg-white rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {/* Item Information */}
                       <div className="space-y-2">
                         <div className="font-medium text-foreground">{item.plant_name}</div>
                         <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
                       </div>
 
-                      {/* Category */}
                       <div className="space-y-2">
                         <div className="text-sm">
                           <span className="font-medium">Category:</span> {getConsumableCategory(item)}
                         </div>
                       </div>
 
-                      {/* Quantity & Unit */}
                       <div className="space-y-2">
                         <div className="text-sm">
                           <span className="font-medium">Quantity:</span> {item.quantity}
@@ -536,7 +489,6 @@ export function InventoryTab() {
                         </div>
                       </div>
 
-                      {/* Purchase Date & Supplier */}
                       <div className="space-y-2">
                         <div className="text-sm">
                           <span className="font-medium">Purchase Date:</span>{" "}
@@ -545,7 +497,6 @@ export function InventoryTab() {
                         {item.source && <div className="text-sm text-muted-foreground">Supplier: {item.source}</div>}
                       </div>
 
-                      {/* Status & Price */}
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">Status:</span>
@@ -568,7 +519,6 @@ export function InventoryTab() {
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                       <Dialog>
                         <DialogTrigger asChild>
@@ -577,11 +527,6 @@ export function InventoryTab() {
                             size="sm"
                             onClick={() => setEditItem(item)}
                             disabled={isDemoMode || !tableExists}
-                            title={
-                              isDemoMode || !tableExists
-                                ? "Connect to Supabase and set up tables to enable editing"
-                                : "Edit consumable"
-                            }
                           >
                             Edit
                           </Button>
@@ -598,11 +543,6 @@ export function InventoryTab() {
                         size="sm"
                         className="border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive bg-transparent"
                         disabled={isDemoMode || !tableExists}
-                        title={
-                          isDemoMode || !tableExists
-                            ? "Connect to Supabase and set up tables to enable deleting"
-                            : "Delete consumable"
-                        }
                         onClick={() => {
                           if (confirm("Are you sure you want to delete this item?")) {
                             deleteInventoryItem(item.id)

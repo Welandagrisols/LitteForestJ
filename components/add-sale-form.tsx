@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
@@ -51,6 +50,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       if (error) throw error
       setInventory(data || [])
     } catch (error: any) {
+      console.error("Error fetching inventory:", error)
       toast({
         title: "Error fetching inventory",
         description: error.message,
@@ -66,6 +66,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       if (error) throw error
       setCustomers(data || [])
     } catch (error: any) {
+      console.error("Error fetching customers:", error)
       toast({
         title: "Error fetching customers",
         description: error.message,
@@ -112,8 +113,8 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
+    console.log("handleSubmit called with data:", formData)
 
     if (isDemoMode) {
       toast({
@@ -124,7 +125,6 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       return
     }
 
-    // Validate required fields
     if (!formData.inventory_id || formData.quantity <= 0 || formData.total_amount <= 0) {
       toast({
         title: "Validation Error",
@@ -145,10 +145,10 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
 
     try {
       setLoading(true)
+      console.log("Starting sale recording...")
 
       let customerId = formData.customer_id
 
-      // Create new customer if needed
       if (isNewCustomer && formData.customer_name && formData.customer_contact) {
         const { data: newCustomer, error: customerError } = await supabase
           .from("customers")
@@ -169,7 +169,6 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
         }
       }
 
-      // Record the sale
       const { error: saleError } = await supabase.from("sales").insert([
         {
           inventory_id: formData.inventory_id,
@@ -183,7 +182,6 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
 
       if (saleError) throw saleError
 
-      // Update inventory quantity
       if (selectedItem) {
         const newQuantity = selectedItem.quantity - formData.quantity
 
@@ -200,7 +198,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
         description: "Sale recorded successfully",
       })
 
-      // Reset all form state completely
+      // Reset form
       setFormData({
         inventory_id: "",
         quantity: 1,
@@ -215,7 +213,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       setSelectedItem(null)
       setIsNewCustomer(false)
 
-      // Call success callback to refresh data
+      console.log("Calling onSuccess...")
       onSuccess()
     } catch (error: any) {
       console.error("Error recording sale:", error)
@@ -231,147 +229,143 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
 
   return (
     <div className="flex flex-col h-[70vh] max-h-[600px]">
-      {/* Scrollable form content */}
       <div className="flex-1 overflow-y-auto pr-2">
-        <form id="add-sale-form" onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="inventory_id">Select Plant/Seedling *</Label>
+            <Select
+              value={formData.inventory_id}
+              onValueChange={(value) => handleSelectChange("inventory_id", value)}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select plant from inventory" />
+              </SelectTrigger>
+              <SelectContent>
+                {inventory.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.plant_name} - {item.quantity} available - Ksh {item.price}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="quantity">Quantity *</Label>
+            <Input
+              id="quantity"
+              name="quantity"
+              type="number"
+              min="1"
+              max={selectedItem?.quantity || 1}
+              value={formData.quantity}
+              onChange={handleChange}
+              required
+            />
+            {selectedItem && (
+              <p className="text-sm text-muted-foreground">
+                Available: {selectedItem.quantity} | Price per unit: Ksh {selectedItem.price}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="sale_date">Sale Date *</Label>
+            <Input
+              id="sale_date"
+              name="sale_date"
+              type="date"
+              value={formData.sale_date}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="total_amount">Total Amount (Ksh) *</Label>
+            <Input
+              id="total_amount"
+              name="total_amount"
+              type="number"
+              value={formData.total_amount}
+              readOnly
+              className="bg-muted"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2 pt-2">
+            <Checkbox
+              id="new-customer"
+              checked={isNewCustomer}
+              onCheckedChange={(checked) => setIsNewCustomer(checked === true)}
+            />
+            <Label htmlFor="new-customer">Add new customer</Label>
+          </div>
+
+          {isNewCustomer ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="customer_name">Customer Name *</Label>
+                <Input
+                  id="customer_name"
+                  name="customer_name"
+                  value={formData.customer_name}
+                  onChange={handleChange}
+                  required={isNewCustomer}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customer_contact">Customer Contact *</Label>
+                <Input
+                  id="customer_contact"
+                  name="customer_contact"
+                  value={formData.customer_contact}
+                  onChange={handleChange}
+                  required={isNewCustomer}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customer_email">Customer Email</Label>
+                <Input
+                  id="customer_email"
+                  name="customer_email"
+                  type="email"
+                  value={formData.customer_email}
+                  onChange={handleChange}
+                />
+              </div>
+            </>
+          ) : (
             <div className="space-y-2">
-              <Label htmlFor="inventory_id">Select Plant/Seedling *</Label>
-              <Select
-                value={formData.inventory_id}
-                onValueChange={(value) => handleSelectChange("inventory_id", value)}
-                required
-              >
+              <Label htmlFor="customer_id">Select Customer (Optional)</Label>
+              <Select value={formData.customer_id} onValueChange={(value) => handleSelectChange("customer_id", value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select plant from inventory" />
+                  <SelectValue placeholder="Select existing customer" />
                 </SelectTrigger>
                 <SelectContent>
-                  {inventory.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.plant_name} - {item.quantity} available - Ksh {item.price}
+                  {customers.map((customer) => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name} - {customer.contact}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity *</Label>
-              <Input
-                id="quantity"
-                name="quantity"
-                type="number"
-                min="1"
-                max={selectedItem?.quantity || 1}
-                value={formData.quantity}
-                onChange={handleChange}
-                required
-              />
-              {selectedItem && (
-                <p className="text-sm text-muted-foreground">
-                  Available: {selectedItem.quantity} | Price per unit: Ksh {selectedItem.price}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sale_date">Sale Date *</Label>
-              <Input
-                id="sale_date"
-                name="sale_date"
-                type="date"
-                value={formData.sale_date}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="total_amount">Total Amount (Ksh) *</Label>
-              <Input
-                id="total_amount"
-                name="total_amount"
-                type="number"
-                value={formData.total_amount}
-                readOnly
-                className="bg-muted"
-              />
-            </div>
-
-            <div className="flex items-center space-x-2 pt-2">
-              <Checkbox
-                id="new-customer"
-                checked={isNewCustomer}
-                onCheckedChange={(checked) => setIsNewCustomer(checked === true)}
-              />
-              <Label htmlFor="new-customer">Add new customer</Label>
-            </div>
-
-            {isNewCustomer ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="customer_name">Customer Name *</Label>
-                  <Input
-                    id="customer_name"
-                    name="customer_name"
-                    value={formData.customer_name}
-                    onChange={handleChange}
-                    required={isNewCustomer}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="customer_contact">Customer Contact *</Label>
-                  <Input
-                    id="customer_contact"
-                    name="customer_contact"
-                    value={formData.customer_contact}
-                    onChange={handleChange}
-                    required={isNewCustomer}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="customer_email">Customer Email</Label>
-                  <Input
-                    id="customer_email"
-                    name="customer_email"
-                    type="email"
-                    value={formData.customer_email}
-                    onChange={handleChange}
-                  />
-                </div>
-              </>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="customer_id">Select Customer (Optional)</Label>
-                <Select
-                  value={formData.customer_id}
-                  onValueChange={(value) => handleSelectChange("customer_id", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select existing customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name} - {customer.contact}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-        </form>
+          )}
+        </div>
       </div>
 
-      {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
           <Button
-            type="submit"
-            form="add-sale-form"
+            type="button"
+            onClick={() => {
+              console.log("Record Sale button clicked")
+              handleSubmit()
+            }}
             className="bg-secondary hover:bg-secondary/90 text-white"
             disabled={loading}
           >

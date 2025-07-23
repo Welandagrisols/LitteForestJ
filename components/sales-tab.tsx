@@ -13,6 +13,25 @@ import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { exportToExcel, formatSalesForExport } from "@/lib/excel-export"
 import { Download, Loader2 } from "lucide-react"
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
+  return isMobile
+}
+
 export function SalesTab() {
   const [sales, setSales] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,9 +41,6 @@ export function SalesTab() {
   const [tableExists, setTableExists] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const { toast } = useToast()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [dateFilter, setDateFilter] = useState("all")
-  const [isAddSaleOpen, setIsAddSaleOpen] = useState(false)
   const isMobile = useIsMobile()
 
   useEffect(() => {
@@ -34,7 +50,6 @@ export function SalesTab() {
         return
       }
 
-      // Check if the sales table exists
       const exists = await checkTableExists("sales")
       setTableExists(exists)
 
@@ -43,7 +58,6 @@ export function SalesTab() {
         return
       }
 
-      // If table exists, fetch data
       fetchSales().catch((error) => {
         console.log("Falling back to demo mode due to:", error.message)
         loadDemoSales()
@@ -56,7 +70,6 @@ export function SalesTab() {
   function loadDemoSales() {
     setSales(demoSales)
 
-    // Calculate totals
     let salesTotal = 0
     let seedlingsTotal = 0
 
@@ -74,7 +87,6 @@ export function SalesTab() {
     try {
       setLoading(true)
 
-      // Fetch sales with inventory and customer details
       const { data, error } = await supabase
         .from("sales")
         .select(`
@@ -88,7 +100,6 @@ export function SalesTab() {
 
       setSales(data || [])
 
-      // Calculate totals
       let salesTotal = 0
       let seedlingsTotal = 0
 
@@ -108,18 +119,21 @@ export function SalesTab() {
   }
 
   const handleAddSaleSuccess = async () => {
-    await fetchSales()
-    setDialogOpen(false)
+    console.log("handleAddSaleSuccess called")
+    try {
+      await fetchSales()
+      setDialogOpen(false)
+    } catch (error) {
+      console.error("Error refreshing sales:", error)
+    }
   }
 
   const handleExportToExcel = async () => {
     try {
       setExporting(true)
 
-      // Format the data for export
       const exportData = formatSalesForExport(sales)
 
-      // Export to Excel
       const success = exportToExcel(exportData, `Sales_Export_${new Date().toISOString().split("T")[0]}`)
 
       if (success) {
@@ -181,7 +195,6 @@ export function SalesTab() {
       </div>
 
       <div className="warm-card rounded-lg shadow-sm overflow-hidden">
-        {/* Sticky Header */}
         <div className="sticky top-0 z-10 bg-white border-b border-border p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold">Sales Records</h2>
@@ -200,11 +213,10 @@ export function SalesTab() {
                   <Button
                     className="bg-secondary hover:bg-secondary/90 text-white w-full sm:w-auto"
                     disabled={isDemoMode || !tableExists}
-                    title={
-                      isDemoMode || !tableExists
-                        ? "Connect to Supabase and set up tables to enable recording sales"
-                        : "Record new sale"
-                    }
+                    onClick={() => {
+                      console.log("Record New Sale button clicked")
+                      setDialogOpen(true)
+                    }}
                   >
                     Record New Sale
                   </Button>
@@ -220,7 +232,6 @@ export function SalesTab() {
           </div>
         </div>
 
-        {/* Scrollable Content */}
         <div className="p-6">
           <div className="rounded-md border border-border overflow-hidden">
             <Table>
@@ -276,28 +287,4 @@ export function SalesTab() {
       </div>
     </div>
   )
-}
-
-// Custom hook to detect mobile devices
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768) // Adjust breakpoint as needed
-    }
-
-    // Set initial value
-    handleResize()
-
-    // Listen for window resize events
-    window.addEventListener("resize", handleResize)
-
-    // Clean up event listener on unmount
-    return () => {
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [])
-
-  return isMobile
 }

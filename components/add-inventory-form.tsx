@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { supabase, isDemoMode } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
@@ -18,8 +17,6 @@ interface AddInventoryFormProps {
 
 export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) {
   const [loading, setLoading] = useState(false)
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const { toast } = useToast()
 
   const [formData, setFormData] = useState({
@@ -30,15 +27,14 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     age: "",
     date_planted: "",
     status: "Healthy",
-    price: 0, // Selling price per unit
-    batch_cost: 0, // Total cost for the entire batch
+    price: 0,
+    batch_cost: 0,
     sku: "",
     section: "",
     row: "",
     source: "",
   })
 
-  // Calculate cost per seedling
   const costPerSeedling = formData.quantity > 0 ? formData.batch_cost / formData.quantity : 0
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,28 +52,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
     }))
   }
 
-  const resetForm = () => {
-    setFormData({
-      plant_name: "",
-      scientific_name: "",
-      category: "",
-      quantity: 0,
-      age: "",
-      date_planted: "",
-      status: "Healthy",
-      price: 0,
-      batch_cost: 0,
-      sku: "",
-      section: "",
-      row: "",
-      source: "",
-    })
-    setImageFile(null)
-    setImagePreview(null)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
+    console.log("handleSubmit called with data:", formData)
 
     if (isDemoMode) {
       toast({
@@ -88,7 +64,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       return
     }
 
-    // Validate required fields
     if (!formData.plant_name || !formData.category || formData.quantity <= 0 || formData.price <= 0) {
       toast({
         title: "Validation Error",
@@ -100,8 +75,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
 
     try {
       setLoading(true)
+      console.log("Starting plant insertion...")
 
-      // Generate SKU if not provided
       const finalFormData = { ...formData }
       if (!finalFormData.sku) {
         const prefix = finalFormData.category.substring(0, 3).toUpperCase()
@@ -109,7 +84,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         finalFormData.sku = `${prefix}${randomNum}`
       }
 
-      // Calculate cost per seedling
       const calculatedCostPerSeedling =
         finalFormData.quantity > 0 ? finalFormData.batch_cost / finalFormData.quantity : 0
 
@@ -136,7 +110,7 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         updated_at: new Date().toISOString(),
       }
 
-      console.log("Inserting data:", insertData)
+      console.log("Inserting plant data:", insertData)
 
       const { data, error } = await supabase.from("inventory").insert([insertData]).select()
 
@@ -145,19 +119,35 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         throw error
       }
 
+      console.log("Plant added successfully:", data)
+
       toast({
         title: "Success",
         description: `New plant batch added to inventory. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
       })
 
-      // Reset form first, then trigger callbacks
-      resetForm()
+      // Reset form
+      setFormData({
+        plant_name: "",
+        scientific_name: "",
+        category: "",
+        quantity: 0,
+        age: "",
+        date_planted: "",
+        status: "Healthy",
+        price: 0,
+        batch_cost: 0,
+        sku: "",
+        section: "",
+        row: "",
+        source: "",
+      })
 
-      // Call success callback to refresh data
+      console.log("Calling onSuccess...")
       onSuccess()
 
-      // Close dialog
       if (onClose) {
+        console.log("Calling onClose...")
         onClose()
       }
     } catch (error: any) {
@@ -176,9 +166,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
 
   return (
     <div className="flex flex-col max-h-[80vh]">
-      {/* Scrollable form container */}
       <div className="flex-1 overflow-y-auto px-1">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div className={`grid grid-cols-1 ${isMobile ? "gap-6" : "md:grid-cols-2 gap-4"}`}>
             <div className="space-y-2">
               <Label htmlFor="plant_name">Plant Name *</Label>
@@ -259,7 +248,6 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
               />
             </div>
 
-            {/* Cost per seedling display */}
             {formData.quantity > 0 && formData.batch_cost > 0 && (
               <div className="space-y-2 md:col-span-2">
                 <div className="p-3 bg-muted rounded-md border">
@@ -334,21 +322,34 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
               />
             </div>
           </div>
-        </form>
+        </div>
       </div>
 
-      {/* Sticky action buttons */}
       <div className="border-t border-border bg-white pt-4 mt-4 flex-shrink-0">
         <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-end space-x-2"}`}>
+          {onClose && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                console.log("Cancel button clicked")
+                onClose()
+              }}
+              disabled={loading}
+              className={isMobile ? "mobile-touch-target w-full" : ""}
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             type="button"
-            variant="outline"
-            onClick={onClose}
-            className={isMobile ? "mobile-touch-target w-full" : ""}
+            onClick={() => {
+              console.log("Add Item button clicked")
+              handleSubmit()
+            }}
+            disabled={loading}
+            className={`bg-primary hover:bg-primary/90 text-white ${isMobile ? "mobile-touch-target w-full" : ""}`}
           >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading} className={isMobile ? "mobile-touch-target w-full" : ""}>
             {loading ? "Adding..." : "Add Item"}
           </Button>
         </div>

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface AddConsumableFormProps {
   onSuccess: () => void
@@ -46,23 +47,8 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
     }))
   }
 
-  const resetForm = () => {
-    setFormData({
-      plant_name: "",
-      category: "",
-      quantity: 0,
-      unit: "Pieces",
-      date_planted: "",
-      status: "Available",
-      price: 0,
-      sku: "",
-      section: "",
-      source: "",
-    })
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
+    console.log("handleSubmit called with data:", formData)
 
     if (isDemoMode) {
       toast({
@@ -73,7 +59,6 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
       return
     }
 
-    // Validate required fields
     if (!formData.plant_name || !formData.category || formData.quantity <= 0 || formData.price <= 0) {
       toast({
         title: "Validation Error",
@@ -85,8 +70,8 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
 
     try {
       setLoading(true)
+      console.log("Starting consumable insertion...")
 
-      // Generate SKU if not provided
       const finalFormData = { ...formData }
       if (!finalFormData.sku) {
         const prefix = finalFormData.category.replace("Consumable: ", "").substring(0, 3).toUpperCase()
@@ -117,6 +102,8 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         updated_at: new Date().toISOString(),
       }
 
+      console.log("Inserting consumable data:", insertData)
+
       const { data, error } = await supabase.from("inventory").insert([insertData]).select()
 
       if (error) {
@@ -124,15 +111,34 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
         throw error
       }
 
+      console.log("Consumable added successfully:", data)
+
       toast({
         title: "Success",
         description: "New consumable added to inventory",
       })
 
-      // Reset form and close dialog
-      resetForm()
+      // Reset form
+      setFormData({
+        plant_name: "",
+        category: "",
+        quantity: 0,
+        unit: "Pieces",
+        date_planted: "",
+        status: "Available",
+        price: 0,
+        sku: "",
+        section: "",
+        source: "",
+      })
+
+      console.log("Calling onSuccess...")
       onSuccess()
-      if (onClose) onClose()
+
+      if (onClose) {
+        console.log("Calling onClose...")
+        onClose()
+      }
     } catch (error: any) {
       console.error("Error adding consumable:", error)
       toast({
@@ -145,11 +151,13 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
     }
   }
 
+  const isMobile = useIsMobile()
+
   return (
-    <div className="flex flex-col h-[70vh] max-h-[600px]">
-      <div className="flex-1 overflow-y-auto pr-2">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-col max-h-[80vh]">
+      <div className="flex-1 overflow-y-auto px-1">
+        <div className="space-y-4">
+          <div className={`grid grid-cols-1 ${isMobile ? "gap-6" : "md:grid-cols-2 gap-4"}`}>
             <div className="space-y-2">
               <Label htmlFor="plant_name">Item Name *</Label>
               <Input id="plant_name" name="plant_name" value={formData.plant_name} onChange={handleChange} required />
@@ -275,20 +283,32 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
               />
             </div>
           </div>
-        </form>
+        </div>
       </div>
 
       <div className="border-t border-border bg-white pt-4 mt-4">
-        <div className="flex justify-end gap-2">
+        <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-end gap-2"}`}>
           {onClose && (
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                console.log("Cancel button clicked")
+                onClose()
+              }}
+              disabled={loading}
+              className={isMobile ? "mobile-touch-target w-full" : ""}
+            >
               Cancel
             </Button>
           )}
           <Button
-            type="submit"
-            onClick={handleSubmit}
-            className="bg-primary hover:bg-primary/90 text-white"
+            type="button"
+            onClick={() => {
+              console.log("Add Consumable button clicked")
+              handleSubmit()
+            }}
+            className={`bg-primary hover:bg-primary/90 text-white ${isMobile ? "mobile-touch-target w-full" : ""}`}
             disabled={loading}
           >
             {loading ? "Adding..." : "Add Consumable"}
