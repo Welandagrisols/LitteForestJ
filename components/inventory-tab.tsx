@@ -51,6 +51,11 @@ export function InventoryTab() {
 
       fetchInventory().catch((error) => {
         console.log("Falling back to demo mode due to:", error.message)
+        toast({
+          title: "Connection Issue",
+          description: "Unable to connect to database. Using demo data. Check your internet connection and Supabase settings.",
+          variant: "destructive",
+        })
         setInventory(demoInventory)
         setLoading(false)
       })

@@ -58,31 +58,53 @@ export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAn
 })
 
 // Helper function to check if a table exists
-export async function checkTableExists(tableName: string): Promise<boolean> {
-  console.log(`Checking if table ${tableName} exists...`)
-
-  if (isDemoMode) {
-    console.log(`Skipping table check - in demo mode`)
-    return false
-  }
+export const checkTableExists = async (tableName: string): Promise<boolean> => {
+  if (isDemoMode) return false
 
   try {
-    // Try to select a single row to check if the table exists
-    const { data, error } = await supabase.from(tableName).select("id").limit(1)
+    console.log(`Checking if table ${tableName} exists...`)
+
+    // Add timeout to the request
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+
+    const { data, error } = await supabase
+      .from(tableName)
+      .select('id')
+      .limit(1)
+      .abortSignal(controller.signal)
+
+    clearTimeout(timeoutId)
 
     console.log(`Table ${tableName} check result:`, { data, error })
 
-    // If the error contains "relation does not exist", the table doesn't exist
-    if (error && error.message.includes("relation") && error.message.includes("does not exist")) {
-      console.log(`Table ${tableName} does not exist`)
-      return false
+    if (error) {
+      console.error(`Supabase error for table ${tableName}:`, error)
+
+      // If we get a specific error about the table not existing, return false
+      if (error.message.includes('does not exist') || 
+          error.message.includes('relation') && error.message.includes('does not exist')) {
+        return false
+      }
+
+      // For network errors, throw to trigger demo mode
+      if (error.message.includes('Failed to fetch') || 
+          error.message.includes('NetworkError') ||
+          error.message.includes('TypeError')) {
+        throw new Error(`Network error: ${error.message}`)
+      }
+
+      // For other errors, we assume the table exists but there's a connection issue
+      return true
     }
 
-    // If there's no error or a different error, assume the table exists
     console.log(`Table ${tableName} exists`)
     return true
-  } catch (error) {
-    console.error(`Error checking if table ${tableName} exists:`, error)
-    return false
+  } catch (error: any) {
+    console.error(`Error checking table ${tableName}:`, error)
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout - check your internet connection')
+    }
+    throw error
   }
 }
