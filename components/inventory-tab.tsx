@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -160,7 +159,7 @@ export function InventoryTab() {
 
       const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter
       const matchesStatus = statusFilter === "all" || item.status === statusFilter
-      
+
       let matchesPlantStatus = true
       if (plantStatusFilter === "current") {
         matchesPlantStatus = item.ready_for_sale === true
@@ -177,7 +176,7 @@ export function InventoryTab() {
       const matchesSearch =
         item.plant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()))
-      
+
       const actualCategory = getConsumableCategory(item)
       const matchesCategory = categoryFilter === "All Categories" || actualCategory === categoryFilter
       const matchesStatus = statusFilter === "all" || item.status === statusFilter

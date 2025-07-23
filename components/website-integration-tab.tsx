@@ -382,22 +382,28 @@ export function WebsiteIntegrationTab() {
           <CardDescription>Products currently available on your website</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {readyForSaleItems.map((item) => {
               const availability = getAvailabilityStatus(item.quantity)
               return (
-                <div key={item.id} className="border rounded-lg p-4 space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-medium">{item.plant_name}</h3>
-                    <Badge className={`${availability.color} text-white`}>{availability.status}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{item.scientific_name}</p>
-                  <p className="text-sm">{item.description || "No description"}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold">Ksh {item.price}</span>
-                    <span className="text-sm text-muted-foreground">{item.quantity} available</span>
-                  </div>
-                </div>
+                <Card key={item.id} className="hover:shadow-md transition-shadow duration-200">
+                  <CardContent className="p-4 space-y-2">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="font-medium text-sm leading-tight line-clamp-2">{item.plant_name}</h3>
+                      <Badge className={`${availability.color} text-white text-xs flex-shrink-0`}>
+                        {availability.status}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground italic line-clamp-1">{item.scientific_name}</p>
+                    <p className="text-xs text-gray-600 line-clamp-2 min-h-[2rem]">
+                      {item.description || "No description available"}
+                    </p>
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <span className="font-bold text-sm text-green-600">Ksh {item.price.toLocaleString()}</span>
+                      <span className="text-xs text-muted-foreground">{item.quantity} in stock</span>
+                    </div>
+                  </CardContent>
+                </Card>
               )
             })}
           </div>
@@ -473,51 +479,88 @@ export function WebsiteIntegrationTab() {
                                 Edit
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+                            <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
                               <DialogHeader className="flex-shrink-0">
-                                <DialogTitle>Edit Website Listing - {item.plant_name}</DialogTitle>
+                                <DialogTitle className="text-lg">Edit Website Listing - {item.plant_name}</DialogTitle>
                               </DialogHeader>
                               {editingItem && (
                                 <>
                                   {/* Scrollable content area */}
-                                  <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-                                    <div
-                                      className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}
-                                    >
-                                      <div>
-                                        <Label>Plant Name</Label>
-                                        <Input value={editingItem.plant_name} disabled />
+                                  <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+                                    <Card className="p-4">
+                                      <CardHeader className="p-0 pb-3">
+                                        <CardTitle className="text-sm font-medium text-muted-foreground">Basic Information</CardTitle>
+                                      </CardHeader>
+                                      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                                        <div>
+                                          <Label className="text-sm font-medium">Plant Name</Label>
+                                          <Input value={editingItem.plant_name} disabled className="mt-1" />
+                                        </div>
+                                        <div>
+                                          <Label className="text-sm font-medium">Selling Price (Ksh)</Label>
+                                          <Input 
+                                            type="number"
+                                            value={editingItem.price} 
+                                            onChange={(e) => setEditingItem({
+                                              ...editingItem,
+                                              price: Number(e.target.value)
+                                            })}
+                                            className="mt-1"
+                                            disabled={isDemoMode || !tableExists}
+                                          />
+                                        </div>
+                                        <div>
+                                          <Label className="text-sm font-medium">Scientific Name</Label>
+                                          <Input value={editingItem.scientific_name} disabled className="mt-1" />
+                                        </div>
+                                        <div>
+                                          <Label className="text-sm font-medium">Current Stock</Label>
+                                          <Input value={editingItem.quantity} disabled className="mt-1" />
+                                        </div>
                                       </div>
-                                      <div>
-                                        <Label>Price (Ksh)</Label>
-                                        <Input value={editingItem.price} disabled />
+                                    </Card>
+
+                                    <Card className="p-4">
+                                      <CardHeader className="p-0 pb-3">
+                                        <CardTitle className="text-sm font-medium text-muted-foreground">Website Content</CardTitle>
+                                      </CardHeader>
+                                      <div className="space-y-4">
+                                        <div>
+                                          <Label htmlFor="description" className="text-sm font-medium">Website Description</Label>
+                                          <Textarea
+                                            id="description"
+                                            placeholder="Enter a compelling description for your website visitors..."
+                                            value={editingItem.description}
+                                            onChange={(e) =>
+                                              setEditingItem({
+                                                ...editingItem,
+                                                description: e.target.value,
+                                              })
+                                            }
+                                            rows={4}
+                                            className="mt-1 resize-none"
+                                            disabled={isDemoMode || !tableExists}
+                                          />
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            {editingItem.description?.length || 0}/500 characters
+                                          </p>
+                                        </div>
                                       </div>
-                                    </div>
+                                    </Card>
 
-                                    <div>
-                                      <Label htmlFor="description">Website Description</Label>
-                                      <Textarea
-                                        id="description"
-                                        placeholder="Enter a description for your website..."
-                                        value={editingItem.description}
-                                        onChange={(e) =>
-                                          setEditingItem({
-                                            ...editingItem,
-                                            description: e.target.value,
-                                          })
-                                        }
-                                        rows={3}
-                                      />
-                                    </div>
-
-                                    <div>
-                                      <Label>Plant Image</Label>
+                                    <Card className="p-4">
+                                      <CardHeader className="p-0 pb-3">
+                                        <CardTitle className="text-sm font-medium text-muted-foreground">Plant Image</CardTitle>
+                                      </CardHeader>
                                       <div className="space-y-4">
                                         {!imagePreview ? (
-                                          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                                            <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
-                                            <div className="space-y-2">
-                                              <p className="text-sm text-muted-foreground">Upload a plant image</p>
+                                          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center bg-gray-50/50">
+                                            <ImageIcon className="h-16 w-16 mx-auto text-muted-foreground/30 mb-3" />
+                                            <div className="space-y-3">
+                                              <div>
+                                                <p className="text-sm font-medium text-muted-foreground mb-1">Upload a plant image</p>
+                                                <p className="text-xs text-muted-foreground">JPG, PNG up to 5MB</p>
+                                              </div>
                                               <input
                                                 type="file"
                                                 accept="image/*"
@@ -545,7 +588,7 @@ export function WebsiteIntegrationTab() {
                                               <img
                                                 src={imagePreview || "/placeholder.svg"}
                                                 alt="Plant preview"
-                                                className="h-32 w-auto max-w-32 object-contain rounded-lg border bg-gray-50"
+                                                className="h-40 w-auto max-w-full object-contain rounded-lg border bg-white shadow-sm"
                                               />
                                               <button
                                                 type="button"
@@ -557,13 +600,13 @@ export function WebsiteIntegrationTab() {
                                                     image_url: "",
                                                   })
                                                 }}
-                                                className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs hover:bg-destructive/90"
+                                                className="absolute -top-2 -right-2 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs hover:bg-destructive/90 transition-colors"
                                               >
                                                 <X className="h-3 w-3" />
                                               </button>
                                             </div>
 
-                                            <div>
+                                            <div className="flex gap-2">
                                               <input
                                                 type="file"
                                                 accept="image/*"
@@ -574,34 +617,46 @@ export function WebsiteIntegrationTab() {
                                               />
                                               <label
                                                 htmlFor="image-replace"
-                                                className={`inline-flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md cursor-pointer transition-colors ${
+                                                className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
                                                   uploadingImage || isDemoMode
                                                     ? "bg-muted text-muted-foreground cursor-not-allowed"
                                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                                                 }`}
                                               >
-                                                <Upload className="h-3 w-3" />
+                                                <Upload className="h-4 w-4" />
                                                 {uploadingImage ? "Uploading..." : "Replace Image"}
                                               </label>
                                             </div>
                                           </div>
                                         )}
                                       </div>
-                                    </div>
+                                    </Card>
 
-                                    <div className="flex items-center gap-2">
-                                      <Switch
-                                        checked={editingItem.ready_for_sale}
-                                        onCheckedChange={(checked) =>
-                                          setEditingItem({
-                                            ...editingItem,
-                                            ready_for_sale: checked,
-                                          })
-                                        }
-                                        disabled={isDemoMode || !tableExists}
-                                      />
-                                      <Label>List on Website</Label>
-                                    </div>
+                                    <Card className="p-4">
+                                      <CardHeader className="p-0 pb-3">
+                                        <CardTitle className="text-sm font-medium text-muted-foreground">Website Settings</CardTitle>
+                                      </CardHeader>
+                                      <div className="flex items-center gap-3">
+                                        <Switch
+                                          checked={editingItem.ready_for_sale}
+                                          onCheckedChange={(checked) =>
+                                            setEditingItem({
+                                              ...editingItem,
+                                              ready_for_sale: checked,
+                                            })
+                                          }
+                                          disabled={isDemoMode || !tableExists}
+                                        />
+                                        <div>
+                                          <Label className="text-sm font-medium">List on Website</Label>
+                                          <p className="text-xs text-muted-foreground">
+                                            {editingItem.ready_for_sale 
+                                              ? "This product will be visible to website visitors" 
+                                              : "This product will be hidden from website visitors"}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </Card>
                                   </div>
 
                                   {/* Fixed action buttons */}
