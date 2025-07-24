@@ -756,7 +756,7 @@ export function InventoryTab() {
                           <p className="font-medium truncate">{item.quantity} {item.unit || 'kg'}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">Price/{item.unit || 'kg'}:</span>
+                          <span className="text-muted-foreground block">Selling Price ({item.age || item.unit || 'per unit'}):</span>
                           <p className="font-medium truncate">Ksh {item.price}</p>
                         </div>
                         <div className="col-span-2">
