@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Download, Loader2, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { DemoModeBanner } from "./demo-mode-banner"
 import { exportToExcel } from "@/lib/excel-export"
 
@@ -317,65 +318,72 @@ export function ReportsTab() {
               No profitability data available. Add inventory and tasks to see reports.
             </div>
           ) : (
-            <Table>
+            <ScrollArea className="h-[600px] w-full">
+              <Table>
               <TableHeader>
                 <TableRow className="sage-header">
-                  <TableHead>Rank</TableHead>
-                  <TableHead>Batch</TableHead>
-                  <TableHead>Plant</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Selling Price</TableHead>
-                  <TableHead>Cost/Seedling</TableHead>
-                  <TableHead>Profit/Seedling</TableHead>
-                  <TableHead>Profit Margin</TableHead>
-                  <TableHead>Revenue</TableHead>
-                  <TableHead>Profit Realized</TableHead>
+                  <TableHead className="w-12">#</TableHead>
+                  <TableHead className="min-w-[200px]">Plant & Batch</TableHead>
+                  <TableHead className="min-w-[120px]">Performance</TableHead>
+                  <TableHead className="hidden lg:table-cell min-w-[100px]">Sales Data</TableHead>
+                  <TableHead className="min-w-[100px]">Profit</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {profitabilityData.map((item, index) => (
                   <TableRow key={item.batch_sku} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="font-mono">
-                        {item.batch_sku}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div>
+                    <TableCell className="font-bold text-primary">{index + 1}</TableCell>
+                    <TableCell className="min-w-[200px]">
+                      <div className="space-y-1">
                         <div className="font-medium">{item.plant_name}</div>
-                        <div className="text-sm text-muted-foreground">{item.category}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>Ksh {item.selling_price}</TableCell>
-                    <TableCell>Ksh {Math.round(item.total_cost_per_seedling)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        {getProfitTrendIcon(item.profit_margin)}
-                        Ksh {Math.round(item.profit_per_seedling)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getProfitBadgeVariant(item.profit_margin)}>
-                        {item.profit_margin.toFixed(1)}%
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">Ksh {item.revenue_generated.toLocaleString()}</div>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {item.batch_sku}
+                          </Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            {item.category}
+                          </Badge>
+                        </div>
                         <div className="text-sm text-muted-foreground">
+                          Qty: {item.quantity} • Price: Ksh {item.selling_price}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="min-w-[120px]">
+                      <div className="space-y-2">
+                        <Badge variant={getProfitBadgeVariant(item.profit_margin)} className="text-xs">
+                          {getProfitTrendIcon(item.profit_margin)}
+                          {item.profit_margin.toFixed(1)}%
+                        </Badge>
+                        <div className="text-xs space-y-1 text-muted-foreground">
+                          <div>Cost: Ksh {Math.round(item.total_cost_per_seedling)}</div>
+                          <div>Profit: Ksh {Math.round(item.profit_per_seedling)}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell min-w-[100px]">
+                      <div className="text-sm space-y-1">
+                        <div className="font-medium">Ksh {item.revenue_generated.toLocaleString()}</div>
+                        <div className="text-muted-foreground">
                           {item.seedlings_sold} sold
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">
-                      Ksh {Math.round(item.profit_realized).toLocaleString()}
+                    <TableCell className="min-w-[100px]">
+                      <div className="space-y-1">
+                        <div className="font-bold text-accent">
+                          Ksh {Math.round(item.profit_realized).toLocaleString()}
+                        </div>
+                        <div className="lg:hidden text-xs text-muted-foreground">
+                          Rev: Ksh {item.revenue_generated.toLocaleString()}
+                        </div>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+              </Table>
+            </ScrollArea>
           )}
         </CardContent>
       </Card>

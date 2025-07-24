@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Plus, Search } from "lucide-react"
 import { AddTaskForm } from "./add-task-form"
 
@@ -194,62 +195,70 @@ export function TasksTab() {
               {tasks.length === 0 ? "No tasks found. Add your first task!" : "No tasks match your filters."}
             </div>
           ) : (
-            <Table>
+            <ScrollArea className="h-[600px] w-full">
+              <Table>
               <TableHeader>
                 <TableRow className="sage-header">
-                  <TableHead>Task</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Batch SKU</TableHead>
-                  <TableHead>Labor</TableHead>
-                  <TableHead>Consumables</TableHead>
-                  <TableHead>Total Cost</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Assigned To</TableHead>
+                  <TableHead className="min-w-[200px]">Task Details</TableHead>
+                  <TableHead className="hidden md:table-cell">Date</TableHead>
+                  <TableHead className="min-w-[120px]">Cost & Status</TableHead>
+                  <TableHead className="hidden lg:table-cell">Assigned</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredTasks.map((task) => (
                   <TableRow key={task.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <div>
+                    <TableCell className="min-w-[200px]">
+                      <div className="space-y-1">
                         <div className="font-medium">{task.task_name}</div>
+                        <div className="flex flex-wrap gap-2 text-sm">
+                          <Badge variant="secondary" className="text-xs">{task.task_type}</Badge>
+                          {task.batch_sku && (
+                            <Badge variant="outline" className="font-mono text-xs">
+                              {task.batch_sku}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="md:hidden text-sm text-muted-foreground">
+                          {new Date(task.task_date).toLocaleDateString()}
+                        </div>
                         {task.description && (
-                          <div className="text-sm text-muted-foreground truncate max-w-[200px]">
+                          <div className="text-sm text-muted-foreground truncate max-w-[180px]">
                             {task.description}
                           </div>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{task.task_type}</TableCell>
-                    <TableCell>{new Date(task.task_date).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      {task.batch_sku && (
-                        <Badge variant="outline" className="font-mono">
-                          {task.batch_sku}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <div className="text-sm">
-                        <div>Ksh {task.labor_cost?.toLocaleString() || 0}</div>
-                        {task.labor_hours && (
-                          <div className="text-muted-foreground">{task.labor_hours}h</div>
-                        )}
+                        {new Date(task.task_date).toLocaleDateString()}
                       </div>
                     </TableCell>
-                    <TableCell>Ksh {task.consumables_cost?.toLocaleString() || 0}</TableCell>
-                    <TableCell className="font-medium">
-                      Ksh {task.total_cost?.toLocaleString() || 0}
+                    <TableCell className="min-w-[120px]">
+                      <div className="space-y-2">
+                        <div className="font-medium text-primary">
+                          Ksh {task.total_cost?.toLocaleString() || 0}
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <div>Labor: Ksh {task.labor_cost?.toLocaleString() || 0}</div>
+                          <div>Materials: Ksh {task.consumables_cost?.toLocaleString() || 0}</div>
+                          {task.labor_hours && (
+                            <div>Hours: {task.labor_hours}h</div>
+                          )}
+                        </div>
+                        <Badge variant={getStatusBadgeVariant(task.status)} className="text-xs">
+                          {task.status}
+                        </Badge>
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(task.status)}>{task.status}</Badge>
+                    <TableCell className="hidden lg:table-cell">
+                      <div className="text-sm">{task.assigned_to || "-"}</div>
                     </TableCell>
-                    <TableCell>{task.assigned_to || "-"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+              </Table>
+            </ScrollArea>
           )}
         </CardContent>
       </Card>
