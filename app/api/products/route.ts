@@ -34,11 +34,12 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Fetch products that are ready for sale
+    // Fetch products that are ready for sale (plants and honey)
     const { data: products, error } = await supabase
       .from('inventory')
       .select('*')
       .eq('ready_for_sale', true)
+      .in('item_type', ['Plant', 'Honey'])
       .order('plant_name', { ascending: true })
 
     if (error) {

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AddInventoryForm } from "@/components/add-inventory-form"
 import { AddConsumableForm } from "@/components/add-consumable-form"
+import { AddHoneyForm } from "@/components/add-honey-form"
 import { EditInventoryForm } from "@/components/edit-inventory-form"
 import { useToast } from "@/components/ui/use-toast"
 import { demoInventory } from "@/components/demo-data"
@@ -29,6 +30,7 @@ export function InventoryTab() {
   const [activeTab, setActiveTab] = useState("plants")
   const [addPlantDialogOpen, setAddPlantDialogOpen] = useState(false)
   const [addConsumableDialogOpen, setAddConsumableDialogOpen] = useState(false)
+  const [addHoneyDialogOpen, setAddHoneyDialogOpen] = useState(false)
   const { toast } = useToast()
   const [plantStatusFilter, setPlantStatusFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -120,6 +122,7 @@ export function InventoryTab() {
       await fetchInventory()
       setAddPlantDialogOpen(false)
       setAddConsumableDialogOpen(false)
+      setAddHoneyDialogOpen(false)
     } catch (error) {
       console.error("Error refreshing inventory:", error)
     }
@@ -201,9 +204,19 @@ export function InventoryTab() {
 
       return matchesSearch && matchesCategory && matchesStatus
     })
-    .sort((a, b) => {
-      // Sort consumables alphabetically by name
-      return a.plant_name.localeCompare(b.plant_name)
+
+  const filteredHoneyProducts = inventory
+    .filter(item => item.item_type === "Honey")
+    .filter(item => {
+      const matchesSearch = !searchTerm || 
+        item.plant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.scientific_name?.toLowerCase().includes(searchTerm.toLowerCase())
+
+      const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter
+      const matchesStatus = statusFilter === "all" || item.status === statusFilter
+
+      return matchesSearch && matchesCategory && matchesStatus
     })
 
   const plantCategories = [
@@ -354,10 +367,14 @@ export function InventoryTab() {
       {/* Main Inventory Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-md grid-cols-3">
             <TabsTrigger value="plants" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Plants ({filteredPlants.length})
+            </TabsTrigger>
+            <TabsTrigger value="honey" className="flex items-center gap-2">
+              🍯
+              Honey ({filteredHoneyProducts.length})
             </TabsTrigger>
             <TabsTrigger value="consumables" className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4" />
@@ -399,6 +416,24 @@ export function InventoryTab() {
                   <DialogTitle>Add New Consumable</DialogTitle>
                 </DialogHeader>
                 <AddConsumableForm onSuccess={handleAddSuccess} onClose={() => setAddConsumableDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+
+             <Dialog open={addHoneyDialogOpen} onOpenChange={setAddHoneyDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant={activeTab === "honey" ? "default" : "outline"}
+                  disabled={isDemoMode || !tableExists || activeTab !== "honey"}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Honey
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add New Honey Product</DialogTitle>
+                </DialogHeader>
+                <AddHoneyForm onSuccess={handleAddSuccess} onClose={() => setAddHoneyDialogOpen(false)} />
               </DialogContent>
             </Dialog>
 
@@ -626,7 +661,115 @@ export function InventoryTab() {
             </div>
           )}
         </TabsContent>
+         {/* Honey Tab */}
+         <TabsContent value="honey" className="space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <ShoppingCart className="h-8 w-8 animate-pulse mx-auto mb-2 text-muted-foreground" />
+                <p className="text-muted-foreground">Loading Honey Products...</p>
+              </div>
+            </div>
+          ) : filteredHoneyProducts.length === 0 ? (
+            <div className="text-center py-12">
+              <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No Honey Products found</h3>
+              <p className="text-muted-foreground mb-4">
+                {searchTerm || categoryFilter !== "All Categories"
+                  ? "Try adjusting your search or filters"
+                  : "Start by adding your first Honey Product"}
+              </p>
+              <Dialog open={addHoneyDialogOpen} onOpenChange={setAddHoneyDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button disabled={isDemoMode || !tableExists}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Your First Honey Product
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Honey Product</DialogTitle>
+                  </DialogHeader>
+                  <AddHoneyForm onSuccess={handleAddSuccess} onClose={() => setAddHoneyDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredHoneyProducts.map((item) => (
+                <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200 h-fit max-w-sm mx-auto w-full">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <Badge className="bg-purple-600 hover:bg-purple-700 text-white text-xs truncate max-w-[140px]">
+                        🍯 Honey
+                      </Badge>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setEditItem(item)} 
+                          className="h-7 w-7 p-0"
+                          disabled={isDemoMode || !tableExists}
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm("Are you sure you want to delete this Honey Product?")) {
+                              deleteInventoryItem(item.id)
+                            }
+                          }}
+                          className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                          disabled={isDemoMode || !tableExists}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
 
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-muted-foreground block">Qty:</span>
+                          <p className="font-medium truncate">{item.quantity}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block">Price/Unit:</span>
+                          <p className="font-medium truncate">Ksh {item.price}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground block">SKU:</span>
+                          <p className="font-medium text-xs truncate">{item.sku}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground block">Status:</span>
+                          <Badge
+                            variant="outline"
+                            className={`text-xs h-5 ${
+                              item.status === "Available"
+                                ? "bg-green-100 text-green-800 border-green-200"
+                                : item.status === "Low Stock"
+                                ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                                : "bg-red-100 text-red-800 border-red-200"
+                            }`}
+                          >
+                            {item.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
         {/* Consumables Tab */}
         <TabsContent value="consumables" className="space-y-4">
           {loading ? (
@@ -636,7 +779,8 @@ export function InventoryTab() {
                 <p className="text-muted-foreground">Loading consumables...</p>
               </div>
             </div>
-          ) : filteredConsumables.length === 0 ? (
+          ) : filteredConsumables.length === 0 ?```text
+(
             <div className="text-center py-12">
               <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No consumables found</h3>

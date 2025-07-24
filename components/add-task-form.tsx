@@ -1,3 +1,4 @@
+javascript
 "use client"
 
 import { useState, useEffect } from "react"
@@ -240,7 +241,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         status: "Completed",
         assigned_to: "",
       })
-      
+
       setConsumableUsages([])
 
       onSuccess()
@@ -291,11 +292,23 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
               <SelectValue placeholder="Select task type" />
             </SelectTrigger>
             <SelectContent>
-              {taskTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
+              <SelectItem value="Watering">Watering</SelectItem>
+                  <SelectItem value="Fertilizing">Fertilizing</SelectItem>
+                  <SelectItem value="Pruning">Pruning</SelectItem>
+                  <SelectItem value="Planting">Planting</SelectItem>
+                  <SelectItem value="Transplanting">Transplanting</SelectItem>
+                  <SelectItem value="Pest Control">Pest Control</SelectItem>
+                  <SelectItem value="Weeding">Weeding</SelectItem>
+                  <SelectItem value="Harvesting">Harvesting</SelectItem>
+                  <SelectItem value="Maintenance">Maintenance</SelectItem>
+                  <SelectItem value="Hive Inspection">Hive Inspection</SelectItem>
+                  <SelectItem value="Honey Extraction">Honey Extraction</SelectItem>
+                  <SelectItem value="Hive Maintenance">Hive Maintenance</SelectItem>
+                  <SelectItem value="Queen Management">Queen Management</SelectItem>
+                  <SelectItem value="Disease Treatment">Disease Treatment</SelectItem>
+                  <SelectItem value="Packaging">Packaging</SelectItem>
+                   <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
           {formData.task_type === "Other" && (
