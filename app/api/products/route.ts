@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       .from('inventory')
       .select('*')
       .eq('ready_for_sale', true)
-      .in('item_type', ['Plant', 'Honey'])
+      .or('item_type.eq.Honey,category.eq.Organic Honey,item_type.is.null')
       .order('plant_name', { ascending: true })
 
     if (error) {
@@ -52,11 +52,23 @@ export async function GET(request: NextRequest) {
 
     // Transform the data to include availability status
     const transformedProducts = products?.map(product => {
+      const isHoney = product.item_type === "Honey" || product.category === "Organic Honey"
+      
       let availability_status = "Not Available"
-      if (product.quantity >= 100) {
-        availability_status = "Available"
-      } else if (product.quantity >= 10) {
-        availability_status = "Limited"
+      if (isHoney) {
+        // For honey products, different availability thresholds
+        if (product.quantity >= 10) {
+          availability_status = "Available"
+        } else if (product.quantity >= 1) {
+          availability_status = "Limited"
+        }
+      } else {
+        // For plants
+        if (product.quantity >= 100) {
+          availability_status = "Available"
+        } else if (product.quantity >= 10) {
+          availability_status = "Limited"
+        }
       }
 
       return {
@@ -65,12 +77,14 @@ export async function GET(request: NextRequest) {
         scientific_name: product.scientific_name,
         category: product.category,
         quantity: product.quantity,
+        unit: product.unit || (isHoney ? 'kg' : 'seedlings'),
         price: product.price,
-        description: product.description || `High quality ${product.plant_name} seedlings`,
+        description: product.description || (isHoney ? `Premium ${product.plant_name} - ${product.age || 'Natural honey'}` : `High quality ${product.plant_name} seedlings`),
         image_url: product.image_url || '/placeholder.svg',
         availability_status,
         ready_for_sale: product.ready_for_sale,
-        sku: product.sku
+        sku: product.sku,
+        item_type: product.item_type
       }
     }) || []
 

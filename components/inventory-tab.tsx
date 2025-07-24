@@ -206,7 +206,7 @@ export function InventoryTab() {
     })
 
   const filteredHoneyProducts = inventory
-    .filter(item => item.item_type === "Honey")
+    .filter(item => item.item_type === "Honey" || item.category === "Organic Honey")
     .filter(item => {
       const matchesSearch = !searchTerm || 
         item.plant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -221,7 +221,7 @@ export function InventoryTab() {
 
   const plantCategories = [
     "All Categories",
-    ...new Set(inventory.filter((item) => !isConsumable(item) && item.category).map((item) => item.category)),
+    ...new Set(inventory.filter((item) => !isConsumable(item) && item.item_type !== "Honey" && item.category).map((item) => item.category)),
   ].filter(Boolean)
 
   const consumableCategories = [
@@ -232,6 +232,11 @@ export function InventoryTab() {
         .map((item) => getConsumableCategory(item))
         .filter(Boolean),
     ),
+  ].filter(Boolean)
+
+  const honeyCategories = [
+    "All Categories",
+    ...new Set(inventory.filter((item) => item.item_type === "Honey" || item.category === "Organic Honey").map((item) => item.category)),
   ].filter(Boolean)
 
   const handleExportToExcel = async () => {
@@ -462,7 +467,7 @@ export function InventoryTab() {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(activeTab === "plants" ? plantCategories : consumableCategories).map((category) => (
+                    {(activeTab === "plants" ? plantCategories : activeTab === "honey" ? honeyCategories : consumableCategories).map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -732,15 +737,18 @@ export function InventoryTab() {
                     <div className="space-y-3">
                       <div>
                         <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
+                        {item.scientific_name && (
+                          <p className="text-xs text-muted-foreground italic truncate">{item.scientific_name}</p>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
                           <span className="text-muted-foreground block">Qty:</span>
-                          <p className="font-medium truncate">{item.quantity}</p>
+                          <p className="font-medium truncate">{item.quantity} {item.unit || 'kg'}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">Price/Unit:</span>
+                          <span className="text-muted-foreground block">Price/{item.unit || 'kg'}:</span>
                           <p className="font-medium truncate">Ksh {item.price}</p>
                         </div>
                         <div className="col-span-2">
@@ -752,7 +760,7 @@ export function InventoryTab() {
                           <Badge
                             variant="outline"
                             className={`text-xs h-5 ${
-                              item.status === "Available"
+                              item.status === "Ready"
                                 ? "bg-green-100 text-green-800 border-green-200"
                                 : item.status === "Low Stock"
                                 ? "bg-yellow-100 text-yellow-800 border-yellow-200"
@@ -762,7 +770,34 @@ export function InventoryTab() {
                             {item.status}
                           </Badge>
                         </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground block">Website Status:</span>
+                          <Badge
+                            variant="outline"
+                            className={`text-xs h-5 ${
+                              item.ready_for_sale
+                                ? "bg-blue-100 text-blue-800 border-blue-200"
+                                : "bg-gray-100 text-gray-800 border-gray-200"
+                            }`}
+                          >
+                            {item.ready_for_sale ? "Listed" : "Not Listed"}
+                          </Badge>
+                        </div>
                       </div>
+
+                      {(item.age || item.section || item.source) && (
+                        <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
+                          {item.age && <p className="truncate">Package: {item.age}</p>}
+                          {item.section && <p className="truncate">Packaging: {item.section}</p>}
+                          {item.row && <p className="truncate">Source Hives: {item.row}</p>}
+                        </div>
+                      )}
+
+                      {item.description && (
+                        <div className="pt-2 border-t">
+                          <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

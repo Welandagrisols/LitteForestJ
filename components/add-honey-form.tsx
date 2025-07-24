@@ -115,7 +115,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
         unit: finalFormData.unit,
         age: finalFormData.packaging_size,
         date_planted: finalFormData.harvest_date || null,
-        status: "Ready",
+        status: finalFormData.ready_for_sale ? "Ready" : "Processing",
         price: Number(finalFormData.price),
         batch_cost: Number(finalFormData.batch_cost),
         cost_per_seedling: calculatedCostPerUnit,
