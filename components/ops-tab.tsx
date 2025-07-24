@@ -141,6 +141,71 @@ export function OpsTab() {
     })
   }
 
+    const handleClearDuplicates = async () => {
+        if (isDemoMode) {
+            toast({
+                title: "Demo Mode",
+                description: "Cannot clear data in demo mode",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setClearing(true);
+        try {
+            // Fetch all inventory items
+            const { data: inventory, error } = await supabase
+                .from("inventory")
+                .select("*");
+
+            if (error) {
+                throw error;
+            }
+
+            // Identify duplicates based on 'name'
+            const nameCounts: { [name: string]: number } = {};
+            const duplicates: any[] = [];
+
+            inventory?.forEach((item) => {
+                const name = item.name;
+                nameCounts[name] = (nameCounts[name] || 0) + 1;
+                if (nameCounts[name] > 1) {
+                    duplicates.push(item);
+                }
+            });
+
+            // Delete the identified duplicates
+            for (const duplicate of duplicates) {
+                const { error: deleteError } = await supabase
+                    .from("inventory")
+                    .delete()
+                    .eq("id", duplicate.id); // Assuming 'id' is the unique identifier
+
+                if (deleteError) {
+                    console.error("Error deleting duplicate:", deleteError);
+                    // Optionally, stop deleting if one fails, or continue and log all errors
+                }
+            }
+
+            toast({
+                title: "Duplicates removed successfully",
+                description: "Duplicate entries have been removed from the database.",
+            });
+
+            // Refresh stats after clearing
+            await fetchStats();
+        } catch (error: any) {
+            console.error("Error clearing duplicates:", error);
+            toast({
+                title: "Error clearing duplicates",
+                description: error.message || "Failed to clear duplicate data",
+                variant: "destructive",
+            });
+        } finally {
+            setClearing(false);
+        }
+    };
+
   useEffect(() => {
     fetchStats()
   }, [])
@@ -352,6 +417,63 @@ export function OpsTab() {
                   </div>
                 </div>
               </div>
+
+                {/* Remove Duplicates Section */}
+                <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
+                        <div className="flex-1">
+                            <h4 className="font-medium text-orange-900 mb-2">Remove Duplicate Entries</h4>
+                            <p className="text-sm text-orange-700 mb-4">
+                                This will remove duplicate entries from your inventory based on plant name.
+                            </p>
+                            <p className="text-sm text-orange-700 mb-4 font-medium">
+                                This action is useful for cleaning up exploratory data entries.
+                            </p>
+
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        disabled={clearing || isDemoMode}
+                                        className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                                    >
+                                        {clearing ? (
+                                            <>
+                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                Removing Duplicates...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Remove Duplicates
+                                            </>
+                                        )}
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure you want to remove duplicate entries?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action will remove all duplicate entries based on plant name.
+                                            Please ensure you have reviewed your data before proceeding.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleClearDuplicates}
+                                            className="bg-orange-600 text-white hover:bg-orange-700"
+                                        >
+                                            Yes, remove duplicates
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </div>
+                </div>
+
 
               {/* System Information */}
               <div>
