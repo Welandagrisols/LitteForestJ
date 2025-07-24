@@ -162,34 +162,100 @@ export function OpsTab() {
                 throw error;
             }
 
-            // Identify duplicates based on 'name'
-            const nameCounts: { [name: string]: number } = {};
-            const duplicates: any[] = [];
-
+            // Group items by plant name (case-insensitive)
+            const itemGroups: { [name: string]: any[] } = {};
+            
             inventory?.forEach((item) => {
-                const name = item.name;
-                nameCounts[name] = (nameCounts[name] || 0) + 1;
-                if (nameCounts[name] > 1) {
-                    duplicates.push(item);
+                const name = item.plant_name.toLowerCase().trim();
+                if (!itemGroups[name]) {
+                    itemGroups[name] = [];
+                }
+                itemGroups[name].push(item);
+            });
+
+            // Find groups with duplicates and determine which to keep/delete
+            const itemsToDelete: string[] = [];
+            let duplicatesFound = 0;
+
+            Object.entries(itemGroups).forEach(([name, items]) => {
+                if (items.length > 1) {
+                    duplicatesFound += items.length - 1;
+                    
+                    // Score each item based on completeness of information
+                    const scoredItems = items.map(item => {
+                        let score = 0;
+                        
+                        // Basic fields
+                        if (item.scientific_name && item.scientific_name.trim()) score += 2;
+                        if (item.description && item.description.trim()) score += 3;
+                        if (item.image_url && item.image_url.trim()) score += 3;
+                        if (item.section && item.section.trim()) score += 1;
+                        if (item.row && item.row.trim()) score += 1;
+                        if (item.source && item.source.trim()) score += 1;
+                        if (item.age && item.age.trim()) score += 1;
+                        
+                        // Prefer items with higher quantities
+                        if (item.quantity > 0) score += Math.min(item.quantity / 10, 5);
+                        
+                        // Prefer items with cost information
+                        if (item.batch_cost && item.batch_cost > 0) score += 2;
+                        if (item.cost_per_seedling && item.cost_per_seedling > 0) score += 1;
+                        
+                        // Prefer items ready for sale
+                        if (item.ready_for_sale === true) score += 2;
+                        
+                        // Prefer newer items (higher score for more recent)
+                        if (item.created_at) {
+                            const daysSinceCreation = (Date.now() - new Date(item.created_at).getTime()) / (1000 * 60 * 60 * 24);
+                            score += Math.max(0, 10 - daysSinceCreation / 30); // Newer items get higher score
+                        }
+                        
+                        return { item, score };
+                    });
+                    
+                    // Sort by score (highest first) and keep the best one
+                    scoredItems.sort((a, b) => b.score - a.score);
+                    
+                    // Mark all except the best one for deletion
+                    for (let i = 1; i < scoredItems.length; i++) {
+                        itemsToDelete.push(scoredItems[i].item.id);
+                    }
+                    
+                    console.log(`Duplicate group "${name}":`, {
+                        total: items.length,
+                        keeping: scoredItems[0].item.plant_name,
+                        keepingScore: scoredItems[0].score.toFixed(1),
+                        deleting: scoredItems.slice(1).map(s => `${s.item.plant_name} (${s.score.toFixed(1)})`),
+                    });
                 }
             });
 
+            if (itemsToDelete.length === 0) {
+                toast({
+                    title: "No duplicates found",
+                    description: "No duplicate entries were found in your inventory.",
+                });
+                return;
+            }
+
             // Delete the identified duplicates
-            for (const duplicate of duplicates) {
+            let deletedCount = 0;
+            for (const itemId of itemsToDelete) {
                 const { error: deleteError } = await supabase
                     .from("inventory")
                     .delete()
-                    .eq("id", duplicate.id); // Assuming 'id' is the unique identifier
+                    .eq("id", itemId);
 
                 if (deleteError) {
                     console.error("Error deleting duplicate:", deleteError);
-                    // Optionally, stop deleting if one fails, or continue and log all errors
+                } else {
+                    deletedCount++;
                 }
             }
 
             toast({
                 title: "Duplicates removed successfully",
-                description: "Duplicate entries have been removed from the database.",
+                description: `Removed ${deletedCount} duplicate entries, keeping the ones with more complete information.`,
             });
 
             // Refresh stats after clearing
