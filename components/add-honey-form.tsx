@@ -88,7 +88,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
     if (!formData.product_name || formData.quantity <= 0 || formData.price <= 0) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields with valid values",
+        description: "Please fill in product name, quantity, and price",
         variant: "destructive",
       })
       return
@@ -104,7 +104,15 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
         finalFormData.sku = `${prefix}${randomNum}`
       }
 
-      const calculatedCostPerUnit = finalFormData.quantity > 0 ? finalFormData.batch_cost / finalFormData.quantity : 0
+      // Calculate production cost from tasks and apiary investment
+      let totalProductionCost = totalApiaryInvestment;
+      
+      // If no apiary data provided, set minimal batch cost
+      if (totalProductionCost === 0) {
+        totalProductionCost = finalFormData.quantity * 50; // Default cost estimation
+      }
+
+      const calculatedCostPerUnit = finalFormData.quantity > 0 ? totalProductionCost / finalFormData.quantity : 0
 
       // Insert honey product into inventory
       const insertData = {
@@ -117,7 +125,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
         date_planted: finalFormData.harvest_date || null,
         status: finalFormData.ready_for_sale ? "Ready" : "Processing",
         price: Number(finalFormData.price),
-        batch_cost: Number(finalFormData.batch_cost),
+        batch_cost: Number(totalProductionCost),
         cost_per_seedling: calculatedCostPerUnit,
         sku: finalFormData.sku,
         section: finalFormData.packaging_type,
@@ -154,7 +162,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
 
       toast({
         title: "Success",
-        description: `Honey product added successfully! Cost per ${finalFormData.unit}: Ksh ${calculatedCostPerUnit.toFixed(2)}`,
+        description: `Honey product added successfully! Production cost per ${finalFormData.unit}: Ksh ${calculatedCostPerUnit.toFixed(2)}. ${finalFormData.ready_for_sale ? 'Listed on website.' : 'Not listed on website.'}`,
       })
 
       // Reset form
@@ -296,7 +304,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="batch_cost">Total Production Cost (Ksh) *</Label>
+                  <Label htmlFor="batch_cost">Total Production Cost (Ksh)</Label>
                   <Input
                     id="batch_cost"
                     name="batch_cost"
@@ -305,9 +313,12 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
                     step="0.01"
                     value={formData.batch_cost}
                     onChange={handleChange}
-                    required
-                    placeholder="Total cost for this batch"
+                    placeholder="Will be calculated from tasks and consumables"
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Production cost will be automatically calculated from related tasks and consumables used
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -363,22 +374,35 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
                   <Input id="sku" name="sku" value={formData.sku} onChange={handleChange} />
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="ready_for_sale"
-                    checked={formData.ready_for_sale}
-                    onChange={(e) => setFormData(prev => ({ ...prev, ready_for_sale: e.target.checked }))}
-                  />
-                  <Label htmlFor="ready_for_sale">Ready for Sale on Website</Label>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="ready_for_sale"
+                      checked={formData.ready_for_sale}
+                      onChange={(e) => setFormData(prev => ({ ...prev, ready_for_sale: e.target.checked }))}
+                    />
+                    <Label htmlFor="ready_for_sale">List on Website</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {formData.ready_for_sale 
+                      ? "✅ This honey product will be visible to website visitors" 
+                      : "⏸️ This honey product will be hidden from website visitors"}
+                  </p>
                 </div>
 
-                {formData.quantity > 0 && formData.batch_cost > 0 && (
+                {formData.quantity > 0 && (totalApiaryInvestment > 0 || formData.price > 0) && (
                   <div className="space-y-2 md:col-span-2">
                     <div className="p-3 bg-muted rounded-md border">
                       <div className="text-sm font-medium text-muted-foreground">Cost Analysis:</div>
-                      <div className="text-lg font-bold text-primary">Cost per {formData.unit}: Ksh {costPerUnit.toFixed(2)}</div>
-                      <div className="text-sm text-green-600">Profit per {formData.unit}: Ksh {(formData.price - costPerUnit).toFixed(2)}</div>
+                      {totalApiaryInvestment > 0 ? (
+                        <>
+                          <div className="text-lg font-bold text-primary">Cost per {formData.unit}: Ksh {(totalApiaryInvestment / formData.quantity).toFixed(2)}</div>
+                          <div className="text-sm text-green-600">Profit per {formData.unit}: Ksh {(formData.price - (totalApiaryInvestment / formData.quantity)).toFixed(2)}</div>
+                        </>
+                      ) : (
+                        <div className="text-sm text-amber-600">Add apiary investment details above to calculate production costs automatically</div>
+                      )}
                     </div>
                   </div>
                 )}

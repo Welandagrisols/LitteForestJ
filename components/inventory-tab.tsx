@@ -779,17 +779,19 @@ export function InventoryTab() {
                           </Badge>
                         </div>
                         <div className="col-span-2">
-                          <span className="text-muted-foreground block">Website Status:</span>
-                          <Badge
-                            variant="outline"
-                            className={`text-xs h-5 ${
-                              item.ready_for_sale
-                                ? "bg-blue-100 text-blue-800 border-blue-200"
-                                : "bg-gray-100 text-gray-800 border-gray-200"
-                            }`}
-                          >
-                            {item.ready_for_sale ? "Listed" : "Not Listed"}
-                          </Badge>
+                          <span className="text-muted-foreground block">Website:</span>
+                          <div className="flex items-center gap-1">
+                            <Badge
+                              variant="outline"
+                              className={`text-xs h-5 ${
+                                item.ready_for_sale
+                                  ? "bg-green-100 text-green-800 border-green-200"
+                                  : "bg-gray-100 text-gray-800 border-gray-200"
+                              }`}
+                            >
+                              {item.ready_for_sale ? "✅ Listed" : "⏸️ Hidden"}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
 
