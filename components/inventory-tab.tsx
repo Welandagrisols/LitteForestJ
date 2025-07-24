@@ -923,6 +923,7 @@ export function InventoryTab() {
             </div>
           )}
         </TabsContent>
+        </TabsContent>
       </Tabs>
 
       {/* Edit Dialog */}
