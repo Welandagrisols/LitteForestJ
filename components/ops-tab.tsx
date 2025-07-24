@@ -132,16 +132,7 @@ export function OpsTab() {
     }
   }
 
-  const handleBulkImportSuccess = () => {
-    console.log("Bulk import success callback triggered")
-    fetchStats()
-    toast({
-      title: "Import completed",
-      description: "Plants have been imported successfully",
-    })
-  }
-
-    const handleClearDuplicates = async () => {
+    const handleClearTasks = async () => {
         if (isDemoMode) {
             toast({
                 title: "Demo Mode",
@@ -153,128 +144,188 @@ export function OpsTab() {
 
         setClearing(true);
         try {
-            // Fetch all inventory items
-            const { data: inventory, error } = await supabase
-                .from("inventory")
-                .select("*");
+            // Clear task consumables first (due to foreign key constraint)
+            const { error: consumablesError } = await supabase
+                .from("task_consumables")
+                .delete()
+                .neq('id', '00000000-0000-0000-0000-000000000000');
 
-            if (error) {
-                throw error;
+            if (consumablesError) {
+                console.error("Error clearing task consumables:", consumablesError);
             }
 
-            // Group items by plant name (case-insensitive)
-            const itemGroups: { [name: string]: any[] } = {};
-            
-            inventory?.forEach((item) => {
-                const name = item.plant_name.toLowerCase().trim();
-                if (!itemGroups[name]) {
-                    itemGroups[name] = [];
-                }
-                itemGroups[name].push(item);
-            });
+            // Clear tasks
+            const { error: tasksError } = await supabase
+                .from("tasks")
+                .delete()
+                .neq('id', '00000000-0000-0000-0000-000000000000');
 
-            // Find groups with duplicates and determine which to keep/delete
-            const itemsToDelete: string[] = [];
-            let duplicatesFound = 0;
-
-            Object.entries(itemGroups).forEach(([name, items]) => {
-                if (items.length > 1) {
-                    duplicatesFound += items.length - 1;
-                    
-                    // Score each item based on completeness of information
-                    const scoredItems = items.map(item => {
-                        let score = 0;
-                        
-                        // Basic fields
-                        if (item.scientific_name && item.scientific_name.trim()) score += 2;
-                        if (item.description && item.description.trim()) score += 3;
-                        if (item.image_url && item.image_url.trim()) score += 3;
-                        if (item.section && item.section.trim()) score += 1;
-                        if (item.row && item.row.trim()) score += 1;
-                        if (item.source && item.source.trim()) score += 1;
-                        if (item.age && item.age.trim()) score += 1;
-                        
-                        // Prefer items with higher quantities
-                        if (item.quantity > 0) score += Math.min(item.quantity / 10, 5);
-                        
-                        // Prefer items with cost information
-                        if (item.batch_cost && item.batch_cost > 0) score += 2;
-                        if (item.cost_per_seedling && item.cost_per_seedling > 0) score += 1;
-                        
-                        // Prefer items ready for sale
-                        if (item.ready_for_sale === true) score += 2;
-                        
-                        // Prefer newer items (higher score for more recent)
-                        if (item.created_at) {
-                            const daysSinceCreation = (Date.now() - new Date(item.created_at).getTime()) / (1000 * 60 * 60 * 24);
-                            score += Math.max(0, 10 - daysSinceCreation / 30); // Newer items get higher score
-                        }
-                        
-                        return { item, score };
-                    });
-                    
-                    // Sort by score (highest first) and keep the best one
-                    scoredItems.sort((a, b) => b.score - a.score);
-                    
-                    // Mark all except the best one for deletion
-                    for (let i = 1; i < scoredItems.length; i++) {
-                        itemsToDelete.push(scoredItems[i].item.id);
-                    }
-                    
-                    console.log(`Duplicate group "${name}":`, {
-                        total: items.length,
-                        keeping: scoredItems[0].item.plant_name,
-                        keepingScore: scoredItems[0].score.toFixed(1),
-                        deleting: scoredItems.slice(1).map(s => `${s.item.plant_name} (${s.score.toFixed(1)})`),
-                    });
-                }
-            });
-
-            if (itemsToDelete.length === 0) {
-                toast({
-                    title: "No duplicates found",
-                    description: "No duplicate entries were found in your inventory.",
-                });
-                return;
-            }
-
-            // Delete the identified duplicates
-            let deletedCount = 0;
-            for (const itemId of itemsToDelete) {
-                const { error: deleteError } = await supabase
-                    .from("inventory")
-                    .delete()
-                    .eq("id", itemId);
-
-                if (deleteError) {
-                    console.error("Error deleting duplicate:", deleteError);
-                } else {
-                    deletedCount++;
-                }
+            if (tasksError) {
+                throw tasksError;
             }
 
             toast({
-                title: "Duplicates removed successfully",
-                description: `Removed ${deletedCount} duplicate entries, keeping the ones with more complete information.`,
+                title: "Tasks cleared successfully",
+                description: "All test tasks have been removed from the system.",
             });
 
             // Refresh stats after clearing
             await fetchStats();
         } catch (error: any) {
-            console.error("Error clearing duplicates:", error);
+            console.error("Error clearing tasks:", error);
             toast({
-                title: "Error clearing duplicates",
-                description: error.message || "Failed to clear duplicate data",
+                title: "Error clearing tasks",
+                description: error.message || "Failed to clear tasks",
                 variant: "destructive",
             });
         } finally {
             setClearing(false);
         }
-    };
+    }
+
+  const handleBulkImportSuccess = () => {
+    console.log("Bulk import success callback triggered")
+    fetchStats()
+    toast({
+      title: "Import completed",
+      description: "Plants have been imported successfully",
+    })
+  }
+
+  const handleClearDuplicates = async () => {
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot clear data in demo mode",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setClearing(true)
+    try {
+      // Fetch all inventory items
+      const { data: inventory, error } = await supabase
+        .from("inventory")
+        .select("*")
+
+      if (error) {
+        throw error
+      }
+
+      // Group items by plant name (case-insensitive)
+      const itemGroups: { [name: string]: any[] } = {};
+
+      inventory?.forEach((item) => {
+        const name = item.plant_name.toLowerCase().trim();
+        if (!itemGroups[name]) {
+          itemGroups[name] = [];
+        }
+        itemGroups[name].push(item);
+      });
+
+      // Find groups with duplicates and determine which to keep/delete
+      const itemsToDelete: string[] = [];
+      let duplicatesFound = 0;
+
+      Object.entries(itemGroups).forEach(([name, items]) => {
+        if (items.length > 1) {
+          duplicatesFound += items.length - 1;
+
+          // Score each item based on completeness of information
+          const scoredItems = items.map(item => {
+            let score = 0;
+
+            // Basic fields
+            if (item.scientific_name && item.scientific_name.trim()) score += 2;
+            if (item.description && item.description.trim()) score += 3;
+            if (item.image_url && item.image_url.trim()) score += 3;
+            if (item.section && item.section.trim()) score += 1;
+            if (item.row && item.row.trim()) score += 1;
+            if (item.source && item.source.trim()) score += 1;
+            if (item.age && item.age.trim()) score += 1;
+
+            // Prefer items with higher quantities
+            if (item.quantity > 0) score += Math.min(item.quantity / 10, 5);
+
+            // Prefer items with cost information
+            if (item.batch_cost && item.batch_cost > 0) score += 2;
+            if (item.cost_per_seedling && item.cost_per_seedling > 0) score += 1;
+
+            // Prefer items ready for sale
+            if (item.ready_for_sale === true) score += 2;
+
+            // Prefer newer items (higher score for more recent)
+            if (item.created_at) {
+              const daysSinceCreation = (Date.now() - new Date(item.created_at).getTime()) / (1000 * 60 * 60 * 24);
+              score += Math.max(0, 10 - daysSinceCreation / 30); // Newer items get higher score
+            }
+
+            return { item, score };
+          });
+
+          // Sort by score (highest first) and keep the best one
+          scoredItems.sort((a, b) => b.score - a.score);
+
+          // Mark all except the best one for deletion
+          for (let i = 1; i < scoredItems.length; i++) {
+            itemsToDelete.push(scoredItems[i].item.id);
+          }
+
+          console.log(`Duplicate group "${name}":`, {
+            total: items.length,
+            keeping: scoredItems[0].item.plant_name,
+            keepingScore: scoredItems[0].score.toFixed(1),
+            deleting: scoredItems.slice(1).map(s => `${s.item.plant_name} (${s.score.toFixed(1)})`),
+          });
+        }
+      });
+
+      if (itemsToDelete.length === 0) {
+        toast({
+          title: "No duplicates found",
+          description: "No duplicate entries were found in your inventory.",
+        });
+        return;
+      }
+
+      // Delete the identified duplicates
+      let deletedCount = 0;
+      for (const itemId of itemsToDelete) {
+        const { error: deleteError } = await supabase
+          .from("inventory")
+          .delete()
+          .eq("id", itemId);
+
+        if (deleteError) {
+          console.error("Error deleting duplicate:", deleteError);
+        } else {
+          deletedCount++;
+        }
+      }
+
+      toast({
+        title: "Duplicates removed successfully",
+        description: `Removed ${deletedCount} duplicate entries, keeping the ones with more complete information.`,
+      });
+
+      // Refresh stats after clearing
+      await fetchStats();
+    } catch (error: any) {
+      console.error("Error clearing duplicates:", error);
+      toast({
+        title: "Error clearing duplicates",
+        description: error.message || "Failed to clear duplicate data",
+        variant: "destructive",
+      });
+    } finally {
+      setClearing(false);
+    }
+  };
 
   useEffect(() => {
     fetchStats()
-    
+
     // Auto-remove duplicates on first load if not in demo mode
     const hasRemovedDuplicates = localStorage.getItem('duplicates_removed')
     if (!isDemoMode && !hasRemovedDuplicates) {
@@ -512,7 +563,7 @@ export function OpsTab() {
                                     <Button
                                         variant="outline"
                                         disabled={clearing || isDemoMode}
-                                        className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                                        className="bg-orange-50 hover:bg-orange-100 border-orange-200"
                                     >
                                         {clearing ? (
                                             <>
@@ -550,6 +601,58 @@ export function OpsTab() {
                     </div>
                 </div>
 
+                {/* Clear Tasks Section */}
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div className="flex-1">
+                            <h4 className="font-medium text-blue-900 mb-2">Clear Test Tasks</h4>
+                            <p className="text-sm text-blue-700 mb-4">
+                                This will remove all tasks that are created for testing purposes.
+                            </p>
+
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        disabled={clearing || isDemoMode}
+                                        className="bg-blue-50 hover:bg-blue-100 border-blue-200"
+                                    >
+                                        {clearing ? (
+                                            <>
+                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                Clearing Tasks...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Clear All Tasks
+                                            </>
+                                        )}
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure you want to clear all tasks?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action will remove all tasks from the system.
+                                            Please ensure you have reviewed your tasks before proceeding.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleClearTasks}
+                                            className="bg-blue-600 text-white hover:bg-blue-700"
+                                        >
+                                            Yes, clear all tasks
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </div>
+                </div>
 
               {/* System Information */}
               <div>
