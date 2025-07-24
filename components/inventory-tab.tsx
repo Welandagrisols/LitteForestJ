@@ -163,8 +163,18 @@ export function InventoryTab() {
       let matchesPlantStatus = true
       if (plantStatusFilter === "current") {
         matchesPlantStatus = item.ready_for_sale === true
+      } else if (plantStatusFilter === "nursery-not-ready") {
+        // Plants in nursery but not ready for sale (not future plans)
+        matchesPlantStatus = item.ready_for_sale === false && 
+          (item.source !== 'Future Plants List' && 
+           item.source !== 'Future Plans' &&
+           !item.source?.toLowerCase().includes('future'))
       } else if (plantStatusFilter === "future") {
-        matchesPlantStatus = item.ready_for_sale === false
+        // Future plans only
+        matchesPlantStatus = item.ready_for_sale === false && 
+          (item.source === 'Future Plants List' || 
+           item.source === 'Future Plans' ||
+           item.source?.toLowerCase().includes('future'))
       }
 
       return matchesSearch && matchesCategory && matchesStatus && matchesPlantStatus
@@ -246,7 +256,10 @@ export function InventoryTab() {
 
   // Summary calculations
   const currentPlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === true)
-  const futurePlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === false)
+  const nurseryNotReady = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === false && 
+    (item.source !== 'Future Plants List' && item.source !== 'Future Plans' && !item.source?.toLowerCase().includes('future')))
+  const futurePlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === false && 
+    (item.source === 'Future Plants List' || item.source === 'Future Plans' || item.source?.toLowerCase().includes('future')))
   const totalConsumables = inventory.filter((item) => isConsumable(item))
 
   return (
@@ -281,6 +294,20 @@ export function InventoryTab() {
           </CardContent>
         </Card>
 
+        <Card className="bg-amber-50 border-amber-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-600 rounded-full">
+                <TrendingUp className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-amber-800">In Nursery (Not Ready)</p>
+                <p className="text-2xl font-bold text-amber-900">{nurseryNotReady.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -288,7 +315,7 @@ export function InventoryTab() {
                 <FileText className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-blue-800">Future Plants</p>
+                <p className="text-sm font-medium text-blue-800">Future Plans</p>
                 <p className="text-2xl font-bold text-blue-900">{futurePlants.length}</p>
               </div>
             </div>
@@ -416,6 +443,7 @@ export function InventoryTab() {
                     <SelectContent>
                       <SelectItem value="all">All Plants</SelectItem>
                       <SelectItem value="current">Ready for Sale</SelectItem>
+                      <SelectItem value="nursery-not-ready">In Nursery (Not Ready)</SelectItem>
                       <SelectItem value="future">Future Plans</SelectItem>
                     </SelectContent>
                   </Select>
@@ -484,12 +512,17 @@ export function InventoryTab() {
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredPlants.map((item) => {
                 const isCurrentPlant = item.ready_for_sale === true
+                const isNurseryNotReady = item.ready_for_sale === false && 
+                  (item.source !== 'Future Plants List' && item.source !== 'Future Plans' && !item.source?.toLowerCase().includes('future'))
+                const isFuturePlan = item.ready_for_sale === false && !isNurseryNotReady
 
                 return (
                   <Card
                     key={item.id}
                     className={`transition-all hover:shadow-md h-fit max-w-sm mx-auto w-full ${
-                      isCurrentPlant ? "bg-green-50 border-green-200" : "bg-blue-50 border-blue-200"
+                      isCurrentPlant ? "bg-green-50 border-green-200" : 
+                      isNurseryNotReady ? "bg-amber-50 border-amber-200" : 
+                      "bg-blue-50 border-blue-200"
                     }`}
                   >
                     <CardContent className="p-4">
@@ -498,10 +531,12 @@ export function InventoryTab() {
                           className={`text-xs truncate max-w-[140px] ${
                             isCurrentPlant
                               ? "bg-green-600 hover:bg-green-700 text-white"
+                              : isNurseryNotReady
+                              ? "bg-amber-600 hover:bg-amber-700 text-white"
                               : "bg-blue-600 hover:bg-blue-700 text-white"
                           }`}
                         >
-                          {isCurrentPlant ? "🌱 Ready" : "📋 Future"}
+                          {isCurrentPlant ? "🌱 Ready" : isNurseryNotReady ? "🚧 In Nursery" : "📋 Future"}
                         </Badge>
                         <div className="flex gap-1 flex-shrink-0">
                           <Button 
