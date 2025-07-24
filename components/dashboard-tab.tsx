@@ -235,8 +235,8 @@ export function DashboardTab() {
         </Card>
       </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      {/* Main Content - 2 Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Sales */}
         <Card className="rounded-2xl shadow-md overflow-hidden">
           <CardHeader className="bg-muted/50 px-4 py-4 sm:px-6">
