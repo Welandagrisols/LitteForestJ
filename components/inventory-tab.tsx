@@ -371,8 +371,9 @@ export function InventoryTab() {
 
       {/* Main Inventory Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+        {/* Tab Navigation */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+          <TabsList className="grid w-full max-w-lg grid-cols-3">
             <TabsTrigger value="plants" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Plants ({filteredPlants.length})
@@ -387,60 +388,67 @@ export function InventoryTab() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex gap-2">
-            <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant={activeTab === "plants" ? "default" : "outline"}
-                  disabled={isDemoMode || !tableExists || activeTab !== "plants"}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Plant
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add New Plant</DialogTitle>
-                </DialogHeader>
-                <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
+          {/* Action Buttons - Conditionally shown based on active tab */}
+          <div className="flex flex-wrap gap-2">
+            {activeTab === "plants" && (
+              <Dialog open={addPlantDialogOpen} onOpenChange={setAddPlantDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="default"
+                    disabled={isDemoMode || !tableExists}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Plant
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New Plant</DialogTitle>
+                  </DialogHeader>
+                  <AddInventoryForm onSuccess={handleAddSuccess} onClose={() => setAddPlantDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            )}
 
-            <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant={activeTab === "consumables" ? "default" : "outline"}
-                  disabled={isDemoMode || !tableExists || activeTab !== "consumables"}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Consumable
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add New Consumable</DialogTitle>
-                </DialogHeader>
-                <AddConsumableForm onSuccess={handleAddSuccess} onClose={() => setAddConsumableDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
+            {activeTab === "honey" && (
+              <Dialog open={addHoneyDialogOpen} onOpenChange={setAddHoneyDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="default"
+                    disabled={isDemoMode || !tableExists}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Honey
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New Honey Product</DialogTitle>
+                  </DialogHeader>
+                  <AddHoneyForm onSuccess={handleAddSuccess} onClose={() => setAddHoneyDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            )}
 
-             <Dialog open={addHoneyDialogOpen} onOpenChange={setAddHoneyDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant={activeTab === "honey" ? "default" : "outline"}
-                  disabled={isDemoMode || !tableExists || activeTab !== "honey"}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Honey
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add New Honey Product</DialogTitle>
-                </DialogHeader>
-                <AddHoneyForm onSuccess={handleAddSuccess} onClose={() => setAddHoneyDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
+            {activeTab === "consumables" && (
+              <Dialog open={addConsumableDialogOpen} onOpenChange={setAddConsumableDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="default"
+                    disabled={isDemoMode || !tableExists}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Consumable
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New Consumable</DialogTitle>
+                  </DialogHeader>
+                  <AddConsumableForm onSuccess={handleAddSuccess} onClose={() => setAddConsumableDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            )}
 
             <Button variant="outline" onClick={handleExportToExcel} disabled={exporting}>
               {exporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
