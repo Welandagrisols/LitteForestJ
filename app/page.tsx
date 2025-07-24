@@ -4,6 +4,8 @@ import { useState } from "react"
 import { DashboardTab } from "@/components/dashboard-tab"
 import { InventoryTab } from "@/components/inventory-tab"
 import { SalesTab } from "@/components/sales-tab"
+import { CustomersTab } from "@/components/customers-tab"
+import { TasksTab } from "@/components/tasks-tab"
 import { ReportsTab } from "@/components/reports-tab"
 import { OpsTab } from "@/components/ops-tab"
 import { WebsiteIntegrationTab } from "@/components/website-integration-tab"
@@ -25,13 +27,14 @@ import {
 import { BarChart3, Package, ShoppingCart, FileText, Settings, Globe, Menu, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { CustomersTab } from "@/components/customers-tab"
+
 
 const tabs = [
   { value: "dashboard", label: "Dashboard", icon: BarChart3 },
   { value: "inventory", label: "Inventory", icon: Package },
   { value: "sales", label: "Sales", icon: ShoppingCart },
   { value: "customers", label: "Customers", icon: Users },
+  { value: "tasks", label: "Tasks", icon: Users },
   { value: "reports", label: "Reports", icon: FileText },
   { value: "website", label: "Website", icon: Globe },
   { value: "ops", label: "Operations", icon: Settings },
@@ -75,6 +78,8 @@ function AppContent() {
         return <SalesTab />
       case "customers":
         return <CustomersTab />
+        case "tasks":
+        return <TasksTab />
       case "reports":
         return <ReportsTab />
       case "website":
