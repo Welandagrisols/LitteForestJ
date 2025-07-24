@@ -169,6 +169,14 @@ export function InventoryTab() {
 
       return matchesSearch && matchesCategory && matchesStatus && matchesPlantStatus
     })
+    .sort((a, b) => {
+      // First sort by ready_for_sale status (ready plants first)
+      if (a.ready_for_sale !== b.ready_for_sale) {
+        return b.ready_for_sale ? 1 : -1
+      }
+      // Then sort alphabetically by plant name
+      return a.plant_name.localeCompare(b.plant_name)
+    })
 
   const filteredConsumables = inventory
     .filter((item) => isConsumable(item))
@@ -182,6 +190,10 @@ export function InventoryTab() {
       const matchesStatus = statusFilter === "all" || item.status === statusFilter
 
       return matchesSearch && matchesCategory && matchesStatus
+    })
+    .sort((a, b) => {
+      // Sort consumables alphabetically by name
+      return a.plant_name.localeCompare(b.plant_name)
     })
 
   const plantCategories = [

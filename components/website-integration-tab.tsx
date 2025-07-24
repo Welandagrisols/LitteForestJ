@@ -326,7 +326,9 @@ export function WebsiteIntegrationTab() {
     return { status: "Not Available", color: "bg-red-500" }
   }
 
-  const readyForSaleItems = inventory.filter((item) => item.ready_for_sale)
+  const readyForSaleItems = inventory
+    .filter((item) => item.ready_for_sale)
+    .sort((a, b) => a.plant_name.localeCompare(b.plant_name))
 
   if (loading) {
     return (
