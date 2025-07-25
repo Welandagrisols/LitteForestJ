@@ -13,8 +13,7 @@ const inter = Inter({
 export const metadata = {
   title: "LittleForest - Agrisols Farm Management System",
   description: "Comprehensive farm and nursery management system for inventory, sales, and customer management",
-  manifest: "/manifest.json",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
