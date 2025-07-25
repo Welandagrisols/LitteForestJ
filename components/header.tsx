@@ -13,6 +13,8 @@ export function Header() {
             height={43}
             className="h-8 sm:h-10 w-auto"
             priority
+            loading="eager"
+            sizes="(max-width: 640px) 128px, 160px"
           />
         </Link>
         <div className="text-xs sm:text-sm text-primary font-medium hidden sm:block">

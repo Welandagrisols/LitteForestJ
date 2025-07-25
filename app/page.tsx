@@ -1,14 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import { DashboardTab } from "@/components/dashboard-tab"
-import { InventoryTab } from "@/components/inventory-tab"
-import { SalesTab } from "@/components/sales-tab"
-import { CustomersTab } from "@/components/customers-tab"
-import { TasksTab } from "@/components/tasks-tab"
-import { ReportsTab } from "@/components/reports-tab"
-import { OpsTab } from "@/components/ops-tab"
-import { WebsiteIntegrationTab } from "@/components/website-integration-tab"
+import { useState, lazy, Suspense } from "react"
+import { LoadingSpinner, DashboardSkeleton } from "@/components/loading-spinner"
+// Lazy load components for better performance
+const DashboardTab = lazy(() => import("@/components/dashboard-tab").then(m => ({ default: m.DashboardTab })))
+const InventoryTab = lazy(() => import("@/components/inventory-tab").then(m => ({ default: m.InventoryTab })))
+const SalesTab = lazy(() => import("@/components/sales-tab").then(m => ({ default: m.SalesTab })))
+const CustomersTab = lazy(() => import("@/components/customers-tab").then(m => ({ default: m.CustomersTab })))
+const TasksTab = lazy(() => import("@/components/tasks-tab").then(m => ({ default: m.TasksTab })))
+const ReportsTab = lazy(() => import("@/components/reports-tab").then(m => ({ default: m.ReportsTab })))
+const OpsTab = lazy(() => import("@/components/ops-tab").then(m => ({ default: m.OpsTab })))
+const WebsiteIntegrationTab = lazy(() => import("@/components/website-integration-tab").then(m => ({ default: m.WebsiteIntegrationTab })))
 import { Header } from "@/components/header"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
@@ -69,26 +71,43 @@ function AppContent() {
   )
 
   const renderTabContent = () => {
-    switch (activeTab) {
-      case "dashboard":
-        return <DashboardTab />
-      case "inventory":
-        return <InventoryTab />
-      case "sales":
-        return <SalesTab />
-      case "customers":
-        return <CustomersTab />
-        case "tasks":
-        return <TasksTab />
-      case "reports":
-        return <ReportsTab />
-      case "website":
-        return <WebsiteIntegrationTab />
-      case "ops":
-        return <OpsTab />
-      default:
-        return <DashboardTab />
+    const getLoadingComponent = (tab: string) => {
+      switch (tab) {
+        case "dashboard":
+          return <DashboardSkeleton />
+        default:
+          return <LoadingSpinner />
+      }
     }
+
+    const content = (() => {
+      switch (activeTab) {
+        case "dashboard":
+          return <DashboardTab />
+        case "inventory":
+          return <InventoryTab />
+        case "sales":
+          return <SalesTab />
+        case "customers":
+          return <CustomersTab />
+        case "tasks":
+          return <TasksTab />
+        case "reports":
+          return <ReportsTab />
+        case "website":
+          return <WebsiteIntegrationTab />
+        case "ops":
+          return <OpsTab />
+        default:
+          return <DashboardTab />
+      }
+    })()
+
+    return (
+      <Suspense fallback={getLoadingComponent(activeTab)}>
+        {content}
+      </Suspense>
+    )
   }
 
   return (
