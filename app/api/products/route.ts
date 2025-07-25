@@ -1,12 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase, isDemoMode } from '@/lib/supabase'
 
+// Rate limiting store (in production, use Redis or similar)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
+
+function getRateLimitKey(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for')
+  const ip = forwarded ? forwarded.split(',')[0] : request.ip || 'unknown'
+  return ip
+}
+
+function checkRateLimit(key: string, limit: number = 100, windowMs: number = 60000): boolean {
+  const now = Date.now()
+  const record = rateLimitStore.get(key)
+  
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs })
+    return true
+  }
+  
+  if (record.count >= limit) {
+    return false
+  }
+  
+  record.count++
+  return true
+}
+
 export async function GET(request: NextRequest) {
-  // Add CORS headers for website integration
+  // Rate limiting
+  const rateLimitKey = getRateLimitKey(request)
+  if (!checkRateLimit(rateLimitKey)) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests' },
+      { status: 429 }
+    )
+  }
+
+  // Enhanced CORS headers
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
+      ? 'https://littleforest.onrender.com' 
+      : '*',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
   }
 
   try {
@@ -50,8 +89,25 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Transform the data to include availability status
-    const transformedProducts = products?.map(product => {
+    // Sanitize and validate data
+    function sanitizeString(str: string): string {
+      if (!str) return ''
+      return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                .replace(/[<>]/g, '')
+                .trim()
+    }
+
+    function validateProduct(product: any): boolean {
+      return product.id && 
+             product.plant_name && 
+             typeof product.quantity === 'number' && 
+             typeof product.price === 'number' &&
+             product.price >= 0 &&
+             product.quantity >= 0
+    }
+
+    // Transform and sanitize the data
+    const transformedProducts = products?.filter(validateProduct).map(product => {
       const isHoney = product.item_type === "Honey" || product.category === "Organic Honey"
       
       let availability_status = "Not Available"
@@ -72,19 +128,19 @@ export async function GET(request: NextRequest) {
       }
 
       return {
-        id: product.id,
-        plant_name: product.plant_name,
-        scientific_name: product.scientific_name,
-        category: product.category,
-        quantity: product.quantity,
-        unit: product.unit || (isHoney ? 'kg' : 'seedlings'),
-        price: product.price,
-        description: product.description || (isHoney ? `Premium ${product.plant_name} - ${product.age || 'Natural honey'}` : `High quality ${product.plant_name} seedlings`),
-        image_url: product.image_url || '/placeholder.svg',
+        id: sanitizeString(product.id),
+        plant_name: sanitizeString(product.plant_name),
+        scientific_name: sanitizeString(product.scientific_name || ''),
+        category: sanitizeString(product.category || ''),
+        quantity: Math.max(0, parseInt(product.quantity) || 0),
+        unit: sanitizeString(product.unit || (isHoney ? 'kg' : 'seedlings')),
+        price: Math.max(0, parseFloat(product.price) || 0),
+        description: sanitizeString(product.description || (isHoney ? `Premium ${product.plant_name} - ${product.age || 'Natural honey'}` : `High quality ${product.plant_name} seedlings`)),
+        image_url: sanitizeString(product.image_url || '/placeholder.svg'),
         availability_status,
-        ready_for_sale: product.ready_for_sale,
-        sku: product.sku,
-        item_type: product.item_type
+        ready_for_sale: Boolean(product.ready_for_sale),
+        sku: sanitizeString(product.sku || ''),
+        item_type: sanitizeString(product.item_type || '')
       }
     }) || []
 
