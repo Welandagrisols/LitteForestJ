@@ -155,28 +155,41 @@ async function fetchNurseryProducts(useCache = true) {
         )
       }
 
-      // Update cache
+      // Cache the results
       productCache.data = data.products
       productCache.timestamp = Date.now()
 
-      console.log(`Fetched ${data.products.length} products from nursery API`)
+      console.log('Successfully fetched', data.products.length, 'products from nursery')
+
+      // Show success notification if products were fetched
+      if (data.products.length > 0) {
+        showNotification(`✅ Loaded ${data.products.length} plants from nursery`, 'success')
+      } else {
+        showNotification('ℹ️ No plants currently available in nursery', 'info')
+      }
+
       return data.products
 
     } catch (error) {
+      console.error('Error fetching nursery products:', error)
+
+      // Show user-friendly error message
       if (error.name === 'AbortError') {
-        throw new NurseryAPIError('Request timeout', 'TIMEOUT_ERROR', 408)
+        showNotification('⚠️ Request timed out. Please check your connection.', 'error')
+      } else if (error instanceof NurseryAPIError) {
+        showNotification(`❌ Nursery API Error: ${error.message}`, 'error')
+      } else {
+        showNotification('❌ Unable to connect to nursery system. Please try again later.', 'error')
       }
 
-      if (error instanceof NurseryAPIError) {
-        throw error
+      // Return cached data if available as fallback
+      if (productCache.data && productCache.data.length > 0) {
+        console.log('Returning cached data as fallback')
+        showNotification('📦 Showing cached nursery data', 'warning')
+        return productCache.data
       }
 
-      // Network or other errors
-      throw new NurseryAPIError(
-        'Network error - please check your connection',
-        'NETWORK_ERROR',
-        0
-      )
+      return []
     }
   })
 }
@@ -505,3 +518,49 @@ setInterval(async () => {
   const products = await nurseryAPI.fetchProducts();
   displayProducts(products);
 }, 5 * 60 * 1000);
+
+// Function to display notifications
+function showNotification(message, type = 'info') {
+  const notificationDiv = document.createElement('div');
+  notificationDiv.className = `notification notification-${type}`;
+  notificationDiv.textContent = message;
+
+  // Style based on type
+  switch (type) {
+    case 'success':
+      notificationDiv.style.backgroundColor = '#4CAF50';
+      notificationDiv.style.color = 'white';
+      break;
+    case 'info':
+      notificationDiv.style.backgroundColor = '#2196F3';
+      notificationDiv.style.color = 'white';
+      break;
+    case 'warning':
+      notificationDiv.style.backgroundColor = '#ff9800';
+      notificationDiv.style.color = 'black';
+      break;
+    case 'error':
+      notificationDiv.style.backgroundColor = '#f44336';
+      notificationDiv.style.color = 'white';
+      break;
+    default:
+      notificationDiv.style.backgroundColor = '#9e9e9e';
+      notificationDiv.style.color = 'white';
+  }
+
+  // Add some padding and margin for better visibility
+  notificationDiv.style.padding = '10px';
+  notificationDiv.style.margin = '10px 0';
+  notificationDiv.style.borderRadius = '5px';
+  notificationDiv.style.position = 'fixed';
+  notificationDiv.style.top = '20px';
+  notificationDiv.style.right = '20px';
+  notificationDiv.style.zIndex = '1000';
+
+  document.body.appendChild(notificationDiv);
+
+  // Remove notification after 3 seconds
+  setTimeout(() => {
+    notificationDiv.remove();
+  }, 3000);
+}

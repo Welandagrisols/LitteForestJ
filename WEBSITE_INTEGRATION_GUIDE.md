@@ -13,7 +13,7 @@ Add this JavaScript code to your website to fetch and display products from your
 ### Fetch Products Function
 \`\`\`javascript
 // Add this to your website's JavaScript
-const NURSERY_API_URL = 'https://[your-repl-name].replit.app'; // Replace with your actual Replit URL
+const NURSERY_API_URL = 'https://litteforest.vercel.app/api'; // Your actual deployed nursery app URL
 
 // Fetch available products from nursery app
 async function fetchNurseryProducts() {
@@ -22,9 +22,11 @@ async function fetchNurseryProducts() {
     const data = await response.json();
     
     if (data.success) {
+      console.log(`✅ Successfully loaded ${data.products.length} products from nursery`);
       return data.products;
     } else {
-      console.error('Error fetching products:', data.error);
+      console.error('❌ Error fetching products:', data.error);
+      alert('Unable to load products from nursery. Please try again later.');
       return [];
     }
   } catch (error) {
