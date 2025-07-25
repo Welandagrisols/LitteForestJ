@@ -183,14 +183,18 @@ function AppContent() {
 
 export default function Home() {
   return (
-    <SupabaseProvider>
-      <AuthProvider>
-        <AuthGuard>
-          <SidebarProvider>
-            <AppContent />
-          </SidebarProvider>
-        </AuthGuard>
-      </AuthProvider>
-    </SupabaseProvider>
+    <ErrorBoundary>
+      <SupabaseProvider>
+        <AuthProvider>
+          <Suspense fallback={<LoadingSpinner />}>
+            <AuthGuard>
+              <SidebarProvider>
+                <AppContent />
+              </SidebarProvider>
+            </AuthGuard>
+          </Suspense>
+        </AuthProvider>
+      </SupabaseProvider>
+    </ErrorBoundary>
   )
 }
