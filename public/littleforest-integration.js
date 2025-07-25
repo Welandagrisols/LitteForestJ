@@ -1,7 +1,40 @@
 // Little Forest Nursery - Website Integration Script
 // Add this to your www.littleforest.co.ke website
 
-const NURSERY_API_URL = 'https://litteforest.vercel.app'; // Your Vercel deployment URL
+const NURSERY_API_URL = 'https://litteforest.vercel.app/api'
+
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  retryDelay: 1000, // 1 second
+  backoffMultiplier: 2
+}
+
+// Enhanced error handling
+class NurseryAPIError extends Error {
+  constructor(message, code, status) {
+    super(message)
+    this.name = 'NurseryAPIError'
+    this.code = code
+    this.status = status
+  }
+}
+
+// Retry function with exponential backoff
+async function retryWithBackoff(fn, retries = RETRY_CONFIG.maxRetries) {
+  try {
+    return await fn()
+  } catch (error) {
+    if (retries > 0 && (error.status >= 500 || error.code === 'NETWORK_ERROR')) {
+      console.log(`Retrying... ${RETRY_CONFIG.maxRetries - retries + 1}/${RETRY_CONFIG.maxRetries}`)
+      await new Promise(resolve => 
+        setTimeout(resolve, RETRY_CONFIG.retryDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, RETRY_CONFIG.maxRetries - retries))
+      )
+      return retryWithBackoff(fn, retries - 1)
+    }
+    throw error
+  }
+}
 
 class LittleForestAPI {
   constructor() {
@@ -65,6 +98,209 @@ class LittleForestAPI {
   }
 }
 
+// Cache for products
+let productCache = {
+  data: null,
+  timestamp: 0,
+  duration: 2 * 60 * 1000 // 2 minutes
+}
+
+// Function to fetch all available plants with caching
+async function fetchNurseryProducts(useCache = true) {
+  // Check cache first
+  if (useCache && productCache.data && (Date.now() - productCache.timestamp) < productCache.duration) {
+    console.log('Using cached products data')
+    return productCache.data
+  }
+
+  return retryWithBackoff(async () => {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+
+      const response = await fetch(`${NURSERY_API_URL}/products`, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new NurseryAPIError(
+          errorData.error || `HTTP error! status: ${response.status}`,
+          errorData.code || 'HTTP_ERROR',
+          response.status
+        )
+      }
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new NurseryAPIError(
+          data.error || 'API returned unsuccessful response',
+          data.code || 'API_ERROR',
+          response.status
+        )
+      }
+
+      if (!Array.isArray(data.products)) {
+        throw new NurseryAPIError(
+          'Invalid response format - products should be an array',
+          'INVALID_FORMAT',
+          200
+        )
+      }
+
+      // Update cache
+      productCache.data = data.products
+      productCache.timestamp = Date.now()
+
+      console.log(`Fetched ${data.products.length} products from nursery API`)
+      return data.products
+
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new NurseryAPIError('Request timeout', 'TIMEOUT_ERROR', 408)
+      }
+
+      if (error instanceof NurseryAPIError) {
+        throw error
+      }
+
+      // Network or other errors
+      throw new NurseryAPIError(
+        'Network error - please check your connection',
+        'NETWORK_ERROR',
+        0
+      )
+    }
+  })
+}
+
+// Function to purchase a product (updates inventory) with validation
+async function purchaseProduct(productId, quantity, customerInfo = {}) {
+  // Input validation
+  if (!productId) {
+    return {
+      success: false,
+      error: 'Product ID is required',
+      code: 'MISSING_PRODUCT_ID'
+    }
+  }
+
+  if (!quantity || !Number.isInteger(quantity) || quantity < 1) {
+    return {
+      success: false,
+      error: 'Quantity must be a positive integer',
+      code: 'INVALID_QUANTITY'
+    }
+  }
+
+  if (quantity > 1000) {
+    return {
+      success: false,
+      error: 'Quantity cannot exceed 1000 items per order',
+      code: 'QUANTITY_TOO_HIGH'
+    }
+  }
+
+  // Validate customer info
+  if (customerInfo) {
+    if (customerInfo.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
+      return {
+        success: false,
+        error: 'Invalid email format',
+        code: 'INVALID_EMAIL'
+      }
+    }
+
+    if (customerInfo.phone && !/^[\d\s\-\+\(\)]+$/.test(customerInfo.phone)) {
+      return {
+        success: false,
+        error: 'Invalid phone number format',
+        code: 'INVALID_PHONE'
+      }
+    }
+  }
+
+  return retryWithBackoff(async () => {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout for purchases
+
+      const response = await fetch(`${NURSERY_API_URL}/update-inventory`, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          productId,
+          quantity,
+          customerInfo
+        })
+      })
+
+      clearTimeout(timeoutId)
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new NurseryAPIError(
+          data.error || `HTTP error! status: ${response.status}`,
+          data.code || 'HTTP_ERROR',
+          response.status
+        )
+      }
+
+      if (!data.success) {
+        return {
+          success: false,
+          error: data.error || 'Purchase failed',
+          code: data.code || 'PURCHASE_FAILED',
+          availableQuantity: data.availableQuantity
+        }
+      }
+
+      console.log('Purchase successful:', data)
+
+      // Clear product cache to force refresh
+      productCache.data = null
+
+      return {
+        success: true,
+        message: data.message || 'Purchase completed successfully',
+        data: data.data,
+        responseTime: data.responseTime
+      }
+
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new NurseryAPIError('Request timeout', 'TIMEOUT_ERROR', 408)
+      }
+
+      if (error instanceof NurseryAPIError) {
+        return {
+          success: false,
+          error: error.message,
+          code: error.code,
+          status: error.status
+        }
+      }
+
+      return {
+        success: false,
+        error: 'Network error or server unavailable',
+        code: 'NETWORK_ERROR'
+      }
+    }
+  })
+}
 // Initialize API
 const nurseryAPI = new LittleForestAPI();
 

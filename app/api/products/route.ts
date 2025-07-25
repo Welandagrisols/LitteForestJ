@@ -1,160 +1,179 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase, isDemoMode } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
-// Rate limiting store (in production, use Redis or similar)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-function getRateLimitKey(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded ? forwarded.split(',')[0] : request.ip || 'unknown'
-  return ip
-}
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-function checkRateLimit(key: string, limit: number = 100, windowMs: number = 60000): boolean {
-  const now = Date.now()
-  const record = rateLimitStore.get(key)
-  
-  if (!record || now > record.resetTime) {
-    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs })
-    return true
-  }
-  
-  if (record.count >= limit) {
-    return false
-  }
-  
-  record.count++
-  return true
-}
+// Cache for products data
+let cachedProducts: any = null
+let cacheTimestamp = 0
+const CACHE_DURATION = 2 * 60 * 1000 // 2 minutes
 
 export async function GET(request: NextRequest) {
-  // Rate limiting
-  const rateLimitKey = getRateLimitKey(request)
-  if (!checkRateLimit(rateLimitKey)) {
-    return NextResponse.json(
-      { success: false, error: 'Too many requests' },
-      { status: 429 }
-    )
-  }
-
-  // Enhanced CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
-      ? 'https://littleforest.onrender.com' 
-      : '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-    'Access-Control-Max-Age': '86400',
-    'Vary': 'Origin',
-  }
+  const startTime = Date.now()
 
   try {
-    // In demo mode, return sample data
-    if (isDemoMode) {
-      const demoProducts = [
-        {
-          id: "1",
-          plant_name: "African Olive",
-          scientific_name: "Olea europaea subsp. cuspidata",
-          category: "Indigenous Trees",
-          quantity: 45,
-          price: 1200,
-          description: "Beautiful indigenous tree perfect for landscaping",
-          image_url: "https://example.com/african-olive.jpg",
-          availability_status: "Limited",
-          ready_for_sale: true
-        }
-      ]
-      
+    // Check cache first
+    const now = Date.now()
+    if (cachedProducts && (now - cacheTimestamp) < CACHE_DURATION) {
       return NextResponse.json({
         success: true,
-        products: demoProducts,
-        total_count: demoProducts.length
+        products: cachedProducts,
+        total: cachedProducts.length,
+        cached: true,
+        responseTime: Date.now() - startTime
+      }, {
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=120',
+          'X-Response-Time': `${Date.now() - startTime}ms`,
+          'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
+            ? 'https://littleforest.onrender.com' 
+            : '*',
+        }
       })
     }
 
-    // Fetch products that are ready for sale (plants and honey)
+    // Validate environment variables
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'Database configuration missing',
+          code: 'CONFIG_ERROR'
+        }, 
+        { status: 503 }
+      )
+    }
+
     const { data: products, error } = await supabase
       .from('inventory')
       .select('*')
       .eq('ready_for_sale', true)
-      .or('item_type.eq.Honey,category.eq.Organic Honey,item_type.is.null')
-      .order('plant_name', { ascending: true })
+      .gt('quantity', 0)
+      .order('plant_name')
 
     if (error) {
-      console.error('Error fetching products:', error)
+      console.error('Supabase error:', error)
+
+      // Handle specific error types
+      if (error.message?.includes('does not exist')) {
+        return NextResponse.json(
+          { 
+            success: false,
+            error: 'Inventory table not found',
+            code: 'TABLE_NOT_FOUND'
+          }, 
+          { status: 404 }
+        )
+      }
+
+      if (error.message?.includes('permission denied')) {
+        return NextResponse.json(
+          { 
+            success: false,
+            error: 'Database access denied',
+            code: 'PERMISSION_DENIED'
+          }, 
+          { status: 403 }
+        )
+      }
+
       return NextResponse.json(
-        { success: false, error: 'Failed to fetch products' },
+        { 
+          success: false,
+          error: 'Failed to fetch products from database',
+          code: 'DATABASE_ERROR'
+        }, 
         { status: 500 }
       )
     }
 
-    // Sanitize and validate data
-    function sanitizeString(str: string): string {
-      if (!str) return ''
-      return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-                .replace(/[<>]/g, '')
-                .trim()
+    if (!products) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'No data returned from database',
+          code: 'NO_DATA'
+        }, 
+        { status: 404 }
+      )
     }
 
-    function validateProduct(product: any): boolean {
-      return product.id && 
-             product.plant_name && 
-             typeof product.quantity === 'number' && 
-             typeof product.price === 'number' &&
-             product.price >= 0 &&
-             product.quantity >= 0
-    }
+    const formattedProducts = products.map(product => ({
+      id: product.id,
+      name: product.plant_name,
+      scientificName: product.scientific_name || '',
+      category: product.category || 'Uncategorized',
+      price: Number(product.price) || 0,
+      quantity: Number(product.quantity) || 0,
+      description: product.description || '',
+      sku: product.sku || '',
+      status: product.status || 'Available',
+      age: product.age || '',
+      inStock: Number(product.quantity) > 0,
+      lastUpdated: product.updated_at || product.created_at
+    }))
 
-    // Transform and sanitize the data
-    const transformedProducts = products?.filter(validateProduct).map(product => {
-      const isHoney = product.item_type === "Honey" || product.category === "Organic Honey"
-      
-      let availability_status = "Not Available"
-      if (isHoney) {
-        // For honey products, different availability thresholds
-        if (product.quantity >= 10) {
-          availability_status = "Available"
-        } else if (product.quantity >= 1) {
-          availability_status = "Limited"
-        }
-      } else {
-        // For plants
-        if (product.quantity >= 100) {
-          availability_status = "Available"
-        } else if (product.quantity >= 10) {
-          availability_status = "Limited"
-        }
-      }
-
-      return {
-        id: sanitizeString(product.id),
-        plant_name: sanitizeString(product.plant_name),
-        scientific_name: sanitizeString(product.scientific_name || ''),
-        category: sanitizeString(product.category || ''),
-        quantity: Math.max(0, parseInt(product.quantity) || 0),
-        unit: sanitizeString(product.unit || (isHoney ? 'kg' : 'seedlings')),
-        price: Math.max(0, parseFloat(product.price) || 0),
-        description: sanitizeString(product.description || (isHoney ? `Premium ${product.plant_name} - ${product.age || 'Natural honey'}` : `High quality ${product.plant_name} seedlings`)),
-        image_url: sanitizeString(product.image_url || '/placeholder.svg'),
-        availability_status,
-        ready_for_sale: Boolean(product.ready_for_sale),
-        sku: sanitizeString(product.sku || ''),
-        item_type: sanitizeString(product.item_type || '')
-      }
-    }) || []
+    // Update cache
+    cachedProducts = formattedProducts
+    cacheTimestamp = now
 
     return NextResponse.json({
       success: true,
-      products: transformedProducts,
-      total_count: transformedProducts.length
-    }, { headers })
+      products: formattedProducts,
+      total: formattedProducts.length,
+      cached: false,
+      responseTime: Date.now() - startTime,
+      timestamp: new Date().toISOString()
+    }, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=120',
+        'X-Response-Time': `${Date.now() - startTime}ms`,
+        'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
+          ? 'https://littleforest.onrender.com' 
+          : '*',
+      }
+    })
 
-  } catch (error) {
-    console.error('API Error:', error)
+  } catch (error: any) {
+    console.error('API error:', error)
+
+    // Handle network errors
+    if (error.message?.includes('fetch')) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'Network connection failed',
+          code: 'NETWORK_ERROR'
+        },
+        { status: 503 }
+      )
+    }
+
+    // Handle timeout errors
+    if (error.message?.includes('timeout')) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'Request timeout',
+          code: 'TIMEOUT_ERROR'
+        },
+        { status: 408 }
+      )
+    }
+
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500, headers }
+      { 
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR',
+        message: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
+      { status: 500 }
     )
   }
 }
