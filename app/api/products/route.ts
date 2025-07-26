@@ -102,20 +102,39 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const formattedProducts = products.map(product => ({
-      id: product.id,
-      name: product.plant_name,
-      scientificName: product.scientific_name || '',
-      category: product.category || 'Uncategorized',
-      price: Number(product.price) || 0,
-      quantity: Number(product.quantity) || 0,
-      description: product.description || '',
-      sku: product.sku || '',
-      status: product.status || 'Available',
-      age: product.age || '',
-      inStock: Number(product.quantity) > 0,
-      lastUpdated: product.updated_at || product.created_at
-    }))
+    const formattedProducts = products.map(product => {
+      const quantity = Number(product.quantity) || 0
+      let availability_status = 'Available'
+      
+      if (quantity >= 100) {
+        availability_status = 'Available'
+      } else if (quantity >= 10) {
+        availability_status = 'Limited'
+      } else {
+        availability_status = 'Not Available'
+      }
+
+      return {
+        id: product.id,
+        plant_name: product.plant_name,
+        scientific_name: product.scientific_name || '',
+        category: product.category || 'Uncategorized',
+        price: Number(product.price) || 0,
+        quantity: quantity,
+        description: product.description || '',
+        image_url: product.image_url || '',
+        availability_status: availability_status,
+        ready_for_sale: product.ready_for_sale,
+        sku: product.sku || '',
+        // Legacy format for backward compatibility
+        name: product.plant_name,
+        scientificName: product.scientific_name || '',
+        status: product.status || 'Available',
+        age: product.age || '',
+        inStock: quantity > 0,
+        lastUpdated: product.updated_at || product.created_at
+      }
+    })
 
     // Update cache
     cachedProducts = formattedProducts
