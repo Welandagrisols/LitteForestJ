@@ -73,3 +73,20 @@ args = "npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev -- --hostname 0.0.0.0 --port 3000"
+
+[[workflows.workflow]]
+name = "Build and Test"
+author = 45590184
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run start -- --hostname 0.0.0.0 --port 5000"

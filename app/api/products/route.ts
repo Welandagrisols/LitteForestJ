@@ -11,6 +11,17 @@ let cachedProducts: any = null
 let cacheTimestamp = 0
 const CACHE_DURATION = 2 * 60 * 1000 // 2 minutes
 
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
+}
+
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
 
@@ -29,9 +40,9 @@ export async function GET(request: NextRequest) {
         headers: {
           'Cache-Control': 'public, max-age=120',
           'X-Response-Time': `${Date.now() - startTime}ms`,
-          'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
-            ? 'https://littleforest.onrender.com' 
-            : '*',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         }
       })
     }
@@ -122,7 +133,7 @@ export async function GET(request: NextRequest) {
         price: Number(product.price) || 0,
         quantity: quantity,
         description: product.description || '',
-        image_url: product.image_url || '',
+        image_url: product.image_url && product.image_url.trim() !== '' ? product.image_url : null,
         availability_status: availability_status,
         ready_for_sale: product.ready_for_sale,
         sku: product.sku || '',
@@ -132,7 +143,9 @@ export async function GET(request: NextRequest) {
         status: product.status || 'Available',
         age: product.age || '',
         inStock: quantity > 0,
-        lastUpdated: product.updated_at || product.created_at
+        lastUpdated: product.updated_at || product.created_at,
+        // Add fallback image for missing images
+        has_image: !!(product.image_url && product.image_url.trim() !== '')
       }
     })
 
@@ -152,9 +165,9 @@ export async function GET(request: NextRequest) {
       headers: {
         'Cache-Control': 'public, max-age=120',
         'X-Response-Time': `${Date.now() - startTime}ms`,
-        'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
-          ? 'https://littleforest.onrender.com' 
-          : '*',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       }
     })
 
