@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
         price: Number(product.price) || 0,
         quantity: quantity,
         description: product.description || '',
-        image_url: product.image_url && product.image_url.trim() !== '' ? product.image_url : `https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop&auto=format`,
+        image_url: product.image_url && product.image_url.trim() !== '' ? product.image_url : null,
         availability_status: availability_status,
         ready_for_sale: product.ready_for_sale,
         sku: product.sku || '',
@@ -144,8 +144,9 @@ export async function GET(request: NextRequest) {
         age: product.age || '',
         inStock: quantity > 0,
         lastUpdated: product.updated_at || product.created_at,
-        // Add fallback image for missing images
-        has_image: !!(product.image_url && product.image_url.trim() !== '')
+        has_image: !!(product.image_url && product.image_url.trim() !== ''),
+        // Return actual image URL or null - no fallback needed
+        original_image_url: product.image_url
       }
     })
 
