@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
         price: Number(product.price) || 0,
         quantity: quantity,
         description: product.description || '',
-        image_url: product.image_url && product.image_url.trim() !== '' ? product.image_url : null,
+        image_url: product.image_url && product.image_url.trim() !== '' ? product.image_url : `https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop&auto=format`,
         availability_status: availability_status,
         ready_for_sale: product.ready_for_sale,
         sku: product.sku || '',
