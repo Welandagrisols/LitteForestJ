@@ -125,9 +125,9 @@ export async function GET(request: NextRequest) {
         availability_status = 'Not Available'
       }
 
-      // Ensure proper image URL formatting
+      // Handle image URL - check if field exists and has value
       let processedImageUrl = null;
-      if (product.image_url && product.image_url.trim() !== '') {
+      if (product.image_url && typeof product.image_url === 'string' && product.image_url.trim() !== '') {
         const imageUrl = product.image_url.trim();
         // If it's already a full URL, use it as is
         if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
@@ -140,6 +140,7 @@ export async function GET(request: NextRequest) {
           processedImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/plant-images/plants/${imageUrl}`;
         }
       }
+      // If no image_url field exists or is empty, processedImageUrl remains null
 
       return {
         id: product.id,
@@ -162,7 +163,7 @@ export async function GET(request: NextRequest) {
         lastUpdated: product.updated_at || product.created_at,
         has_image: !!processedImageUrl,
         // Return actual image URL or null - no fallback needed
-        original_image_url: product.image_url
+        original_image_url: product.image_url || null
       }
     })
 

@@ -128,8 +128,10 @@ function createProductCard(product) {
   card.className = 'product-card col-md-4 mb-4';
 
   // Handle image URL with better fallback
-  const imageUrl = product.image_url || 'https://via.placeholder.com/300x200?text=Plant+Image';
-  const imageOnError = `this.onerror=null; this.src='https://via.placeholder.com/300x200?text=Plant+Image';`;
+  const imageUrl = product.image_url && product.image_url !== 'null' && product.image_url.trim() !== '' 
+    ? product.image_url 
+    : 'https://via.placeholder.com/300x200?text=Plant+Image';
+  const imageOnError = `this.onerror=null; this.src='https://via.placeholder.com/300x200?text=Plant+Image';mage';`;
 
   card.innerHTML = `
     <div class="card h-100">
