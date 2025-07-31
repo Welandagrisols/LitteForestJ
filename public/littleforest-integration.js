@@ -127,29 +127,28 @@ function createProductCard(product) {
   const card = document.createElement('div');
   card.className = 'product-card col-md-4 mb-4';
 
-  // Only show image if it exists, otherwise show empty space
-  const imageHTML = product.image_url && product.image_url.trim() !== '' 
-    ? `<img src="${product.image_url}" class="card-img-top" alt="${product.plant_name}" style="height: 200px; object-fit: cover;">` 
-    : `<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height: 200px; background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
-         <span>No Image Available</span>
-       </div>`;
+  // Handle image URL with better fallback
+  const imageUrl = product.image_url || 'https://via.placeholder.com/300x200?text=Plant+Image';
+  const imageOnError = `this.onerror=null; this.src='https://via.placeholder.com/300x200?text=Plant+Image';`;
 
   card.innerHTML = `
     <div class="card h-100">
-      ${imageHTML}
-      <div class="card-body d-flex flex-column">
+      <img src="${imageUrl}" 
+           class="card-img-top" 
+           alt="${product.plant_name}"
+           style="height: 200px; object-fit: cover;"
+           onerror="${imageOnError}">
+      <div class="card-body">
         <h5 class="card-title">${product.plant_name}</h5>
-        <p class="card-text">${product.description || 'No description available'}</p>
+        <p class="card-text">${product.description || 'Beautiful plant perfect for your garden'}</p>
         <p class="text-muted small">${product.scientific_name || ''}</p>
-        <p class="fw-bold text-success">Ksh ${product.price ? product.price.toLocaleString() : 'Price not set'}</p>
-        <div class="mt-auto">
-          ${getAvailabilityBadge(product.availability_status, product.quantity)}
-          <div class="mt-3">
-            <input type="number" class="form-control mb-2" id="qty-${product.id}" min="1" max="${product.quantity}" value="1" ${product.availability_status === 'Not Available' ? 'disabled' : ''}>
-            <button class="btn btn-primary w-100" onclick="addToCart('${product.id}', '${product.plant_name}', ${product.price || 0})" ${product.availability_status === 'Not Available' ? 'disabled' : ''}>
-              Add to Cart
-            </button>
-          </div>
+        <p class="fw-bold text-success">Ksh ${product.price.toLocaleString()}</p>
+        ${getAvailabilityBadge(product.availability_status, product.quantity)}
+        <div class="mt-3">
+          <input type="number" class="form-control mb-2" id="qty-${product.id}" min="1" max="${product.quantity}" value="1" ${product.availability_status === 'Not Available' ? 'disabled' : ''}>
+          <button class="btn btn-primary w-100" onclick="addToCart('${product.id}', '${product.plant_name}', ${product.price})" ${product.availability_status === 'Not Available' ? 'disabled' : ''}>
+            ${product.availability_status === 'Not Available' ? 'Out of Stock' : 'Add to Cart'}
+          </button>
         </div>
       </div>
     </div>
@@ -160,17 +159,32 @@ function createProductCard(product) {
 
 // Display products in container
 function displayProducts(products) {
-  const productContainer = document.getElementById('products-container');
+  const productContainer = document.getElementById('products-container'); // Your products container
 
   if (!productContainer) {
-    console.error('Products container (#products-container) not found');
+    console.error('Products container not found');
     return;
   }
 
-  productContainer.innerHTML = '';
+  productContainer.innerHTML = ''; // Clear existing products
+
+  // Debug image URLs
+  console.log('Products with image info:', products.map(p => ({
+    name: p.plant_name,
+    has_image: p.has_image,
+    image_url: p.image_url,
+    original_image_url: p.original_image_url
+  })));
 
   if (products.length === 0) {
-    productContainer.innerHTML = '<div class="col-12"><p class="text-center">No products available at the moment.</p></div>';
+    productContainer.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          <h4>No products available</h4>
+          <p>Check back later for new plants!</p>
+        </div>
+      </div>
+    `;
     return;
   }
 

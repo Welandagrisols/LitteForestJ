@@ -125,6 +125,22 @@ export async function GET(request: NextRequest) {
         availability_status = 'Not Available'
       }
 
+      // Ensure proper image URL formatting
+      let processedImageUrl = null;
+      if (product.image_url && product.image_url.trim() !== '') {
+        const imageUrl = product.image_url.trim();
+        // If it's already a full URL, use it as is
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+          processedImageUrl = imageUrl;
+        } else if (imageUrl.startsWith('/')) {
+          // If it's a relative path, make it absolute
+          processedImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/plant-images${imageUrl}`;
+        } else {
+          // If it's just a filename, construct the full Supabase storage URL
+          processedImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/plant-images/plants/${imageUrl}`;
+        }
+      }
+
       return {
         id: product.id,
         plant_name: product.plant_name,
@@ -133,7 +149,7 @@ export async function GET(request: NextRequest) {
         price: Number(product.price) || 0,
         quantity: quantity,
         description: product.description || '',
-        image_url: product.image_url && product.image_url.trim() !== '' ? product.image_url : null,
+        image_url: processedImageUrl,
         availability_status: availability_status,
         ready_for_sale: product.ready_for_sale,
         sku: product.sku || '',
@@ -144,7 +160,7 @@ export async function GET(request: NextRequest) {
         age: product.age || '',
         inStock: quantity > 0,
         lastUpdated: product.updated_at || product.created_at,
-        has_image: !!(product.image_url && product.image_url.trim() !== ''),
+        has_image: !!processedImageUrl,
         // Return actual image URL or null - no fallback needed
         original_image_url: product.image_url
       }
