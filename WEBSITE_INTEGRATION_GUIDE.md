@@ -1,6 +1,6 @@
 # Website Integration Guide for Little Forest
 
-This guide explains how to integrate your Little Forest website (https://littleforest.onrender.com/) with your Replit nursery management app.
+This guide explains how to integrate your Little Forest website (https://www.littleforest.co.ke/) with your Vercel-deployed nursery management app.
 
 ## Step 1: Your API URL
 
@@ -13,7 +13,7 @@ Add this JavaScript code to your website to fetch and display products from your
 ### Fetch Products Function
 \`\`\`javascript
 // Add this to your website's JavaScript
-const NURSERY_API_URL = 'https://litteforest.vercel.app/api'; // Your actual deployed nursery app URL
+const NURSERY_API_URL = 'https://litteforest.vercel.app'; // Your actual deployed nursery app URL
 
 // Fetch available products from nursery app
 async function fetchNurseryProducts() {

@@ -23,7 +23,7 @@ const nextConfig = {
           { 
             key: 'Access-Control-Allow-Origin', 
             value: process.env.NODE_ENV === 'production' 
-              ? 'https://littleforest.onrender.com' 
+              ? 'https://www.littleforest.co.ke' 
               : '*' 
           },
           { key: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
