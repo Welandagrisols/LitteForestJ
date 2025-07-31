@@ -569,12 +569,12 @@ export function WebsiteIntegrationTab() {
                                                 onChange={handleFileSelect}
                                                 className="hidden"
                                                 id="image-upload"
-                                                disabled={uploadingImage || isDemoMode}
+                                                disabled={uploadingImage}
                                               />
                                               <label
                                                 htmlFor="image-upload"
                                                 className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
-                                                  uploadingImage || isDemoMode
+                                                  uploadingImage
                                                     ? "bg-muted text-muted-foreground cursor-not-allowed"
                                                     : "bg-primary text-primary-foreground hover:bg-primary/90"
                                                 }`}
@@ -615,12 +615,12 @@ export function WebsiteIntegrationTab() {
                                                 onChange={handleFileSelect}
                                                 className="hidden"
                                                 id="image-replace"
-                                                disabled={uploadingImage || isDemoMode}
+                                                disabled={uploadingImage}
                                               />
                                               <label
                                                 htmlFor="image-replace"
                                                 className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
-                                                  uploadingImage || isDemoMode
+                                                  uploadingImage
                                                     ? "bg-muted text-muted-foreground cursor-not-allowed"
                                                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                                                 }`}
