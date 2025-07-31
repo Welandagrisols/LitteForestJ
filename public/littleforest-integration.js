@@ -127,9 +127,16 @@ function createProductCard(product) {
   const card = document.createElement('div');
   card.className = 'product-card col-md-4 mb-4';
 
+  // Only show image if it exists, otherwise show empty space
+  const imageHTML = product.image_url && product.image_url.trim() !== '' 
+    ? `<img src="${product.image_url}" class="card-img-top" alt="${product.plant_name}" style="height: 200px; object-fit: cover;">` 
+    : `<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height: 200px; background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+         <span>No Image Available</span>
+       </div>`;
+
   card.innerHTML = `
     <div class="card h-100">
-      <img src="${product.image_url || '/placeholder.jpg'}" class="card-img-top" alt="${product.plant_name}" style="height: 200px; object-fit: cover;">
+      ${imageHTML}
       <div class="card-body d-flex flex-column">
         <h5 class="card-title">${product.plant_name}</h5>
         <p class="card-text">${product.description || 'No description available'}</p>
