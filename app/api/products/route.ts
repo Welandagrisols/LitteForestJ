@@ -132,12 +132,15 @@ export async function GET(request: NextRequest) {
         // If it's already a full URL, use it as is
         if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
           processedImageUrl = imageUrl;
+        } else if (imageUrl.startsWith('/storage/v1/object/public/')) {
+          // If it's a Supabase storage path, make it absolute
+          processedImageUrl = `${supabaseUrl}${imageUrl}`;
         } else if (imageUrl.startsWith('/')) {
           // If it's a relative path, make it absolute
-          processedImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/plant-images${imageUrl}`;
+          processedImageUrl = `${supabaseUrl}/storage/v1/object/public/plant-images${imageUrl}`;
         } else {
           // If it's just a filename, construct the full Supabase storage URL
-          processedImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/plant-images/plants/${imageUrl}`;
+          processedImageUrl = `${supabaseUrl}/storage/v1/object/public/plant-images/plants/${imageUrl}`;
         }
       }
       // If no image_url field exists or is empty, processedImageUrl remains null
@@ -163,7 +166,14 @@ export async function GET(request: NextRequest) {
         lastUpdated: product.updated_at || product.created_at,
         has_image: !!processedImageUrl,
         // Return actual image URL or null - no fallback needed
-        original_image_url: product.image_url || null
+        original_image_url: product.image_url || null,
+        // Debug info (remove in production)
+        _debug_image_processing: process.env.NODE_ENV === 'development' ? {
+          original: product.image_url,
+          processed: processedImageUrl,
+          has_original: !!product.image_url,
+          has_processed: !!processedImageUrl
+        } : undefined
       }
     })
 
