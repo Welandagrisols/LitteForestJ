@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Forest Nursery - Product Integration Example</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: #2c5530;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 8px;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #1a3a1e;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #2c5530;
+            color: #2c5530;
+        }
+        
+        .btn-outline:hover {
+            background: #2c5530;
+            color: white;
+        }
+        
+        #products-container {
+            min-height: 200px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌱 Little Forest Nursery</h1>
+        <p>Fresh Plants Directly from Our Nursery Management System</p>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="total-products">-</div>
+                <div class="stat-label">Available Plants</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="with-images">-</div>
+                <div class="stat-label">With Photos</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="categories">-</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="nursery.displayProducts('products-container')">
+            🔄 Refresh Products
+        </button>
+        <button class="btn btn-outline" onclick="showAPIInfo()">
+            📊 API Info
+        </button>
+        <button class="btn btn-outline" onclick="testImageUrls()">
+            🖼️ Test Images
+        </button>
+    </div>
+
+    <!-- This is where your products will be displayed -->
+    <div id="products-container"></div>
+
+    <div class="footer">
+        <p><strong>Integration Guide:</strong></p>
+        <ol style="text-align: left; max-width: 600px; margin: 0 auto;">
+            <li>Include the <code>nursery-api-integration.js</code> script in your website</li>
+            <li>Create a div with <code>id="products-container"</code></li>
+            <li>Products will load automatically, or call <code>nursery.displayProducts()</code></li>
+            <li>Customize the <code>createProductCard()</code> method for your design</li>
+            <li>Implement <code>addToCart()</code> and <code>viewDetails()</code> functions</li>
+        </ol>
+        
+        <p style="margin-top: 20px;">
+            <strong>API Endpoint:</strong> 
+            <code>https://litteforest.vercel.app/api/products</code>
+        </p>
+    </div>
+
+    <!-- Load the nursery API integration -->
+    <script src="nursery-api-integration.js"></script>
+    
+    <script>
+        // Example of additional functionality
+        async function showAPIInfo() {
+            const result = await nursery.fetchProducts();
+            if (result.success) {
+                const categories = [...new Set(result.products.map(p => p.category))];
+                
+                document.getElementById('total-products').textContent = result.products.length;
+                document.getElementById('with-images').textContent = result.withImages || 0;
+                document.getElementById('categories').textContent = categories.length;
+                
+                alert(`API Info:
+📊 Total Products: ${result.products.length}
+🖼️ With Images: ${result.withImages || 0}
+📁 Categories: ${categories.length}
+⚡ Cached: ${result.cached ? 'Yes' : 'No'}
+🔗 Endpoint: ${nursery.apiBaseUrl}/api/products`);
+            } else {
+                alert(`API Error: ${result.error}`);
+            }
+        }
+        
+        async function testImageUrls() {
+            const result = await nursery.fetchProducts();
+            if (result.success) {
+                const withImages = result.products.filter(p => p.has_image && p.image_url);
+                console.log('Testing image URLs...');
+                
+                withImages.slice(0, 5).forEach(async (product, index) => {
+                    try {
+                        const response = await fetch(product.image_url, { method: 'HEAD' });
+                        console.log(`✅ Image ${index + 1} (${product.plant_name}): ${response.status} ${response.statusText}`);
+                    } catch (error) {
+                        console.log(`❌ Image ${index + 1} (${product.plant_name}): ${error.message}`);
+                    }
+                });
+                
+                alert(`Testing ${withImages.length} image URLs... Check console for results.`);
+            }
+        }
+        
+        // Update stats when products load
+        nursery.fetchProducts().then(result => {
+            if (result.success) {
+                const categories = [...new Set(result.products.map(p => p.category))];
+                document.getElementById('total-products').textContent = result.products.length;
+                document.getElementById('with-images').textContent = result.withImages || 0;
+                document.getElementById('categories').textContent = categories.length;
+            }
+        });
+    </script>
+</body>
+</html>
