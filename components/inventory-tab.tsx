@@ -612,6 +612,20 @@ export function InventoryTab() {
                         </div>
                       </div>
 
+                      {/* Plant Image */}
+                      {item.image_url && (
+                        <div className="mb-3">
+                          <img 
+                            src={item.image_url} 
+                            alt={item.plant_name}
+                            className="w-full h-32 object-cover rounded-md border border-gray-200"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+
                       <div className="space-y-3">
                         <div>
                           <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
@@ -741,6 +755,20 @@ export function InventoryTab() {
                         </Button>
                       </div>
                     </div>
+
+                    {/* Honey Product Image */}
+                    {item.image_url && (
+                      <div className="mb-3">
+                        <img 
+                          src={item.image_url} 
+                          alt={item.plant_name}
+                          className="w-full h-32 object-cover rounded-md border border-gray-200"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
 
                     <div className="space-y-3">
                       <div>
@@ -882,6 +910,20 @@ export function InventoryTab() {
                         </Button>
                       </div>
                     </div>
+
+                    {/* Consumable Image */}
+                    {item.image_url && (
+                      <div className="mb-3">
+                        <img 
+                          src={item.image_url} 
+                          alt={item.plant_name}
+                          className="w-full h-32 object-cover rounded-md border border-gray-200"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
 
                     <div className="space-y-3">
                       <div>
