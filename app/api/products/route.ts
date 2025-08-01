@@ -164,6 +164,7 @@ export async function GET(request: NextRequest) {
         inStock: quantity > 0,
         lastUpdated: product.updated_at || product.created_at,
         has_image: !!processedImageUrl,
+        image_url: processedImageUrl,
         original_image_url: product.image_url || null
       }
     })
