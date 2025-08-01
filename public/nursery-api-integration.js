@@ -117,27 +117,20 @@ class NurseryAPIIntegration {
    * Handle image loading with fallback
    */
   getImageHtml(product, width = 300, height = 200) {
-    const fallbackImage = 'https://via.placeholder.com/300x200/e0e0e0/666666?text=Plant+Image';
+    const fallbackImage = 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop&crop=center&auto=format&q=80';
+    const imageUrl = product.display_image_url || product.image_url || fallbackImage;
     
-    if (product.has_image && product.image_url) {
-      return `
-        <img 
-          src="${product.image_url}" 
-          alt="${product.plant_name}"
-          style="width: ${width}px; height: ${height}px; object-fit: cover; border-radius: 8px;"
-          onerror="this.onerror=null; this.src='${fallbackImage}'; console.log('Image failed to load: ${product.image_url}');"
-          onload="console.log('Image loaded successfully: ${product.plant_name}');"
-        />
-      `;
-    } else {
-      return `
-        <img 
-          src="${fallbackImage}" 
-          alt="${product.plant_name}"
-          style="width: ${width}px; height: ${height}px; object-fit: cover; border-radius: 8px; opacity: 0.7;"
-        />
-      `;
-    }
+    return `
+      <img 
+        src="${imageUrl}" 
+        alt="${product.plant_name}"
+        style="width: ${width}px; height: ${height}px; object-fit: cover; border-radius: 8px; transition: transform 0.2s;"
+        onerror="this.onerror=null; this.src='${fallbackImage}'; console.log('Image failed to load: ${imageUrl}');"
+        onload="console.log('Image loaded successfully: ${product.plant_name}');"
+        onmouseover="this.style.transform='scale(1.05)'"
+        onmouseout="this.style.transform='scale(1)'"
+      />
+    `;
   }
 
   /**

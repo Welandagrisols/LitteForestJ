@@ -127,23 +127,34 @@ export async function GET(request: NextRequest) {
 
       // Handle image URL - check if field exists and has value
       let processedImageUrl = null;
+      let hasValidImage = false;
+      
       if (product.image_url && typeof product.image_url === 'string' && product.image_url.trim() !== '') {
         const imageUrl = product.image_url.trim();
+        
         // If it's already a full URL, use it as is
         if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
           processedImageUrl = imageUrl;
+          hasValidImage = true;
         } else if (imageUrl.startsWith('/storage/v1/object/public/')) {
           // If it's a Supabase storage path, make it absolute
           processedImageUrl = `${supabaseUrl}${imageUrl}`;
+          hasValidImage = true;
         } else if (imageUrl.startsWith('/')) {
           // If it's a relative path, make it absolute
           processedImageUrl = `${supabaseUrl}/storage/v1/object/public/plant-images${imageUrl}`;
+          hasValidImage = true;
         } else {
           // If it's just a filename, construct the full Supabase storage URL
           processedImageUrl = `${supabaseUrl}/storage/v1/object/public/plant-images/plants/${imageUrl}`;
+          hasValidImage = true;
         }
       }
-      // If no image_url field exists or is empty, processedImageUrl remains null
+      
+      // Fallback high-quality placeholder for plants without images
+      if (!hasValidImage) {
+        processedImageUrl = `https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop&crop=center&auto=format&q=80`;
+      }
 
       return {
         id: product.id,
@@ -163,8 +174,10 @@ export async function GET(request: NextRequest) {
         age: product.age || '',
         inStock: quantity > 0,
         lastUpdated: product.updated_at || product.created_at,
-        has_image: !!processedImageUrl,
-        original_image_url: product.image_url || null
+        has_image: hasValidImage,
+        has_custom_image: hasValidImage && product.image_url && product.image_url.trim() !== '',
+        original_image_url: product.image_url || null,
+        display_image_url: processedImageUrl
       }
     })
 
