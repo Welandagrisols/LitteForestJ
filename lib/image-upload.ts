@@ -1,0 +1,177 @@
+
+import { supabase } from './supabase'
+
+export interface ImageUploadResult {
+  success: boolean
+  url?: string
+  error?: string
+  filePath?: string
+}
+
+/**
+ * Upload an image to Supabase Storage with public access
+ * @param file - The image file to upload
+ * @param folder - Optional folder within plant-images bucket (defaults to 'plants')
+ * @returns Promise with upload result
+ */
+export async function uploadImageToSupabase(
+  file: File, 
+  folder: string = 'plants'
+): Promise<ImageUploadResult> {
+  try {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return {
+        success: false,
+        error: 'File must be an image'
+      }
+    }
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      return {
+        success: false,
+        error: 'Image must be smaller than 5MB'
+      }
+    }
+
+    // Create unique filename with timestamp and random string
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const timestamp = Date.now()
+    const randomString = Math.random().toString(36).substring(2, 8)
+    const fileName = `${timestamp}-${randomString}.${fileExt}`
+    const filePath = `${folder}/${fileName}`
+
+    console.log('Uploading image to Supabase Storage:', filePath)
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('plant-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      })
+
+    if (error) {
+      console.error('Supabase upload error:', error)
+      return {
+        success: false,
+        error: `Upload failed: ${error.message}`
+      }
+    }
+
+    console.log('Upload successful:', data)
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('plant-images')
+      .getPublicUrl(filePath)
+
+    console.log('Generated public URL:', publicUrl)
+
+    return {
+      success: true,
+      url: publicUrl,
+      filePath: filePath
+    }
+
+  } catch (error: any) {
+    console.error('Image upload error:', error)
+    return {
+      success: false,
+      error: `Upload failed: ${error.message || 'Unknown error'}`
+    }
+  }
+}
+
+/**
+ * Delete an image from Supabase Storage
+ * @param filePath - The path of the file to delete
+ * @returns Promise with deletion result
+ */
+export async function deleteImageFromSupabase(filePath: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.storage
+      .from('plant-images')
+      .remove([filePath])
+
+    if (error) {
+      console.error('Error deleting image:', error)
+      return false
+    }
+
+    console.log('Image deleted successfully:', filePath)
+    return true
+  } catch (error) {
+    console.error('Error deleting image:', error)
+    return false
+  }
+}
+
+/**
+ * Check if the plant-images bucket exists and is accessible
+ * @returns Promise with bucket status
+ */
+export async function checkStorageBucket(): Promise<{
+  exists: boolean
+  accessible: boolean
+  error?: string
+}> {
+  try {
+    // Try to list buckets
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets()
+
+    if (listError) {
+      return {
+        exists: false,
+        accessible: false,
+        error: `Cannot access storage: ${listError.message}`
+      }
+    }
+
+    const plantImagesBucket = buckets?.find(bucket => bucket.id === 'plant-images')
+
+    if (!plantImagesBucket) {
+      return {
+        exists: false,
+        accessible: false,
+        error: 'plant-images bucket not found'
+      }
+    }
+
+    // Test upload permission with a small test file
+    const testFileName = `test-${Date.now()}.txt`
+    const testContent = 'test'
+    
+    const { error: uploadError } = await supabase.storage
+      .from('plant-images')
+      .upload(`test/${testFileName}`, new Blob([testContent], { type: 'text/plain' }))
+
+    if (uploadError) {
+      return {
+        exists: true,
+        accessible: false,
+        error: `Upload test failed: ${uploadError.message}`
+      }
+    }
+
+    // Clean up test file
+    await supabase.storage
+      .from('plant-images')
+      .remove([`test/${testFileName}`])
+
+    return {
+      exists: true,
+      accessible: true
+    }
+
+  } catch (error: any) {
+    return {
+      exists: false,
+      accessible: false,
+      error: `Storage check failed: ${error.message}`
+    }
+  }
+}

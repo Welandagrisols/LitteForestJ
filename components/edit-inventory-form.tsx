@@ -78,26 +78,37 @@ export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFo
     try {
       setUploadingImage(true)
 
-      // Generate unique filename
-      const fileExt = file.name.split(".").pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      // Create unique filename with timestamp and random string
+      const fileExt = file.name.split(".").pop()?.toLowerCase() || 'jpg'
+      const timestamp = Date.now()
+      const randomString = Math.random().toString(36).substring(2, 8)
+      const fileName = `${timestamp}-${randomString}.${fileExt}`
       const filePath = `plants/${fileName}`
 
-      // Upload file to Supabase Storage
-      const { data, error } = await supabase.storage.from("plant-images").upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-      })
+      console.log('Uploading image to:', filePath)
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from("plant-images")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type
+        })
 
       if (error) {
         console.error("Upload error:", error)
         throw error
       }
 
-      // Get public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("plant-images").getPublicUrl(filePath)
+      console.log('Upload successful:', data)
+
+      // Get public URL using the uploaded file path
+      const { data: { publicUrl } } = supabase.storage
+        .from("plant-images")
+        .getPublicUrl(filePath)
+
+      console.log('Generated public URL:', publicUrl)
 
       return publicUrl
     } catch (error: any) {

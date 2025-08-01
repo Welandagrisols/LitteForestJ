@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Storage Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        .upload-area.dragover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .uploaded-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .progress {
+            margin: 10px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #007bff;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Supabase Storage Test</h1>
+        <p>Test your plant-images bucket connection and upload functionality</p>
+
+        <div class="upload-area" id="uploadArea">
+            <p>Drag & drop an image here or click to select</p>
+            <button type="button" onclick="document.getElementById('fileInput').click()">
+                Choose Image
+            </button>
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+
+        <div class="progress" id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">Uploading...</p>
+        </div>
+
+        <div id="result"></div>
+
+        <div>
+            <button onclick="testBucket()">Test Bucket Access</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Get Supabase config from your app's API
+        const SUPABASE_URL = 'https://mjsuwlpixcregiikiusd.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key-here'; // You'll need to replace this
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const result = document.getElementById('result');
+
+        // Drag and drop handlers
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        async function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showResult('Please select an image file', 'error');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showResult('Image must be smaller than 5MB', 'error');
+                return;
+            }
+
+            showProgress(true);
+            updateProgress(10, 'Preparing upload...');
+
+            try {
+                // Create unique filename
+                const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+                const timestamp = Date.now();
+                const randomString = Math.random().toString(36).substring(2, 8);
+                const fileName = `${timestamp}-${randomString}.${fileExt}`;
+                const filePath = `plants/${fileName}`;
+
+                updateProgress(30, 'Uploading to Supabase Storage...');
+
+                // Upload to Supabase Storage
+                const { data, error } = await supabase.storage
+                    .from('plant-images')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false,
+                        contentType: file.type
+                    });
+
+                if (error) {
+                    throw error;
+                }
+
+                updateProgress(80, 'Getting public URL...');
+
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('plant-images')
+                    .getPublicUrl(filePath);
+
+                updateProgress(100, 'Upload complete!');
+
+                setTimeout(() => {
+                    showProgress(false);
+                    showResult(`
+                        <strong>Upload Successful!</strong><br>
+                        <strong>File Path:</strong> ${filePath}<br>
+                        <strong>Public URL:</strong> <a href="${publicUrl}" target="_blank">${publicUrl}</a><br>
+                        <img src="${publicUrl}" alt="Uploaded image" class="uploaded-image">
+                    `, 'success');
+                }, 1000);
+
+            } catch (error) {
+                showProgress(false);
+                showResult(`Upload failed: ${error.message}`, 'error');
+                console.error('Upload error:', error);
+            }
+        }
+
+        async function testBucket() {
+            showResult('Testing bucket access...', 'success');
+            
+            try {
+                // Test bucket listing
+                const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+                
+                if (listError) {
+                    throw new Error(`Cannot list buckets: ${listError.message}`);
+                }
+
+                const plantImagesBucket = buckets.find(bucket => bucket.id === 'plant-images');
+                
+                if (!plantImagesBucket) {
+                    throw new Error('plant-images bucket not found');
+                }
+
+                // Test file listing
+                const { data: files, error: filesError } = await supabase.storage
+                    .from('plant-images')
+                    .list('plants', { limit: 5 });
+
+                if (filesError) {
+                    throw new Error(`Cannot list files: ${filesError.message}`);
+                }
+
+                showResult(`
+                    <strong>Bucket Test Successful!</strong><br>
+                    <strong>Bucket:</strong> plant-images (${plantImagesBucket.public ? 'Public' : 'Private'})<br>
+                    <strong>Files in plants folder:</strong> ${files.length}<br>
+                    <strong>Storage URL:</strong> ${SUPABASE_URL}/storage/v1/object/public/plant-images/
+                `, 'success');
+
+            } catch (error) {
+                showResult(`Bucket test failed: ${error.message}`, 'error');
+                console.error('Bucket test error:', error);
+            }
+        }
+
+        function showProgress(show) {
+            progressContainer.style.display = show ? 'block' : 'none';
+        }
+
+        function updateProgress(percent, text) {
+            progressFill.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+
+        function showResult(message, type) {
+            result.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        function clearResults() {
+            result.innerHTML = '';
+            fileInput.value = '';
+        }
+
+        // Test connection on page load
+        window.onload = function() {
+            if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'your-anon-key-here') {
+                showResult('⚠️ Please update the SUPABASE_ANON_KEY in this test file', 'error');
+            }
+        };
+    </script>
+</body>
+</html>
+</script>
+</body>
+</html>
