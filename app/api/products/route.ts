@@ -147,7 +147,9 @@ export async function GET(request: NextRequest) {
 
       return {
         id: product.id,
+        name: product.plant_name,
         plant_name: product.plant_name,
+        scientificName: product.scientific_name || '',
         scientific_name: product.scientific_name || '',
         category: product.category || 'Uncategorized',
         price: Number(product.price) || 0,
@@ -157,23 +159,12 @@ export async function GET(request: NextRequest) {
         availability_status: availability_status,
         ready_for_sale: product.ready_for_sale,
         sku: product.sku || '',
-        // Legacy format for backward compatibility
-        name: product.plant_name,
-        scientificName: product.scientific_name || '',
         status: product.status || 'Available',
         age: product.age || '',
         inStock: quantity > 0,
         lastUpdated: product.updated_at || product.created_at,
         has_image: !!processedImageUrl,
-        // Return actual image URL or null - no fallback needed
-        original_image_url: product.image_url || null,
-        // Debug info (remove in production)
-        _debug_image_processing: process.env.NODE_ENV === 'development' ? {
-          original: product.image_url,
-          processed: processedImageUrl,
-          has_original: !!product.image_url,
-          has_processed: !!processedImageUrl
-        } : undefined
+        original_image_url: product.image_url || null
       }
     })
 
