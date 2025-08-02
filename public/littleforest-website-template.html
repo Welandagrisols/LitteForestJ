@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Forest - Premium Plants & Garden Supplies</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="/littleforest-website-styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-leaf me-2"></i>Little Forest
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products">Plants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item position-relative">
+                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#cartModal">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge" style="display: none;">0</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-success text-white py-5">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-3">Welcome to Little Forest</h1>
+            <p class="lead mb-4">Your premier destination for premium plants and garden supplies in Kenya</p>
+            <a href="#products" class="btn btn-light btn-lg">
+                <i class="fas fa-seedling me-2"></i>Shop Plants
+            </a>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="container py-5" id="products">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-success">Our Premium Plants</h2>
+            <p class="text-muted">Fresh from our nursery, delivered to your doorstep</p>
+        </div>
+        
+        <!-- Products will be loaded here by JavaScript -->
+        <div id="products-container" class="row">
+            <!-- Loading skeleton -->
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-success" role="status">
+                    <span class="visually-hidden">Loading plants...</span>
+                </div>
+                <p class="mt-3 text-muted">Loading our beautiful plants...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="bg-light py-5" id="about">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold text-success mb-4">About Little Forest</h2>
+                    <p class="lead">We are Kenya's leading plant nursery, dedicated to bringing you the finest selection of plants and garden supplies.</p>
+                    <p>Our passionate team ensures every plant is healthy, vibrant, and ready to transform your space into a green paradise.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Premium quality plants</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Expert gardening advice</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Delivery across Kenya</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Satisfaction guaranteed</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6">
+                    <img src="/images/nursery-background.jpg" alt="Little Forest Nursery" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="py-5" id="contact">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-success">Get In Touch</h2>
+                <p class="text-muted">Ready to start your garden journey? Contact us today!</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-phone fa-2x text-success mb-3"></i>
+                        <h5>Call Us</h5>
+                        <p class="text-muted">+254 XXX XXXXXX</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-envelope fa-2x text-success mb-3"></i>
+                        <h5>Email Us</h5>
+                        <p class="text-muted">info@littleforest.co.ke</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-map-marker-alt fa-2x text-success mb-3"></i>
+                        <h5>Visit Us</h5>
+                        <p class="text-muted">Nairobi, Kenya</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-shopping-cart me-2"></i>Your Cart
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cart-items">
+                        <!-- Cart items will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="border-top pt-3 mt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>Total: <span class="cart-total">KSh 0</span></h5>
+                        </div>
+                        
+                        <form id="checkout-form">
+                            <div class="mb-3">
+                                <label for="customer-name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="customer-name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customer-contact" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="customer-contact" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customer-email" class="form-label">Email (Optional)</label>
+                                <input type="email" class="form-control" id="customer-email">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="clearCart()">
+                        <i class="fas fa-trash me-2"></i>Clear Cart
+                    </button>
+                    <button type="button" class="btn btn-success" id="checkout-btn" onclick="processCheckout()">
+                        <i class="fas fa-credit-card me-2"></i>Complete Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Little Forest. All rights reserved.</p>
+            <p class="mb-0 small text-muted">Bringing nature closer to you</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Little Forest Integration -->
+    <script src="/littleforest-website-integration.js"></script>
+</body>
+</html>
