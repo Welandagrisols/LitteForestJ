@@ -1,0 +1,10 @@
+<div class="info">
+                            <h3>🔧 For Developer:</h3>
+                            <p><strong>This is the CORRECT API endpoint to use:</strong></p>
+                            <pre>https://litteforest.vercel.app/api/products</pre>
+                            <p><strong>DO NOT use:</strong> <code>/api/integration/products</code> (doesn't exist)</p>
+                            <p><strong>Note:</strong> API now serves ONLY products managed through the inventory dashboard!</p>
+                            <p><strong>Dashboard Managed:</strong> ${data.dashboard_managed_only ? '✅ YES' : '❌ NO'}</p>
+                            <p><strong>Total Products Available:</strong> ${totalProducts}</p>
+                            ${data.filtered_from_total ? `<p><strong>Filtered Out:</strong> ${data.filtered_from_total - totalProducts} manual entries</p>` : ''}
+                        </div>
