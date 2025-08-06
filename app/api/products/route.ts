@@ -64,9 +64,6 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('ready_for_sale', true)
       .gt('quantity', 0)
-      .not('created_at', 'is', null) // Ensure it was properly created through the system
-      .not('updated_at', 'is', null) // Ensure it has update tracking
-      .not('item_type', 'is', null) // Ensure it has proper item_type field
       .order('plant_name')
 
     if (error) {
@@ -116,27 +113,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Filter out any products that weren't created through the dashboard
-    const dashboardProducts = products.filter(product => {
-      // Must have been created through the proper form (has all required fields)
-      const hasRequiredFields = product.plant_name && 
-                               product.category && 
-                               product.price !== null && 
-                               product.quantity !== null
-      
-      // Must have proper timestamps indicating it was created through the system
-      const hasProperTimestamps = product.created_at && product.updated_at
-      
-      // Item type is optional - many valid items don't have this field set yet
-      const hasItemType = !product.item_type || 
-                         product.item_type === 'Plant' || 
-                         product.item_type === 'Honey' || 
-                         product.item_type === 'Consumable'
-      
-      return hasRequiredFields && hasProperTimestamps && hasItemType
-    })
-
-    const formattedProducts = dashboardProducts.map(product => {
+    const formattedProducts = products.map(product => {
       const quantity = Number(product.quantity) || 0
       let availability_status = 'Available'
       
@@ -212,8 +189,6 @@ export async function GET(request: NextRequest) {
       success: true,
       products: formattedProducts,
       total: formattedProducts.length,
-      dashboard_managed_only: true, // Indicate these are dashboard-managed products
-      filtered_from_total: products.length, // Show how many were filtered out
       cached: false,
       responseTime: Date.now() - startTime,
       timestamp: new Date().toISOString()
