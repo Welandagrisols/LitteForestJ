@@ -127,8 +127,11 @@ export async function GET(request: NextRequest) {
       // Must have proper timestamps indicating it was created through the system
       const hasProperTimestamps = product.created_at && product.updated_at
       
-      // Must have item_type field (dashboard-created items have this)
-      const hasItemType = product.item_type === 'Plant' || product.item_type === 'Honey' || product.item_type === 'Consumable'
+      // Item type is optional - many valid items don't have this field set yet
+      const hasItemType = !product.item_type || 
+                         product.item_type === 'Plant' || 
+                         product.item_type === 'Honey' || 
+                         product.item_type === 'Consumable'
       
       return hasRequiredFields && hasProperTimestamps && hasItemType
     })
