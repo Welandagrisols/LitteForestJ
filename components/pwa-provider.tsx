@@ -3,7 +3,9 @@
 
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { X, Download } from 'lucide-react'
+import { X, Download, Wifi, WifiOff, Upload } from 'lucide-react'
+import { offlineSync } from '@/lib/offline-sync'
+import { useToast } from '@/components/ui/use-toast'
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[]
@@ -18,6 +20,9 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
+  const [hasPendingSync, setHasPendingSync] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     // Register service worker
@@ -40,8 +45,37 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Handle online/offline status
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
+    const handleOnline = async () => {
+      setIsOnline(true)
+      setIsSyncing(true)
+      
+      try {
+        const result = await offlineSync.syncPendingOperations()
+        if (result.synced > 0) {
+          toast({
+            title: "Data Synced",
+            description: `${result.synced} offline changes synced successfully`,
+          })
+        }
+        if (result.failed > 0) {
+          toast({
+            title: "Sync Issues",
+            description: `${result.failed} items failed to sync`,
+            variant: "destructive"
+          })
+        }
+        setHasPendingSync(false)
+      } catch (error) {
+        console.error('Sync failed:', error)
+      } finally {
+        setIsSyncing(false)
+      }
+    }
+    
+    const handleOffline = () => {
+      setIsOnline(false)
+      setHasPendingSync(true)
+    }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('online', handleOnline)
@@ -101,8 +135,27 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
       {/* Offline Banner */}
       {!isOnline && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-yellow-900 p-2 text-center text-sm">
-          You're offline. Some features may not work.
+        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-yellow-900 p-2 text-center text-sm flex items-center justify-center gap-2">
+          <WifiOff className="h-4 w-4" />
+          You're offline. Changes will sync when reconnected.
+          {hasPendingSync && <span className="font-medium">(Pending changes)</span>}
+        </div>
+      )}
+
+      {/* Sync Status */}
+      {isOnline && hasPendingSync && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-blue-500 text-white p-2 text-center text-sm flex items-center justify-center gap-2">
+          {isSyncing ? (
+            <>
+              <Upload className="h-4 w-4 animate-spin" />
+              Syncing offline changes...
+            </>
+          ) : (
+            <>
+              <Wifi className="h-4 w-4" />
+              Back online! Changes synced.
+            </>
+          )}
         </div>
       )}
     </>
