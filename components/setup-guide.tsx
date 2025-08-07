@@ -120,10 +120,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=${supabaseKey}`
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="connect">1. Connect Supabase</TabsTrigger>
           <TabsTrigger value="create-tables">2. Create Tables</TabsTrigger>
-          <TabsTrigger value="configure">3. Configure App</TabsTrigger>
         </TabsList>
 
         <TabsContent value="connect" className="space-y-6">

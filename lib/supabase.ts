@@ -49,7 +49,7 @@ function isValidUrl(string: string): boolean {
 const validSupabaseUrl = isDemoMode ? "https://demo.supabase.co" : supabaseUrl!
 const validSupabaseAnonKey = isDemoMode ? "demo-key" : supabaseAnonKey!
 
-// Create a single supabase client for the entire app
+// Create a single supabase client for internal use only
 export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAnonKey, {
   auth: {
     persistSession: true,
