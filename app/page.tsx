@@ -10,7 +10,7 @@ const CustomersTab = lazy(() => import("@/components/customers-tab").then(m => (
 const TasksTab = lazy(() => import("@/components/tasks-tab").then(m => ({ default: m.TasksTab })))
 const ReportsTab = lazy(() => import("@/components/reports-tab").then(m => ({ default: m.ReportsTab })))
 const OpsTab = lazy(() => import("@/components/ops-tab").then(m => ({ default: m.OpsTab })))
-const WebsiteIntegrationTab = lazy(() => import("@/components/website-integration-tab").then(m => ({ default: m.WebsiteIntegrationTab })))
+
 import { Header } from "@/components/header"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { SupabaseProvider } from "@/components/supabase-provider"
@@ -26,7 +26,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { BarChart3, Package, ShoppingCart, FileText, Settings, Globe, Menu, Users } from "lucide-react"
+import { BarChart3, Package, ShoppingCart, FileText, Settings, Menu, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -38,7 +38,6 @@ const tabs = [
   { value: "customers", label: "Customers", icon: Users },
   { value: "tasks", label: "Tasks", icon: Users },
   { value: "reports", label: "Reports", icon: FileText },
-  { value: "website", label: "Website", icon: Globe },
   { value: "ops", label: "Operations", icon: Settings },
 ]
 

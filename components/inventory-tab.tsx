@@ -32,7 +32,6 @@ export function InventoryTab() {
   const [addConsumableDialogOpen, setAddConsumableDialogOpen] = useState(false)
   const [addHoneyDialogOpen, setAddHoneyDialogOpen] = useState(false)
   const { toast } = useToast()
-  const [plantStatusFilter, setPlantStatusFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
 
   useEffect(() => {
@@ -163,30 +162,9 @@ export function InventoryTab() {
       const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter
       const matchesStatus = statusFilter === "all" || item.status === statusFilter
 
-      let matchesPlantStatus = true
-      if (plantStatusFilter === "current") {
-        matchesPlantStatus = item.ready_for_sale === true
-      } else if (plantStatusFilter === "nursery-not-ready") {
-        // Plants in nursery but not ready for sale (not future plans)
-        matchesPlantStatus = item.ready_for_sale === false && 
-          (item.source !== 'Future Plants List' && 
-           item.source !== 'Future Plans' &&
-           !item.source?.toLowerCase().includes('future'))
-      } else if (plantStatusFilter === "future") {
-        // Future plans only
-        matchesPlantStatus = item.ready_for_sale === false && 
-          (item.source === 'Future Plants List' || 
-           item.source === 'Future Plans' ||
-           item.source?.toLowerCase().includes('future'))
-      }
-
-      return matchesSearch && matchesCategory && matchesStatus && matchesPlantStatus
+      return matchesSearch && matchesCategory && matchesStatus
     })
     .sort((a, b) => {
-      // First sort by ready_for_sale status (ready plants first)
-      if (a.ready_for_sale !== b.ready_for_sale) {
-        return b.ready_for_sale ? 1 : -1
-      }
       // Then sort alphabetically by plant name
       return a.plant_name.localeCompare(b.plant_name)
     })
@@ -243,13 +221,15 @@ export function InventoryTab() {
     try {
       setExporting(true)
 
-      const dataToExport = activeTab === "plants" ? filteredPlants : filteredConsumables
+      const dataToExport = activeTab === "plants" ? filteredPlants : activeTab === "consumables" ? filteredConsumables : filteredHoneyProducts
       const exportData = formatInventoryForExport(dataToExport, activeTab === "consumables")
 
       const fileName =
         activeTab === "plants"
           ? `Plants_Export_${new Date().toISOString().split("T")[0]}`
-          : `Consumables_Export_${new Date().toISOString().split("T")[0]}`
+          : activeTab === "consumables"
+          ? `Consumables_Export_${new Date().toISOString().split("T")[0]}`
+          : `Honey_Export_${new Date().toISOString().split("T")[0]}`;
 
       const success = exportToExcel(exportData, fileName)
 
@@ -273,11 +253,7 @@ export function InventoryTab() {
   }
 
   // Summary calculations
-  const currentPlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === true)
-  const nurseryNotReady = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === false && 
-    (item.source !== 'Future Plants List' && item.source !== 'Future Plans' && !item.source?.toLowerCase().includes('future')))
-  const futurePlants = inventory.filter((item) => !isConsumable(item) && item.ready_for_sale === false && 
-    (item.source === 'Future Plants List' || item.source === 'Future Plans' || item.source?.toLowerCase().includes('future')))
+  const currentPlants = inventory.filter((item) => !isConsumable(item))
   const totalConsumables = inventory.filter((item) => isConsumable(item))
 
   return (
@@ -305,36 +281,8 @@ export function InventoryTab() {
                 <Package className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-green-800">Ready Plants</p>
+                <p className="text-sm font-medium text-green-800">Plants</p>
                 <p className="text-2xl font-bold text-green-900">{currentPlants.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-amber-50 border-amber-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-600 rounded-full">
-                <TrendingUp className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-amber-800">In Nursery (Not Ready)</p>
-                <p className="text-2xl font-bold text-amber-900">{nurseryNotReady.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-full">
-                <FileText className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-blue-800">Future Plans</p>
-                <p className="text-2xl font-bold text-blue-900">{futurePlants.length}</p>
               </div>
             </div>
           </CardContent>
@@ -463,7 +411,7 @@ export function InventoryTab() {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <Input
-                  placeholder={`Search ${activeTab === "plants" ? "plants" : "consumables"}...`}
+                  placeholder={`Search ${activeTab === "plants" ? "plants" : activeTab === "consumables" ? "consumables" : "honey"}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full"
@@ -484,40 +432,45 @@ export function InventoryTab() {
                 </Select>
 
                 {activeTab === "plants" && (
-                  <Select value={plantStatusFilter} onValueChange={setPlantStatusFilter}>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-32">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Plants</SelectItem>
-                      <SelectItem value="current">Ready for Sale</SelectItem>
-                      <SelectItem value="nursery-not-ready">In Nursery (Not Ready)</SelectItem>
-                      <SelectItem value="future">Future Plans</SelectItem>
+                      <SelectItem value="Healthy">Healthy</SelectItem>
+                      <SelectItem value="Attention">Needs Attention</SelectItem>
+                      <SelectItem value="Critical">Critical</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
-
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Condition" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    {activeTab === "plants" ? (
-                      <>
-                        <SelectItem value="Healthy">Healthy</SelectItem>
-                        <SelectItem value="Attention">Needs Attention</SelectItem>
-                        <SelectItem value="Critical">Critical</SelectItem>
-                      </>
-                    ) : (
-                      <>
-                        <SelectItem value="Available">Available</SelectItem>
-                        <SelectItem value="Low Stock">Low Stock</SelectItem>
-                        <SelectItem value="Out of Stock">Out of Stock</SelectItem>
-                      </>
-                    )}
-                  </SelectContent>
-                </Select>
+                
+                {activeTab === "consumables" && (
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Condition" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="Available">Available</SelectItem>
+                      <SelectItem value="Low Stock">Low Stock</SelectItem>
+                      <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                {activeTab === "honey" && (
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="Available">Available</SelectItem>
+                      <SelectItem value="Low Stock">Low Stock</SelectItem>
+                      <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             </div>
           </CardContent>
@@ -537,7 +490,7 @@ export function InventoryTab() {
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No plants found</h3>
               <p className="text-muted-foreground mb-4">
-                {searchTerm || categoryFilter !== "All Categories" || plantStatusFilter !== "all"
+                {searchTerm || categoryFilter !== "All Categories"
                   ? "Try adjusting your search or filters"
                   : "Start by adding your first plant"}
               </p>
@@ -558,133 +511,118 @@ export function InventoryTab() {
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredPlants.map((item) => {
-                const isCurrentPlant = item.ready_for_sale === true
-                const isNurseryNotReady = item.ready_for_sale === false && 
-                  (item.source !== 'Future Plants List' && item.source !== 'Future Plans' && !item.source?.toLowerCase().includes('future'))
-                const isFuturePlan = item.ready_for_sale === false && !isNurseryNotReady
-
-                return (
-                  <Card
-                    key={item.id}
-                    className={`transition-all hover:shadow-md h-fit max-w-sm mx-auto w-full ${
-                      isCurrentPlant ? "bg-green-50 border-green-200" : 
-                      isNurseryNotReady ? "bg-amber-50 border-amber-200" : 
-                      "bg-blue-50 border-blue-200"
-                    }`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <Badge
-                          className={`text-xs truncate max-w-[140px] ${
-                            isCurrentPlant
-                              ? "bg-green-600 hover:bg-green-700 text-white"
-                              : isNurseryNotReady
-                              ? "bg-amber-600 hover:bg-amber-700 text-white"
-                              : "bg-blue-600 hover:bg-blue-700 text-white"
-                          }`}
+              {filteredPlants.map((item) => (
+                <Card
+                  key={item.id}
+                  className={`transition-all hover:shadow-md h-fit max-w-sm mx-auto w-full`}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <Badge className="text-xs truncate max-w-[140px] bg-green-600 hover:bg-green-700 text-white">
+                          🌱 Plants
+                      </Badge>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setEditItem(item)} 
+                          className="h-7 w-7 p-0"
+                          disabled={isDemoMode || !tableExists}
                         >
-                          {isCurrentPlant ? "🌱 Ready" : isNurseryNotReady ? "🚧 In Nursery" : "📋 Future"}
-                        </Badge>
-                        <div className="flex gap-1 flex-shrink-0">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => setEditItem(item)} 
-                            className="h-7 w-7 p-0"
-                            disabled={isDemoMode || !tableExists}
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm("Are you sure you want to delete this plant?")) {
+                              deleteInventoryItem(item.id)
+                            }
+                          }}
+                          className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                          disabled={isDemoMode || !tableExists}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Plant Image */}
+                    {item.image_url && (
+                      <div className="mb-3">
+                        <img 
+                          src={item.image_url} 
+                          alt={item.plant_name}
+                          className="w-full h-32 object-cover rounded-md border border-gray-200"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
+                        {item.scientific_name && (
+                          <p className="text-xs text-muted-foreground italic truncate">{item.scientific_name}</p>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-muted-foreground block">Qty:</span>
+                          <p className="font-medium truncate">{item.quantity}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground block">Price:</span>
+                          <p className="font-medium truncate">Ksh {item.price}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground block">Category:</span>
+                          <p className="font-medium text-xs truncate">{item.category}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground block">Status:</span>
+                          <Badge
+                            variant="outline"
+                            className={`text-xs h-5 ${
+                              item.status === "Healthy"
+                                ? "bg-green-100 text-green-800 border-green-200"
+                                : item.status === "Attention"
+                                ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                                : item.status === "Critical"
+                                ? "bg-red-100 text-red-800 border-red-200"
+                                : "bg-gray-100 text-gray-800 border-gray-200"
+                            }`}
                           >
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              if (confirm("Are you sure you want to delete this plant?")) {
-                                deleteInventoryItem(item.id)
-                              }
-                            }}
-                            className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-                            disabled={isDemoMode || !tableExists}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                            {item.status}
+                          </Badge>
                         </div>
                       </div>
 
-                      {/* Plant Image */}
-                      {item.image_url && (
-                        <div className="mb-3">
-                          <img 
-                            src={item.image_url} 
-                            alt={item.plant_name}
-                            className="w-full h-32 object-cover rounded-md border border-gray-200"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
+                      {(item.age || item.section || item.source) && (
+                        <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
+                          {item.age && <p className="truncate">Age: {item.age}</p>}
+                          {item.section && (
+                            <p className="truncate">
+                              Location: Section {item.section}
+                              {item.row ? `, Row ${item.row}` : ""}
+                            </p>
+                          )}
+                          {item.source && <p className="truncate">Source: {item.source}</p>}
                         </div>
                       )}
 
-                      <div className="space-y-3">
-                        <div>
-                          <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
-                          {item.scientific_name && (
-                            <p className="text-xs text-muted-foreground italic truncate">{item.scientific_name}</p>
-                          )}
+                      {item.description && (
+                        <div className="pt-2 border-t">
+                          <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-muted-foreground block">Qty:</span>
-                            <p className="font-medium truncate">{item.quantity}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground block">Price:</span>
-                            <p className="font-medium truncate">Ksh {item.price}</p>
-                          </div>
-                          <div className="col-span-2">
-                            <span className="text-muted-foreground block">Category:</span>
-                            <p className="font-medium text-xs truncate">{item.category}</p>
-                          </div>
-                          <div className="col-span-2">
-                            <span className="text-muted-foreground block">Status:</span>
-                            <Badge
-                              variant="outline"
-                              className={`text-xs h-5 ${
-                                item.status === "Healthy"
-                                  ? "bg-green-100 text-green-800 border-green-200"
-                                  : "bg-yellow-100 text-yellow-800 border-yellow-200"
-                              }`}
-                            >
-                              {item.status}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        {(item.age || item.section || item.source) && (
-                          <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
-                            {item.age && <p className="truncate">Age: {item.age}</p>}
-                            {item.section && (
-                              <p className="truncate">
-                                Location: Section {item.section}
-                                {item.row ? `, Row ${item.row}` : ""}
-                              </p>
-                            )}
-                            {item.source && <p className="truncate">Source: {item.source}</p>}
-                          </div>
-                        )}
-
-                        {item.description && (
-                          <div className="pt-2 border-t">
-                            <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
         </TabsContent>
@@ -781,7 +719,7 @@ export function InventoryTab() {
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
                           <span className="text-muted-foreground block">Qty:</span>
-                          <p className="font-medium truncate">{item.quantity} {item.unit || 'kg'}</p>
+                          <p className="font-medium truncate">{item.quantity}</p>
                         </div>
                         <div>
                           <span className="text-muted-foreground block">Selling Price ({item.age || item.unit || 'per unit'}):</span>
@@ -796,7 +734,7 @@ export function InventoryTab() {
                           <Badge
                             variant="outline"
                             className={`text-xs h-5 ${
-                              item.status === "Ready"
+                              item.status === "Available"
                                 ? "bg-green-100 text-green-800 border-green-200"
                                 : item.status === "Low Stock"
                                 ? "bg-yellow-100 text-yellow-800 border-yellow-200"
