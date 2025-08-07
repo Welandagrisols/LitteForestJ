@@ -2,6 +2,7 @@ import type React from "react"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { PWAProvider } from "@/components/pwa-provider"
 import "./globals.css"
 
 const inter = Inter({ 
@@ -28,15 +29,21 @@ export default function RootLayout({
         <meta name="theme-color" content="#22A45D" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Agrisols Farm" />
+        <meta name="apple-mobile-web-app-title" content="LittleForest" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="LittleForest" />
+        <meta name="msapplication-TileColor" content="#22A45D" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="apple-startup-image" href="/icon-512x512.png" />
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          {children}
-          <Toaster />
+          <PWAProvider>
+            {children}
+            <Toaster />
+          </PWAProvider>
         </ThemeProvider>
       </body>
     </html>
