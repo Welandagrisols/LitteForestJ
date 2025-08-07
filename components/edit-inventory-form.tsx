@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Upload, X, ImageIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { uploadImageToSupabase, uploadImageAndLinkToInventory, deleteImageFromSupabase } from "@/lib/image-upload"
 
 interface EditInventoryFormProps {
   item: any
@@ -241,17 +242,39 @@ export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFo
       const calculatedCostPerSeedling =
         !isConsumable && formData.quantity > 0 ? formData.batch_cost / formData.quantity : item.cost_per_seedling || 0
 
-      // Upload image if selected
+      // Upload image if selected and link it to the inventory item
       let imageUrl = formData.image_url
       if (imageFile) {
-        const uploadedUrl = await handleImageUpload(imageFile)
-        if (uploadedUrl) {
-          imageUrl = uploadedUrl
-        } else {
-          // If image upload fails, don't proceed with form submission
-          return
+        const { publicUrl, error } = await uploadImageAndLinkToInventory(imageFile, item.id);
+        if (error) {
+          console.error("Image upload and linking error:", error);
+          toast({
+            title: "Image Upload Failed",
+            description: error.message || "Failed to upload and link image.",
+            variant: "destructive",
+          });
+          return;
         }
+        if (publicUrl) {
+          imageUrl = publicUrl;
+        } else {
+          // If uploadImageAndLinkToInventory fails to return a URL but no error, it might be a soft failure or a case where the image wasn't needed.
+          // However, for safety, we'll treat it as a failure to upload.
+          toast({
+            title: "Image Upload Failed",
+            description: "Could not get image URL after upload.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else if (formData.image_url && !item.image_url) {
+        // If an image URL exists in formData but not in item.image_url (meaning it was likely removed and not replaced)
+        // and no new file was selected, ensure we don't keep a stale URL if it's supposed to be empty.
+        // However, the logic here should really be about handling deletion if that's a feature.
+        // For now, we assume if imageFile is null, and formData.image_url matches item.image_url, it's fine.
+        // If formData.image_url is empty and item.image_url was not, this implies a deliberate removal which needs explicit handling if required.
       }
+
 
       const updateData = {
         plant_name: formData.plant_name.trim(),
@@ -442,6 +465,52 @@ export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFo
                   placeholder="Additional notes about this plant"
                   rows={3}
                 />
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="space-y-2">
+                <Label>Image</Label>
+                <div className="flex items-center gap-4">
+                  {imagePreview || formData.image_url ? (
+                    <div className="relative w-24 h-24 rounded-md overflow-hidden border border-border">
+                      <img
+                        src={imagePreview || formData.image_url}
+                        alt="Image Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-1 right-1 bg-black/50 rounded-full p-1 text-white"
+                        disabled={uploadingImage || loading}
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-md border border-border flex items-center justify-center bg-secondary/50">
+                      <ImageIcon size={32} className="text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById("imageUploadInput")?.click()}
+                      disabled={uploadingImage || loading}
+                    >
+                      {uploadingImage ? "Uploading..." : "Choose Image"}
+                    </Button>
+                    <input
+                      id="imageUploadInput"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      disabled={uploadingImage || loading}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -111,6 +111,63 @@ export async function deleteImageFromSupabase(filePath: string): Promise<boolean
 }
 
 /**
+ * Upload an image and associate it with an inventory item
+ * @param file - The image file to upload
+ * @param inventoryId - The ID of the inventory item to associate with
+ * @param folder - Optional folder within plant-images bucket (defaults to 'plants')
+ * @returns Promise with upload result
+ */
+export async function uploadImageAndLinkToInventory(
+  file: File,
+  inventoryId: string,
+  folder: string = 'plants'
+): Promise<ImageUploadResult> {
+  try {
+    // First upload the image
+    const uploadResult = await uploadImageToSupabase(file, folder)
+    
+    if (!uploadResult.success || !uploadResult.url) {
+      return uploadResult
+    }
+
+    // Then update the inventory item with the image URL
+    const { error: updateError } = await supabase
+      .from('inventory')
+      .update({ 
+        image_url: uploadResult.url,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', inventoryId)
+
+    if (updateError) {
+      console.error('Error linking image to inventory:', updateError)
+      // Try to clean up the uploaded image if inventory update fails
+      if (uploadResult.filePath) {
+        await deleteImageFromSupabase(uploadResult.filePath)
+      }
+      return {
+        success: false,
+        error: `Image uploaded but failed to link to product: ${updateError.message}`
+      }
+    }
+
+    console.log('Successfully linked image to inventory item:', inventoryId)
+    return {
+      success: true,
+      url: uploadResult.url,
+      filePath: uploadResult.filePath
+    }
+
+  } catch (error: any) {
+    console.error('Error uploading and linking image:', error)
+    return {
+      success: false,
+      error: `Failed to upload and link image: ${error.message || 'Unknown error'}`
+    }
+  }
+}
+
+/**
  * Check if the plant-images bucket exists and is accessible
  * @returns Promise with bucket status
  */
