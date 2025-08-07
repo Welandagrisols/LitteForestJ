@@ -1,5 +1,0 @@
-green-clean.zip
-*.zip
-node_modules/
-.env
-.DS_Store

@@ -26,3 +26,19 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env
+
+# Large assets that shouldn't be in git
+/attached_assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+!public/**/*.png
+!public/**/*.jpg
+!public/**/*.jpeg
+!public/**/*.gif
+!public/**/*.svg
+
+# Duplicate gitignore
+.gitignore (2)
