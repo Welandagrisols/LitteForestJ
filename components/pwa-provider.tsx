@@ -1,10 +1,9 @@
+
 'use client'
 
-import { ReactNode, useEffect, useState, lazy, Suspense } from 'react'
-import dynamic from 'next/dynamic'
+import { ReactNode, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { X, Download, Wifi, WifiOff, Upload } from 'lucide-react'
-import { offlineSync } from '@/lib/offline-sync'
 import { useToast } from '@/components/ui/use-toast'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -16,174 +15,155 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
 }
 
-const PwaInstallBanner = dynamic(() => import('./PwaInstallBanner'), { ssr: false })
-const OfflineStatusBanner = dynamic(() => import('./OfflineStatusBanner'), { ssr: false })
-const SyncStatusIndicator = dynamic(() => import('./SyncStatusIndicator'), { ssr: false })
+interface PWAProviderProps {
+  children: ReactNode
+}
 
-export function PWAProvider({ children }: { children: React.ReactNode }) {
+// Simple install banner component
+function InstallBanner({ 
+  onInstall, 
+  onDismiss 
+}: { 
+  onInstall: () => void
+  onDismiss: () => void 
+}) {
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground p-4 shadow-lg">
+      <div className="flex items-center justify-between max-w-4xl mx-auto">
+        <div className="flex items-center gap-3">
+          <Download className="h-5 w-5" />
+          <div>
+            <p className="font-medium">Install LittleForest App</p>
+            <p className="text-sm opacity-90">Get the full app experience</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onInstall}
+            className="bg-white text-primary hover:bg-gray-100"
+          >
+            Install
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDismiss}
+            className="text-primary-foreground hover:bg-primary-foreground/10"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Simple offline banner component
+function OfflineBanner({ isOnline }: { isOnline: boolean }) {
+  if (isOnline) return null
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-yellow-500 text-white p-2 text-center text-sm">
+      <div className="flex items-center justify-center gap-2">
+        <WifiOff className="h-4 w-4" />
+        <span>You're offline. Changes will sync when connection is restored.</span>
+      </div>
+    </div>
+  )
+}
+
+export function PWAProvider({ children }: PWAProviderProps) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
-  const [canInstall, setCanInstall] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
-  const [hasPendingSync, setHasPendingSync] = useState(false)
-  const [isSyncing, setIsSyncing] = useState(false)
+  const [isInstalled, setIsInstalled] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration)
-        })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError)
-        })
-    }
-
-    // Check if already installed
-    const checkIfInstalled = () => {
-      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+    // Check if app is already installed
+    const checkInstalled = () => {
+      if ('standalone' in window.navigator && (window.navigator as any).standalone) {
         setIsInstalled(true)
-      }
-      // Also check for iOS Safari standalone mode
-      if ((window.navigator as any).standalone === true) {
+      } else if (window.matchMedia('(display-mode: standalone)').matches) {
         setIsInstalled(true)
       }
     }
 
-    // Handle install prompt
+    checkInstalled()
+
+    // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
-      setCanInstall(true)
-      setShowInstallBanner(true)
-    }
-
-    checkIfInstalled()
-
-    // Handle online/offline status
-    const handleOnline = async () => {
-      setIsOnline(true)
-      setIsSyncing(true)
-
-      try {
-        const result = await offlineSync.syncPendingOperations()
-        if (result.synced > 0) {
-          toast({
-            title: "Data Synced",
-            description: `${result.synced} offline changes synced successfully`,
-          })
-        }
-        if (result.failed > 0) {
-          toast({
-            title: "Sync Issues",
-            description: `${result.failed} items failed to sync`,
-            variant: "destructive"
-          })
-        }
-        setHasPendingSync(false)
-      } catch (error) {
-        console.error('Sync failed:', error)
-      } finally {
-        setIsSyncing(false)
+      
+      if (!isInstalled) {
+        setShowInstallBanner(true)
       }
     }
 
-    const handleOffline = () => {
-      setIsOnline(false)
-      setHasPendingSync(true)
+    // Listen for online/offline events
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+
+    // Listen for app installed event
+    const handleAppInstalled = () => {
+      setIsInstalled(true)
+      setShowInstallBanner(false)
+      toast({
+        title: "App Installed!",
+        description: "LittleForest has been installed successfully.",
+      })
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    window.addEventListener('appinstalled', handleAppInstalled)
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
 
+    // Check initial online status
+    setIsOnline(navigator.onLine)
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      window.removeEventListener('appinstalled', handleAppInstalled)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [])
+  }, [isInstalled, toast])
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      // Show manual install instructions
-      showManualInstallInstructions()
-      return
+    if (!deferredPrompt) return
+
+    try {
+      await deferredPrompt.prompt()
+      const choiceResult = await deferredPrompt.userChoice
+      
+      if (choiceResult.outcome === 'accepted') {
+        setShowInstallBanner(false)
+        setDeferredPrompt(null)
+      }
+    } catch (error) {
+      console.error('Error during install:', error)
+      toast({
+        title: "Installation Error",
+        description: "Unable to install the app. Please try again later.",
+        variant: "destructive"
+      })
     }
-
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null)
-      setShowInstallBanner(false)
-      setCanInstall(false)
-    }
-  }
-
-  const showManualInstallInstructions = () => {
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
-    const isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
-    const isEdge = /Edg/.test(navigator.userAgent)
-
-    let instructions = ""
-
-    if (isChrome || isEdge) {
-      instructions = "Look for the install icon (⊞) in your address bar, or click the three dots menu → 'Install LittleForest'"
-    } else if (isSafari) {
-      instructions = "Tap the Share button (□↗) and select 'Add to Home Screen'"
-    } else {
-      instructions = "Look for an install or 'Add to Home Screen' option in your browser menu"
-    }
-
-    toast({
-      title: "Install LittleForest",
-      description: instructions,
-      duration: 8000,
-    })
   }
 
   return (
     <>
       {children}
-
-      <Suspense fallback={null}>
-        <PwaInstallBanner
-          deferredPrompt={deferredPrompt}
-          showInstallBanner={showInstallBanner}
-          canInstall={canInstall}
-          isInstalled={isInstalled}
-          handleInstallClick={handleInstallClick}
-          setShowInstallBanner={setShowInstallBanner}
+      {showInstallBanner && !isInstalled && (
+        <InstallBanner
+          onInstall={handleInstallClick}
+          onDismiss={() => setShowInstallBanner(false)}
         />
-      </Suspense>
-
-      {/* Permanent Install Button for Desktop */}
-      {!isInstalled && (
-        <div className="fixed top-4 right-4 z-40 hidden md:block">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleInstallClick}
-            className="bg-background/80 backdrop-blur-sm"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Install App
-          </Button>
-        </div>
       )}
-
-      <Suspense fallback={null}>
-        <OfflineStatusBanner isOnline={isOnline} hasPendingSync={hasPendingSync} />
-      </Suspense>
-
-      <Suspense fallback={null}>
-        <SyncStatusIndicator isOnline={isOnline} isSyncing={isSyncing} hasPendingSync={hasPendingSync} />
-      </Suspense>
+      <OfflineBanner isOnline={isOnline} />
     </>
   )
 }
