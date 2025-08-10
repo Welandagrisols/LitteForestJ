@@ -1,9 +1,10 @@
 
 'use client'
 
-import { ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { X, Download, Wifi, WifiOff, Upload } from 'lucide-react'
+import { offlineSync } from '@/lib/offline-sync'
 import { useToast } from '@/components/ui/use-toast'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -15,155 +16,208 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
 }
 
-interface PWAProviderProps {
-  children: ReactNode
-}
-
-// Simple install banner component
-function InstallBanner({ 
-  onInstall, 
-  onDismiss 
-}: { 
-  onInstall: () => void
-  onDismiss: () => void 
-}) {
-  return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground p-4 shadow-lg">
-      <div className="flex items-center justify-between max-w-4xl mx-auto">
-        <div className="flex items-center gap-3">
-          <Download className="h-5 w-5" />
-          <div>
-            <p className="font-medium">Install LittleForest App</p>
-            <p className="text-sm opacity-90">Get the full app experience</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onInstall}
-            className="bg-white text-primary hover:bg-gray-100"
-          >
-            Install
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onDismiss}
-            className="text-primary-foreground hover:bg-primary-foreground/10"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Simple offline banner component
-function OfflineBanner({ isOnline }: { isOnline: boolean }) {
-  if (isOnline) return null
-
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-yellow-500 text-white p-2 text-center text-sm">
-      <div className="flex items-center justify-center gap-2">
-        <WifiOff className="h-4 w-4" />
-        <span>You're offline. Changes will sync when connection is restored.</span>
-      </div>
-    </div>
-  )
-}
-
-export function PWAProvider({ children }: PWAProviderProps) {
+export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
-  const [isOnline, setIsOnline] = useState(true)
+  const [canInstall, setCanInstall] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
+  const [isOnline, setIsOnline] = useState(true)
+  const [hasPendingSync, setHasPendingSync] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
-    // Check if app is already installed
-    const checkInstalled = () => {
-      if ('standalone' in window.navigator && (window.navigator as any).standalone) {
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((registration) => {
+          console.log('SW registered: ', registration)
+        })
+        .catch((registrationError) => {
+          console.log('SW registration failed: ', registrationError)
+        })
+    }
+
+    // Check if already installed
+    const checkIfInstalled = () => {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
         setIsInstalled(true)
-      } else if (window.matchMedia('(display-mode: standalone)').matches) {
+      }
+      // Also check for iOS Safari standalone mode
+      if ((window.navigator as any).standalone === true) {
         setIsInstalled(true)
       }
     }
 
-    checkInstalled()
-
-    // Listen for beforeinstallprompt event
+    // Handle install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
-      
-      if (!isInstalled) {
-        setShowInstallBanner(true)
-      }
+      setCanInstall(true)
+      setShowInstallBanner(true)
     }
 
-    // Listen for online/offline events
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
+    checkIfInstalled()
 
-    // Listen for app installed event
-    const handleAppInstalled = () => {
-      setIsInstalled(true)
-      setShowInstallBanner(false)
-      toast({
-        title: "App Installed!",
-        description: "LittleForest has been installed successfully.",
-      })
+    // Handle online/offline status
+    const handleOnline = async () => {
+      setIsOnline(true)
+      setIsSyncing(true)
+      
+      try {
+        const result = await offlineSync.syncPendingOperations()
+        if (result.synced > 0) {
+          toast({
+            title: "Data Synced",
+            description: `${result.synced} offline changes synced successfully`,
+          })
+        }
+        if (result.failed > 0) {
+          toast({
+            title: "Sync Issues",
+            description: `${result.failed} items failed to sync`,
+            variant: "destructive"
+          })
+        }
+        setHasPendingSync(false)
+      } catch (error) {
+        console.error('Sync failed:', error)
+      } finally {
+        setIsSyncing(false)
+      }
+    }
+    
+    const handleOffline = () => {
+      setIsOnline(false)
+      setHasPendingSync(true)
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('appinstalled', handleAppInstalled)
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
 
-    // Check initial online status
-    setIsOnline(navigator.onLine)
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', handleAppInstalled)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [isInstalled, toast])
+  }, [])
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return
-
-    try {
-      await deferredPrompt.prompt()
-      const choiceResult = await deferredPrompt.userChoice
-      
-      if (choiceResult.outcome === 'accepted') {
-        setShowInstallBanner(false)
-        setDeferredPrompt(null)
-      }
-    } catch (error) {
-      console.error('Error during install:', error)
-      toast({
-        title: "Installation Error",
-        description: "Unable to install the app. Please try again later.",
-        variant: "destructive"
-      })
+    if (!deferredPrompt) {
+      // Show manual install instructions
+      showManualInstallInstructions()
+      return
     }
+
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null)
+      setShowInstallBanner(false)
+      setCanInstall(false)
+    }
+  }
+
+  const showManualInstallInstructions = () => {
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
+    const isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
+    const isEdge = /Edg/.test(navigator.userAgent)
+    
+    let instructions = ""
+    
+    if (isChrome || isEdge) {
+      instructions = "Look for the install icon (⊞) in your address bar, or click the three dots menu → 'Install LittleForest'"
+    } else if (isSafari) {
+      instructions = "Tap the Share button (□↗) and select 'Add to Home Screen'"
+    } else {
+      instructions = "Look for an install or 'Add to Home Screen' option in your browser menu"
+    }
+
+    toast({
+      title: "Install LittleForest",
+      description: instructions,
+      duration: 8000,
+    })
   }
 
   return (
     <>
       {children}
-      {showInstallBanner && !isInstalled && (
-        <InstallBanner
-          onInstall={handleInstallClick}
-          onDismiss={() => setShowInstallBanner(false)}
-        />
+      
+      {/* Install Banner */}
+      {(showInstallBanner || (!isInstalled && canInstall)) && (
+        <div className="fixed bottom-4 left-4 right-4 z-50 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Download className="h-5 w-5" />
+            <div>
+              <p className="font-medium">Install LittleForest</p>
+              <p className="text-sm opacity-90">
+                {deferredPrompt ? "Add to home screen for better experience" : "Available as app - click for instructions"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleInstallClick}
+            >
+              {deferredPrompt ? "Install" : "How to Install"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowInstallBanner(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       )}
-      <OfflineBanner isOnline={isOnline} />
+
+      {/* Permanent Install Button for Desktop */}
+      {!isInstalled && (
+        <div className="fixed top-4 right-4 z-40 hidden md:block">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleInstallClick}
+            className="bg-background/80 backdrop-blur-sm"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Install App
+          </Button>
+        </div>
+      )}
+
+      {/* Offline Banner */}
+      {!isOnline && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-yellow-900 p-2 text-center text-sm flex items-center justify-center gap-2">
+          <WifiOff className="h-4 w-4" />
+          You're offline. Changes will sync when reconnected.
+          {hasPendingSync && <span className="font-medium">(Pending changes)</span>}
+        </div>
+      )}
+
+      {/* Sync Status */}
+      {isOnline && hasPendingSync && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-blue-500 text-white p-2 text-center text-sm flex items-center justify-center gap-2">
+          {isSyncing ? (
+            <>
+              <Upload className="h-4 w-4 animate-spin" />
+              Syncing offline changes...
+            </>
+          ) : (
+            <>
+              <Wifi className="h-4 w-4" />
+              Back online! Changes synced.
+            </>
+          )}
+        </div>
+      )}
     </>
   )
 }

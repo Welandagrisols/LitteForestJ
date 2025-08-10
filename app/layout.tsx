@@ -8,8 +8,7 @@ import "./globals.css"
 const inter = Inter({ 
   subsets: ["latin"],
   display: 'swap',
-  preload: true,
-  variable: '--font-inter'
+  preload: true
 })
 
 export const metadata = {
@@ -38,10 +37,6 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <link rel="apple-startup-image" href="/icon-512x512.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta httpEquiv="x-dns-prefetch-control" content="on" />
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
