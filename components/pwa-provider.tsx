@@ -1,7 +1,7 @@
-
 'use client'
 
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState, lazy, Suspense } from 'react'
+import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
 import { X, Download, Wifi, WifiOff, Upload } from 'lucide-react'
 import { offlineSync } from '@/lib/offline-sync'
@@ -15,6 +15,10 @@ interface BeforeInstallPromptEvent extends Event {
   }>
   prompt(): Promise<void>
 }
+
+const PwaInstallBanner = dynamic(() => import('./PwaInstallBanner'), { ssr: false })
+const OfflineStatusBanner = dynamic(() => import('./OfflineStatusBanner'), { ssr: false })
+const SyncStatusIndicator = dynamic(() => import('./SyncStatusIndicator'), { ssr: false })
 
 export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
@@ -64,7 +68,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     const handleOnline = async () => {
       setIsOnline(true)
       setIsSyncing(true)
-      
+
       try {
         const result = await offlineSync.syncPendingOperations()
         if (result.synced > 0) {
@@ -87,7 +91,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         setIsSyncing(false)
       }
     }
-    
+
     const handleOffline = () => {
       setIsOnline(false)
       setHasPendingSync(true)
@@ -113,7 +117,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
-    
+
     if (outcome === 'accepted') {
       setDeferredPrompt(null)
       setShowInstallBanner(false)
@@ -125,9 +129,9 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
     const isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
     const isEdge = /Edg/.test(navigator.userAgent)
-    
+
     let instructions = ""
-    
+
     if (isChrome || isEdge) {
       instructions = "Look for the install icon (⊞) in your address bar, or click the three dots menu → 'Install LittleForest'"
     } else if (isSafari) {
@@ -146,37 +150,17 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
-      
-      {/* Install Banner */}
-      {(showInstallBanner || (!isInstalled && canInstall)) && (
-        <div className="fixed bottom-4 left-4 right-4 z-50 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Download className="h-5 w-5" />
-            <div>
-              <p className="font-medium">Install LittleForest</p>
-              <p className="text-sm opacity-90">
-                {deferredPrompt ? "Add to home screen for better experience" : "Available as app - click for instructions"}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleInstallClick}
-            >
-              {deferredPrompt ? "Install" : "How to Install"}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowInstallBanner(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+
+      <Suspense fallback={null}>
+        <PwaInstallBanner
+          deferredPrompt={deferredPrompt}
+          showInstallBanner={showInstallBanner}
+          canInstall={canInstall}
+          isInstalled={isInstalled}
+          handleInstallClick={handleInstallClick}
+          setShowInstallBanner={setShowInstallBanner}
+        />
+      </Suspense>
 
       {/* Permanent Install Button for Desktop */}
       {!isInstalled && (
@@ -193,31 +177,13 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Offline Banner */}
-      {!isOnline && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-yellow-900 p-2 text-center text-sm flex items-center justify-center gap-2">
-          <WifiOff className="h-4 w-4" />
-          You're offline. Changes will sync when reconnected.
-          {hasPendingSync && <span className="font-medium">(Pending changes)</span>}
-        </div>
-      )}
+      <Suspense fallback={null}>
+        <OfflineStatusBanner isOnline={isOnline} hasPendingSync={hasPendingSync} />
+      </Suspense>
 
-      {/* Sync Status */}
-      {isOnline && hasPendingSync && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-blue-500 text-white p-2 text-center text-sm flex items-center justify-center gap-2">
-          {isSyncing ? (
-            <>
-              <Upload className="h-4 w-4 animate-spin" />
-              Syncing offline changes...
-            </>
-          ) : (
-            <>
-              <Wifi className="h-4 w-4" />
-              Back online! Changes synced.
-            </>
-          )}
-        </div>
-      )}
+      <Suspense fallback={null}>
+        <SyncStatusIndicator isOnline={isOnline} isSyncing={isSyncing} hasPendingSync={hasPendingSync} />
+      </Suspense>
     </>
   )
 }
