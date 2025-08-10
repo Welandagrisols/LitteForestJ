@@ -19,6 +19,8 @@ interface BeforeInstallPromptEvent extends Event {
 export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
+  const [canInstall, setCanInstall] = useState(false)
+  const [isInstalled, setIsInstalled] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [hasPendingSync, setHasPendingSync] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
@@ -37,12 +39,26 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         })
     }
 
+    // Check if already installed
+    const checkIfInstalled = () => {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+        setIsInstalled(true)
+      }
+      // Also check for iOS Safari standalone mode
+      if ((window.navigator as any).standalone === true) {
+        setIsInstalled(true)
+      }
+    }
+
     // Handle install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
+      setCanInstall(true)
       setShowInstallBanner(true)
     }
+
+    checkIfInstalled()
 
     // Handle online/offline status
     const handleOnline = async () => {
@@ -89,7 +105,11 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) {
+      // Show manual install instructions
+      showManualInstallInstructions()
+      return
+    }
 
     deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
@@ -97,7 +117,30 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     if (outcome === 'accepted') {
       setDeferredPrompt(null)
       setShowInstallBanner(false)
+      setCanInstall(false)
     }
+  }
+
+  const showManualInstallInstructions = () => {
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
+    const isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor)
+    const isEdge = /Edg/.test(navigator.userAgent)
+    
+    let instructions = ""
+    
+    if (isChrome || isEdge) {
+      instructions = "Look for the install icon (⊞) in your address bar, or click the three dots menu → 'Install LittleForest'"
+    } else if (isSafari) {
+      instructions = "Tap the Share button (□↗) and select 'Add to Home Screen'"
+    } else {
+      instructions = "Look for an install or 'Add to Home Screen' option in your browser menu"
+    }
+
+    toast({
+      title: "Install LittleForest",
+      description: instructions,
+      duration: 8000,
+    })
   }
 
   return (
@@ -105,13 +148,15 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       {children}
       
       {/* Install Banner */}
-      {showInstallBanner && (
+      {(showInstallBanner || (!isInstalled && canInstall)) && (
         <div className="fixed bottom-4 left-4 right-4 z-50 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Download className="h-5 w-5" />
             <div>
               <p className="font-medium">Install LittleForest</p>
-              <p className="text-sm opacity-90">Add to home screen for better experience</p>
+              <p className="text-sm opacity-90">
+                {deferredPrompt ? "Add to home screen for better experience" : "Available as app - click for instructions"}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -120,7 +165,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
               size="sm"
               onClick={handleInstallClick}
             >
-              Install
+              {deferredPrompt ? "Install" : "How to Install"}
             </Button>
             <Button
               variant="ghost"
@@ -130,6 +175,21 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
               <X className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+      )}
+
+      {/* Permanent Install Button for Desktop */}
+      {!isInstalled && (
+        <div className="fixed top-4 right-4 z-40 hidden md:block">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleInstallClick}
+            className="bg-background/80 backdrop-blur-sm"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Install App
+          </Button>
         </div>
       )}
 
