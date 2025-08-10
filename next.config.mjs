@@ -13,30 +13,17 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  output: 'export',
-  distDir: 'out',
   experimental: {
-    serverActions: {
-      allowedOrigins: ['*']
-    }
+    optimizePackageImports: ['lucide-react']
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  async headers() {
+  headers: async () => {
     return [
       {
-        source: '/api/:path*',
+        source: '/(.*)',
         headers: [
-          { 
-            key: 'Access-Control-Allow-Origin', 
-            value: process.env.NODE_ENV === 'production' 
-              ? 'https://www.littleforest.co.ke' 
-              : '*' 
-          },
-          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
-          { key: 'Access-Control-Max-Age', value: '86400' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
