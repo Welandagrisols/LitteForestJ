@@ -94,7 +94,7 @@ export const createNewOrderNotification = (order: any): NotificationData => ({
     `Order Date: ${new Date(order.created_at).toLocaleString()}\n\n` +
     `Items ordered:\n` +
     (order.items?.map((item: any) => 
-      `• ${item.plant_name} - Qty: ${item.quantity} @ Ksh ${item.price_per_unit}`
+      `• ${item.plant_name} - Qty: ${item.quantity} @ Ksh ${item.price}`
     ).join('\n') || 'No items listed') +
     `\n\nPlease process this order promptly.`,
   data: { order }
