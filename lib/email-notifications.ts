@@ -8,7 +8,7 @@ const NOTIFICATION_EMAILS = [
 ]
 
 export interface NotificationData {
-  type: 'low_stock' | 'new_sale' | 'task_due' | 'inventory_update'
+  type: 'low_stock' | 'new_sale' | 'task_due' | 'inventory_update' | 'new_order'
   title: string
   message: string
   data?: any
@@ -81,4 +81,21 @@ export const createInventoryUpdateNotification = (item: any, action: string): No
     `Status: ${item.status}\n` +
     `Updated: ${new Date().toLocaleString()}`,
   data: { item, action }
+})
+
+export const createNewOrderNotification = (order: any): NotificationData => ({
+  type: 'new_order',
+  title: 'New Website Order - Little Forest Nursery',
+  message: `A new order has been placed on your website:\n\n` +
+    `Customer: ${order.customer_name}\n` +
+    `Email: ${order.customer_email}\n` +
+    `Phone: ${order.customer_phone || 'Not provided'}\n` +
+    `Total Amount: Ksh ${order.total_amount?.toFixed(2) || '0.00'}\n` +
+    `Order Date: ${new Date(order.created_at).toLocaleString()}\n\n` +
+    `Items ordered:\n` +
+    (order.items?.map((item: any) => 
+      `• ${item.plant_name} - Qty: ${item.quantity} @ Ksh ${item.price_per_unit}`
+    ).join('\n') || 'No items listed') +
+    `\n\nPlease process this order promptly.`,
+  data: { order }
 })

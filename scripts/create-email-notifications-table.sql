@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS email_notifications (
     id BIGSERIAL PRIMARY KEY,
     recipient_emails TEXT[] NOT NULL,
-    notification_type TEXT NOT NULL CHECK (notification_type IN ('low_stock', 'new_sale', 'task_due', 'inventory_update')),
+    notification_type TEXT NOT NULL CHECK (notification_type IN ('low_stock', 'new_sale', 'task_due', 'inventory_update', 'new_order')),
     title TEXT NOT NULL,
     message TEXT NOT NULL,
     data JSONB,

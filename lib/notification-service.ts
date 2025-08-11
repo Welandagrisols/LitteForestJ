@@ -5,7 +5,8 @@ import {
   createLowStockNotification, 
   createNewSaleNotification, 
   createTaskDueNotification,
-  createInventoryUpdateNotification 
+  createInventoryUpdateNotification,
+  createNewOrderNotification 
 } from './email-notifications'
 
 class NotificationService {
@@ -103,6 +104,16 @@ class NotificationService {
       console.log(`Sent inventory update notification: ${action}`)
     } catch (error) {
       console.error('Error sending inventory update notification:', error)
+    }
+  }
+
+  async notifyNewOrder(order: any) {
+    try {
+      const notification = createNewOrderNotification(order)
+      await sendEmailNotification(notification)
+      console.log('Sent new order notification')
+    } catch (error) {
+      console.error('Error sending new order notification:', error)
     }
   }
 }
