@@ -3,6 +3,8 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { PWAProvider } from "@/components/pwa-provider"
+import { SupabaseProvider } from "@/components/supabase-provider"
+import { NotificationProvider } from "@/components/notification-provider"
 import "./globals.css"
 
 const inter = Inter({ 
@@ -40,10 +42,13 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <PWAProvider>
-            {children}
-            <Toaster />
-          </PWAProvider>
+          <SupabaseProvider>
+            <NotificationProvider>
+              <PWAProvider>
+                {children}
+              </PWAProvider>
+            </NotificationProvider>
+          </SupabaseProvider>
         </ThemeProvider>
       </body>
     </html>

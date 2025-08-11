@@ -13,6 +13,7 @@ import { Upload, X, ImageIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { uploadImageToSupabase, uploadImageAndLinkToInventory, deleteImageFromSupabase } from "@/lib/image-upload"
+import { notificationService } from "@/lib/notification-service"
 
 interface EditInventoryFormProps {
   item: any
@@ -297,7 +298,7 @@ export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFo
         updated_at: new Date().toISOString(),
       }
 
-      const { error } = await supabase.from("inventory").update(updateData).eq("id", item.id)
+      const { data, error } = await supabase.from("inventory").update(updateData).eq("id", item.id)
 
       if (error) {
         console.error("Update error:", error)
@@ -310,6 +311,9 @@ export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFo
           ? "Consumable updated successfully"
           : `Plant updated successfully. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
       })
+
+      // Send notification for inventory update
+      await notificationService.notifyInventoryUpdate(data[0], 'updated')
 
       onSuccess()
     } catch (error: any) {

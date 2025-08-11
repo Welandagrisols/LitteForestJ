@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { uploadImageToSupabase, uploadImageAndLinkToInventory } from "@/lib/image-upload"
+import { notificationService } from "@/lib/notification-service"
 
 interface AddInventoryFormProps {
   onSuccess: () => void
@@ -127,6 +128,9 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
         title: "Success",
         description: `New plant batch added to inventory. Cost per seedling: Ksh ${calculatedCostPerSeedling.toFixed(2)}`,
       })
+
+      // Send notification for inventory addition
+      await notificationService.notifyInventoryUpdate(data[0], 'added')
 
       // Reset form
       setFormData({
