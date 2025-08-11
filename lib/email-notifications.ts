@@ -83,19 +83,5 @@ export const createInventoryUpdateNotification = (item: any, action: string): No
   data: { item, action }
 })
 
-export const createNewOrderNotification = (order: any): NotificationData => ({
-  type: 'new_order',
-  title: 'New Website Order - Little Forest Nursery',
-  message: `A new order has been placed on your website:\n\n` +
-    `Customer: ${order.customer_name}\n` +
-    `Email: ${order.customer_email}\n` +
-    `Phone: ${order.customer_phone || 'Not provided'}\n` +
-    `Total Amount: Ksh ${order.total_amount?.toFixed(2) || '0.00'}\n` +
-    `Order Date: ${new Date(order.created_at).toLocaleString()}\n\n` +
-    `Items ordered:\n` +
-    (order.items?.map((item: any) => 
-      `• ${item.plant_name} - Qty: ${item.quantity} @ Ksh ${item.price}`
-    ).join('\n') || 'No items listed') +
-    `\n\nPlease process this order promptly.`,
-  data: { order }
+// Order notifications removed - this is an internal farm management systemr }
 })
