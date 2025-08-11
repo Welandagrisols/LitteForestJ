@@ -1,11 +1,11 @@
+
 import { supabase } from './supabase'
 import { 
   sendEmailNotification, 
   createLowStockNotification, 
   createNewSaleNotification, 
   createTaskDueNotification,
-  createInventoryUpdateNotification,
-  createNewOrderNotification 
+  createInventoryUpdateNotification 
 } from './email-notifications'
 
 class NotificationService {
@@ -14,7 +14,7 @@ class NotificationService {
 
   startMonitoring() {
     if (this.isMonitoring) return
-
+    
     this.isMonitoring = true
     console.log('Starting notification monitoring service...')
 
@@ -64,7 +64,7 @@ class NotificationService {
   private async checkDueTasks() {
     try {
       const today = new Date().toISOString().split('T')[0]
-
+      
       const { data: tasks, error } = await supabase
         .from('tasks')
         .select('*')
@@ -105,8 +105,6 @@ class NotificationService {
       console.error('Error sending inventory update notification:', error)
     }
   }
-
-  // Order notifications removed - this is an internal farm management system
 }
 
 export const notificationService = new NotificationService()

@@ -8,7 +8,7 @@ const NOTIFICATION_EMAILS = [
 ]
 
 export interface NotificationData {
-  type: 'low_stock' | 'new_sale' | 'task_due' | 'inventory_update' | 'new_order'
+  type: 'low_stock' | 'new_sale' | 'task_due' | 'inventory_update'
   title: string
   message: string
   data?: any
@@ -81,7 +81,4 @@ export const createInventoryUpdateNotification = (item: any, action: string): No
     `Status: ${item.status}\n` +
     `Updated: ${new Date().toLocaleString()}`,
   data: { item, action }
-})
-
-// Order notifications removed - this is an internal farm management systemr }
 })
