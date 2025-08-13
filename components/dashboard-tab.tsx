@@ -275,9 +275,9 @@ export function DashboardTab() {
         </Card>
 
         {/* Low Stock Items */}
-        <Card className="rounded-2xl shadow-md overflow-hidden">
-          <CardHeader className="bg-muted/50 px-4 py-4 sm:px-6">
-            <CardTitle className="text-lg font-semibold">Low Stock Items</CardTitle>
+        <Card className="mobile-card mobile-table-wrapper rounded-2xl shadow-md overflow-hidden">
+          <CardHeader className="bg-muted/50 px-4 py-4 sm:px-6 mobile-section-header">
+            <CardTitle className="mobile-title text-lg font-semibold">Low Stock Items</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (

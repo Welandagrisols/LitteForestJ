@@ -112,31 +112,31 @@ function AppContent() {
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
         {isMobile ? (
-          <div className="flex h-screen bg-background">
+          <div className="flex h-screen bg-background pwa-scroll">
             {/* Mobile Header */}
-            <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+            <div className="fixed top-0 left-0 right-0 z-40 pwa-header bg-background/98 backdrop-blur-xl supports-[backdrop-filter]:bg-background/95 border-b border-border/50">
               <div className="flex items-center justify-between px-4 py-3">
                 <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="mobile-touch-target">
+                    <Button variant="ghost" size="icon" className="mobile-touch-target mobile-button">
                       <Menu className="h-5 w-5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="w-72 p-0">
+                  <SheetContent side="left" className="w-72 p-0 mobile-card">
                     <div className="flex h-full flex-col">
-                      <div className="flex items-center justify-center p-6 border-b">
-                        <h2 className="text-xl font-bold">
+                      <div className="flex items-center justify-center p-6 border-b border-border/20">
+                        <h2 className="mobile-title">
                           <span className="text-orange-500">Little</span>
                           <span className="text-green-600">Forest</span>
                         </h2>
                       </div>
-                      <div className="flex-1 overflow-auto p-4">
+                      <div className="flex-1 overflow-auto p-4 pwa-scroll">
                         <NavigationItems onItemClick={() => setMobileMenuOpen(false)} />
                       </div>
                     </div>
                   </SheetContent>
                 </Sheet>
-                <h1 className="text-lg font-semibold truncate">
+                <h1 className="mobile-title truncate">
                   {tabs.find((tab) => tab.value === activeTab)?.label}
                 </h1>
                 <div className="w-10" /> {/* Spacer */}
@@ -144,10 +144,10 @@ function AppContent() {
             </div>
 
             {/* Mobile Content */}
-            <div className="flex-1 pt-16 overflow-auto">
+            <div className="flex-1 pt-16 overflow-auto pwa-content">
               <div className="mobile-content">
                 <Header />
-                <main className="mt-6">{renderTabContent()}</main>
+                <main className="mt-6 pwa-card-enter">{renderTabContent()}</main>
               </div>
             </div>
           </div>
