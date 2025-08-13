@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Checkbox } from "@/components/ui/checkbox"
 import { isDemoMode } from "@/lib/supabase"
 import * as notificationService from "@/services/notificationService" // Assuming notificationService is in this path
+import { useForm } from "react-hook-form" // Import useForm
 
 interface AddSaleFormProps {
   onSuccess: () => void
@@ -25,7 +26,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
   const { toast } = useToast()
 
   // Use useForm from react-hook-form for better form management
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = Form
+  const { register, handleSubmit: handleFormSubmit, watch, setValue, formState: { errors } } = useForm() // Alias handleSubmit
 
   const [formData, setFormData] = useState({
     inventory_id: "",
@@ -427,8 +428,8 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
           <Button
-            type="button"
-            onClick={handleSubmit(handleSubmit)} // Use handleSubmit from react-hook-form
+            type="submit" // Changed to type="submit"
+            onClick={handleFormSubmit(handleSubmit)} // Use handleFormSubmit from react-hook-form
             className="bg-secondary hover:bg-secondary/90 text-white"
             disabled={loading}
           >
