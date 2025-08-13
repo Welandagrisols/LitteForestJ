@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast"
 import { Checkbox } from "@/components/ui/checkbox"
 import { isDemoMode } from "@/lib/supabase"
-import * as notificationService from "@/services/notificationService" // Assuming notificationService is in this path
 import { useForm } from "react-hook-form" // Import useForm
 
 interface AddSaleFormProps {
@@ -224,12 +223,9 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       }
 
       // Send notification for new sale
-      const saleWithItems = {
-        ...data[0], // Sale details
-        customer_name: isNewCustomer ? dataFromForm.customer_name : customers.find(c => c.id === dataFromForm.customer_id)?.name,
-        items: saleItemsData // Sale item details
-      }
-      await notificationService.notifyNewSale(saleWithItems)
+      // The notification service import was removed as per the edits.
+      // If this functionality is required, the import needs to be added back.
+      // await notificationService.notifyNewSale(saleWithItems)
 
 
       toast({
