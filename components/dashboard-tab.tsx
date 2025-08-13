@@ -200,7 +200,7 @@ export function DashboardTab() {
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 max-w-7xl mx-auto">
         <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-200">
           <CardHeader className="pb-2 px-0 pt-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Plants</CardTitle>
