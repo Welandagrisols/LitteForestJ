@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
@@ -23,34 +22,67 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  // Debug logging
+  useEffect(() => {
+    console.log("AuthProvider: Loading state changed to:", isLoading)
+    console.log("AuthProvider: User state:", user ? "authenticated" : "not authenticated")
+    console.log("AuthProvider: Demo mode:", isDemoMode)
+  }, [isLoading, user])
 
   // Define admin emails - you can modify this list
   const adminEmails = ['admin@littleforest.com', 'farm@littleforest.com']
 
-  const isAdmin = user ? adminEmails.includes(user.email || '') : false
-  const isAuthenticated = !!user && isAdmin
+  const isAdminCheck = user ? adminEmails.includes(user.email || '') : false
+  const isAuthenticated = !!user && isAdminCheck
 
   useEffect(() => {
-    if (isDemoMode) {
+    // Failsafe timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      console.warn("Auth loading timeout reached - forcing demo mode")
+      setIsAdmin(true)
       setIsLoading(false)
-      return
+    }, 10000) // 10 second timeout
+
+    async function getInitialSession() {
+      try {
+        if (isDemoMode) {
+          console.log("AuthProvider: Setting demo mode")
+          setIsAdmin(true)
+          setIsLoading(false)
+          clearTimeout(timeout)
+          return
+        }
+        console.log("AuthProvider: Checking Supabase session")
+        const { data: { session } } = await supabase.auth.getSession()
+        console.log("AuthProvider: Session received:", !!session)
+        setUser(session?.user ?? null)
+        setIsAdmin(!!session?.user)
+        setIsLoading(false)
+        clearTimeout(timeout)
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          console.log("AuthProvider: Auth state changed:", !!session)
+          setUser(session?.user ?? null)
+          setIsAdmin(!!session?.user)
+          setIsLoading(false)
+        })
+
+        return () => {
+          subscription.unsubscribe()
+          clearTimeout(timeout)
+        }
+      } catch (error) {
+        console.error('AuthProvider: Error getting session:', error)
+        setIsLoading(false)
+        clearTimeout(timeout)
+      }
     }
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setIsLoading(false)
-    })
+    getInitialSession()
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      setIsLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
+    return () => clearTimeout(timeout)
   }, [])
 
   const signIn = async (email: string, password: string) => {
@@ -58,6 +90,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Demo mode - simulate admin login
       if (adminEmails.includes(email)) {
         setUser({ email, id: 'demo-admin' } as User)
+        setIsAdmin(true)
         return { error: null }
       }
       return { error: { message: 'Invalid admin credentials' } }
@@ -73,12 +106,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return { error: { message: 'Access denied. Admin privileges required.' } }
     }
 
+    if (data.user) {
+      setIsAdmin(adminEmails.includes(data.user.email || ''))
+    }
+
     return { error }
   }
 
   const signOut = async () => {
     if (isDemoMode) {
       setUser(null)
+      setIsAdmin(false)
       return
     }
     await supabase.auth.signOut()
@@ -86,7 +124,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const value = {
     user,
-    isAdmin,
+    isAdmin: isAdminCheck,
     isLoading,
     signIn,
     signOut,

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, lazy, Suspense } from "react"
+import { useState, useEffect, lazy, Suspense } from "react"
 import { LoadingSpinner, DashboardSkeleton } from "@/components/loading-spinner"
 // Lazy load components for better performance
 const DashboardTab = lazy(() => import("@/components/dashboard-tab").then(m => ({ default: m.DashboardTab })))
@@ -48,7 +48,17 @@ const tabs = [
 function AppContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [componentError, setComponentError] = useState<string | null>(null)
   const isMobile = useIsMobile()
+
+  // Debug logging
+  useEffect(() => {
+    console.log("AppContent mounted, activeTab:", activeTab)
+  }, [])
+
+  useEffect(() => {
+    console.log("Active tab changed to:", activeTab)
+  }, [activeTab])
 
   const NavigationItems = ({ onItemClick }: { onItemClick?: () => void }) => (
     <SidebarMenu className="space-y-2">
@@ -83,25 +93,32 @@ function AppContent() {
   }
 
   const renderTabContent = () => {
-    switch (activeTab) {
-      case "dashboard":
-        return <DashboardTab />
-      case "inventory":
-        return <InventoryTab />
-      case "sales":
-        return <SalesTab />
-      case "customers":
-        return <CustomersTab />
-      case "tasks":
-        return <TasksTab />
-      case "reports":
-        return <ReportsTab />
-      case "website":
-        return <WebsiteIntegrationTab />
-      case "ops":
-        return <OpsTab />
-      default:
-        return <DashboardTab />
+    try {
+      console.log("Rendering tab content for:", activeTab)
+      switch (activeTab) {
+        case "dashboard":
+          return <DashboardTab />
+        case "inventory":
+          return <InventoryTab />
+        case "sales":
+          return <SalesTab />
+        case "customers":
+          return <CustomersTab />
+        case "tasks":
+          return <TasksTab />
+        case "reports":
+          return <ReportsTab />
+        case "website":
+          return <WebsiteIntegrationTab />
+        case "ops":
+          return <OpsTab />
+        default:
+          return <DashboardTab />
+      }
+    } catch (error) {
+      console.error("Error rendering tab content:", error)
+      setComponentError(`Error loading ${activeTab} tab: ${error}`)
+      return <div className="p-4 text-red-500">Error loading {activeTab} tab. Check console for details.</div>
     }
   }
 
@@ -145,9 +162,21 @@ function AppContent() {
               <div className="mobile-content">
                 <Header />
                 <main className="mt-6 pwa-card-enter">
-                  <Suspense fallback={getLoadingComponent(activeTab)}>
-                    {renderTabContent()}
-                  </Suspense>
+                  {componentError ? (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded text-red-700">
+                      {componentError}
+                      <button 
+                        onClick={() => setComponentError(null)} 
+                        className="ml-2 text-red-500 underline"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  ) : (
+                    <Suspense fallback={getLoadingComponent(activeTab)}>
+                      {renderTabContent()}
+                    </Suspense>
+                  )}
                 </main>
               </div>
             </div>
@@ -168,9 +197,21 @@ function AppContent() {
             <div className="flex-1">
               <Header />
               <main className="p-6">
-                <Suspense fallback={getLoadingComponent(activeTab)}>
-                  {renderTabContent()}
-                </Suspense>
+                {componentError ? (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded text-red-700">
+                    {componentError}
+                    <button 
+                      onClick={() => setComponentError(null)} 
+                      className="ml-2 text-red-500 underline"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : (
+                  <Suspense fallback={getLoadingComponent(activeTab)}>
+                    {renderTabContent()}
+                  </Suspense>
+                )}
               </main>
             </div>
           </div>
