@@ -49,11 +49,20 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [componentError, setComponentError] = useState<string | null>(null)
+  const [appReady, setAppReady] = useState(false)
   const isMobile = useIsMobile()
 
   // Debug logging
   useEffect(() => {
     console.log("AppContent mounted, activeTab:", activeTab)
+    
+    // Force app to be ready after a short delay
+    const readyTimeout = setTimeout(() => {
+      setAppReady(true)
+      console.log("App forced ready")
+    }, 2000)
+    
+    return () => clearTimeout(readyTimeout)
   }, [])
 
   useEffect(() => {
@@ -225,7 +234,14 @@ export default function Home() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="text-center space-y-4">
+              <LoadingSpinner />
+              <p className="text-sm text-muted-foreground">Loading LittleForest...</p>
+            </div>
+          </div>
+        }>
           <AuthGuard>
             <SidebarProvider>
               <AppContent />

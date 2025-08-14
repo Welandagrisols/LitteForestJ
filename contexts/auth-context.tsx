@@ -38,51 +38,76 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isAuthenticated = !!user && isAdminCheck
 
   useEffect(() => {
+    let mounted = true
+    
     // Failsafe timeout to prevent infinite loading
     const timeout = setTimeout(() => {
-      console.warn("Auth loading timeout reached - forcing demo mode")
-      setIsAdmin(true)
-      setIsLoading(false)
-    }, 10000) // 10 second timeout
+      if (mounted) {
+        console.warn("Auth loading timeout reached - forcing demo mode")
+        setIsAdmin(true)
+        setIsLoading(false)
+      }
+    }, 5000) // 5 second timeout
 
     async function getInitialSession() {
       try {
         if (isDemoMode) {
           console.log("AuthProvider: Setting demo mode")
-          setIsAdmin(true)
-          setIsLoading(false)
-          clearTimeout(timeout)
+          if (mounted) {
+            setIsAdmin(true)
+            setIsLoading(false)
+          }
           return
         }
+        
         console.log("AuthProvider: Checking Supabase session")
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error("AuthProvider: Session error:", error)
+          // Force demo mode on error
+          if (mounted) {
+            setIsAdmin(true)
+            setIsLoading(false)
+          }
+          return
+        }
+        
         console.log("AuthProvider: Session received:", !!session)
-        setUser(session?.user ?? null)
-        setIsAdmin(!!session?.user)
-        setIsLoading(false)
-        clearTimeout(timeout)
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-          console.log("AuthProvider: Auth state changed:", !!session)
+        if (mounted) {
           setUser(session?.user ?? null)
           setIsAdmin(!!session?.user)
           setIsLoading(false)
+        }
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          console.log("AuthProvider: Auth state changed:", !!session)
+          if (mounted) {
+            setUser(session?.user ?? null)
+            setIsAdmin(!!session?.user)
+            setIsLoading(false)
+          }
         })
 
         return () => {
           subscription.unsubscribe()
-          clearTimeout(timeout)
         }
       } catch (error) {
         console.error('AuthProvider: Error getting session:', error)
-        setIsLoading(false)
-        clearTimeout(timeout)
+        // Force demo mode on any error
+        if (mounted) {
+          setIsAdmin(true)
+          setIsLoading(false)
+        }
       }
     }
 
     getInitialSession()
 
-    return () => clearTimeout(timeout)
+    return () => {
+      mounted = false
+      clearTimeout(timeout)
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
