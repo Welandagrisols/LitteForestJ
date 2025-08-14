@@ -1,15 +1,17 @@
+
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Suspense } from "react"
-import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import { NotificationProvider } from "@/components/notification-provider"
 import { ErrorBoundary } from "@/components/error-boundary"
+import { AuthProvider } from "@/contexts/auth-context"
+import { AuthGuard } from "@/components/auth-guard"
 import { LoadingSpinner } from "@/components/loading-spinner"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Header } from "@/components/header"
+import { AppSidebar } from "@/components/app-sidebar"
 import { DashboardTab } from "@/components/dashboard-tab"
 import { InventoryTab } from "@/components/inventory-tab"
 import { SalesTab } from "@/components/sales-tab"
@@ -18,17 +20,11 @@ import { TasksTab } from "@/components/tasks-tab"
 import { ReportsTab } from "@/components/reports-tab"
 import { OpsTab } from "@/components/ops-tab"
 import { WebsiteIntegrationTab } from "@/components/website-integration-tab"
-import { NotificationSettings } from "@/components/notification-settings"
-import { DemoModeBanner } from "@/components/demo-mode-banner"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { Separator } from "@/components/ui/separator"
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState("dashboard")
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const isMobile = useIsMobile()
-
-  useEffect(() => {
-    console.log("App loaded successfully, activeTab:", activeTab)
-  }, [])
 
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -48,26 +44,32 @@ function AppContent() {
         return <OpsTab />
       case "website":
         return <WebsiteIntegrationTab />
-      case "notifications":
-        return <NotificationSettings />
       default:
         return <DashboardTab />
     }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <DemoModeBanner />
-      <Header 
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-      />
-      <main className="container mx-auto px-4 py-6">
-        {renderActiveTab()}
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <h1 className="text-lg font-semibold">
+              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+            </h1>
+          </div>
+          <div className="ml-auto px-4">
+            <ThemeToggle />
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          {renderActiveTab()}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
 
@@ -80,8 +82,8 @@ export default function Home() {
       disableTransitionOnChange
     >
       <ErrorBoundary>
-        <NotificationProvider>
-          <SidebarProvider>
+        <AuthProvider>
+          <NotificationProvider>
             <Suspense fallback={
               <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="text-center space-y-4">
@@ -90,11 +92,13 @@ export default function Home() {
                 </div>
               </div>
             }>
-              <AppContent />
+              <AuthGuard>
+                <AppContent />
+              </AuthGuard>
             </Suspense>
             <Toaster />
-          </SidebarProvider>
-        </NotificationProvider>
+          </NotificationProvider>
+        </AuthProvider>
       </ErrorBoundary>
     </ThemeProvider>
   )
