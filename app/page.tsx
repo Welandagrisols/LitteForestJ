@@ -11,6 +11,10 @@ const TasksTab = lazy(() => import("@/components/tasks-tab").then(m => ({ defaul
 const ReportsTab = lazy(() => import("@/components/reports-tab").then(m => ({ default: m.ReportsTab })))
 const OpsTab = lazy(() => import("@/components/ops-tab").then(m => ({ default: m.OpsTab })))
 
+// Import WebsiteIntegrationTab here
+const WebsiteIntegrationTab = lazy(() => import("@/components/website-integration-tab").then(m => ({ default: m.WebsiteIntegrationTab })))
+
+
 import { Header } from "@/components/header"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { AuthProvider } from "@/contexts/auth-context"
@@ -25,7 +29,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { BarChart3, Package, ShoppingCart, FileText, Settings, Menu, Users } from "lucide-react"
+import { BarChart3, Package, ShoppingCart, FileText, Settings, Menu, Users, Monitor } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -35,8 +39,9 @@ const tabs = [
   { value: "inventory", label: "Inventory", icon: Package },
   { value: "sales", label: "Sales", icon: ShoppingCart },
   { value: "customers", label: "Customers", icon: Users },
-  { value: "tasks", label: "Tasks", icon: Users },
+  { value: "tasks", label: "Tasks", icon: FileText },
   { value: "reports", label: "Reports", icon: FileText },
+  { value: "website", label: "Website", icon: Monitor },
   { value: "ops", label: "Operations", icon: Settings },
 ]
 
