@@ -42,7 +42,7 @@ const tabs = [
   { value: "customers", label: "Customers", icon: Users },
   { value: "tasks", label: "Tasks", icon: FileText },
   { value: "reports", label: "Reports", icon: FileText },
-  { value: "website", label: "Website", icon: Monitor },
+  { value: "website", label: "Website", icon: Globe },
   { value: "ops", label: "Operations", icon: Settings },
 ]
 
