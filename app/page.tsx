@@ -12,7 +12,7 @@ const ReportsTab = lazy(() => import("@/components/reports-tab").then(m => ({ de
 const OpsTab = lazy(() => import("@/components/ops-tab").then(m => ({ default: m.OpsTab })))
 
 // Import WebsiteIntegrationTab here
-const WebsiteIntegrationTab = lazy(() => import("@/components/website-integration-tab").then(m => ({ default: m.WebsiteIntegrationTab })))
+const WebsiteIntegrationTab = lazy(() => import("@/components/website-integration-tab"))
 
 
 import { Header } from "@/components/header"
@@ -186,7 +186,7 @@ function AppContent() {
                         <span className="hidden sm:inline">Website</span>
                         <span className="sm:hidden">Web</span>
                       </TabsTrigger>
-                      <TabsTrigger value="operations" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <TabsTrigger value="ops" className="flex items-center gap-2 text-xs lg:text-sm">
                         <Settings className="h-4 w-4" />
                         <span className="hidden sm:inline">Operations</span>
                         <span className="sm:hidden">Ops</span>
@@ -227,7 +227,7 @@ function AppContent() {
                         <WebsiteIntegrationTab />
                       </Suspense>
                     </TabsContent>
-                    <TabsContent value="operations" className="space-y-4">
+                    <TabsContent value="ops" className="space-y-4">
                       <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
                         <OpsTab />
                       </Suspense>
@@ -285,7 +285,7 @@ function AppContent() {
                       <span className="hidden sm:inline">Website</span>
                       <span className="sm:hidden">Web</span>
                     </TabsTrigger>
-                    <TabsTrigger value="operations" className="flex items-center gap-2 text-xs lg:text-sm">
+                    <TabsTrigger value="ops" className="flex items-center gap-2 text-xs lg:text-sm">
                       <Settings className="h-4 w-4" />
                       <span className="hidden sm:inline">Operations</span>
                       <span className="sm:hidden">Ops</span>
@@ -326,7 +326,7 @@ function AppContent() {
                       <WebsiteIntegrationTab />
                     </Suspense>
                   </TabsContent>
-                  <TabsContent value="operations" className="space-y-4">
+                  <TabsContent value="ops" className="space-y-4">
                     <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
                       <OpsTab />
                     </Suspense>
