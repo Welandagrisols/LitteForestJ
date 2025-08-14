@@ -29,13 +29,14 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { BarChart3, Package, ShoppingCart, FileText, Settings, Menu, Users, Monitor } from "lucide-react"
+import { BarChart, Package, ShoppingCart, FileText, Settings, Menu, Users, Monitor, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 
 const tabs = [
-  { value: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { value: "dashboard", label: "Dashboard", icon: BarChart },
   { value: "inventory", label: "Inventory", icon: Package },
   { value: "sales", label: "Sales", icon: ShoppingCart },
   { value: "customers", label: "Customers", icon: Users },
@@ -152,7 +153,87 @@ function AppContent() {
             <div className="flex-1 pt-16 overflow-auto pwa-content">
               <div className="mobile-content">
                 <Header />
-                <main className="mt-6 pwa-card-enter">{renderTabContent()}</main>
+                <main className="mt-6 pwa-card-enter">
+                  <Tabs defaultValue="dashboard" className="w-full">
+                    <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
+                      <TabsTrigger value="dashboard" className="flex items-center gap-2 text-xs lg:text-sm">
+                        <BarChart className="h-4 w-4" />
+                        <span className="hidden sm:inline">Dashboard</span>
+                        <span className="sm:hidden">Dash</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="inventory" className="flex items-center gap-2 text-xs lg:text-sm">
+                        <Package className="h-4 w-4" />
+                        <span className="hidden sm:inline">Inventory</span>
+                        <span className="sm:hidden">Inv</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="sales" className="flex items-center gap-2 text-xs lg:text-sm">
+                        <ShoppingCart className="h-4 w-4" />
+                        <span className="hidden sm:inline">Sales</span>
+                        <span className="sm:hidden">Sales</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="customers" className="flex items-center gap-2 text-xs lg:text-sm">
+                        <Users className="h-4 w-4" />
+                        <span className="hidden sm:inline">Customers</span>
+                        <span className="sm:hidden">Cust</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="reports" className="flex items-center gap-2 text-xs lg:text-sm">
+                        <FileText className="h-4 w-4" />
+                        <span className="hidden sm:inline">Reports</span>
+                        <span className="sm:hidden">Rep</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="website" className="flex items-center gap-2 text-xs lg:text-sm">
+                        <Globe className="h-4 w-4" />
+                        <span className="hidden sm:inline">Website</span>
+                        <span className="sm:hidden">Web</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="operations" className="flex items-center gap-2 text-xs lg:text-sm">
+                        <Settings className="h-4 w-4" />
+                        <span className="hidden sm:inline">Operations</span>
+                        <span className="sm:hidden">Ops</span>
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="dashboard" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <DashboardTab />
+                      </Suspense>
+                    </TabsContent>
+                    <TabsContent value="inventory" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <InventoryTab />
+                      </Suspense>
+                    </TabsContent>
+                    <TabsContent value="sales" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <SalesTab />
+                      </Suspense>
+                    </TabsContent>
+                    <TabsContent value="customers" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <CustomersTab />
+                      </Suspense>
+                    </TabsContent>
+                    <TabsContent value="tasks" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <TasksTab />
+                      </Suspense>
+                    </TabsContent>
+                    <TabsContent value="reports" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <ReportsTab />
+                      </Suspense>
+                    </TabsContent>
+                    <TabsContent value="website" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <WebsiteIntegrationTab />
+                      </Suspense>
+                    </TabsContent>
+                    <TabsContent value="operations" className="space-y-4">
+                      <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                        <OpsTab />
+                      </Suspense>
+                    </TabsContent>
+                  </Tabs>
+                </main>
               </div>
             </div>
           </div>
@@ -172,7 +253,85 @@ function AppContent() {
             <div className="flex-1">
               <Header />
               <main className="p-6">
-                <ErrorBoundary>{renderTabContent()}</ErrorBoundary>
+                <Tabs defaultValue="dashboard" className="w-full">
+                  <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
+                    <TabsTrigger value="dashboard" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <BarChart className="h-4 w-4" />
+                      <span className="hidden sm:inline">Dashboard</span>
+                      <span className="sm:hidden">Dash</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="inventory" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <Package className="h-4 w-4" />
+                      <span className="hidden sm:inline">Inventory</span>
+                      <span className="sm:hidden">Inv</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="sales" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <ShoppingCart className="h-4 w-4" />
+                      <span className="hidden sm:inline">Sales</span>
+                      <span className="sm:hidden">Sales</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="customers" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <Users className="h-4 w-4" />
+                      <span className="hidden sm:inline">Customers</span>
+                      <span className="sm:hidden">Cust</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="reports" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <FileText className="h-4 w-4" />
+                      <span className="hidden sm:inline">Reports</span>
+                      <span className="sm:hidden">Rep</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="website" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <Globe className="h-4 w-4" />
+                      <span className="hidden sm:inline">Website</span>
+                      <span className="sm:hidden">Web</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="operations" className="flex items-center gap-2 text-xs lg:text-sm">
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden sm:inline">Operations</span>
+                      <span className="sm:hidden">Ops</span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="dashboard" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <DashboardTab />
+                    </Suspense>
+                  </TabsContent>
+                  <TabsContent value="inventory" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <InventoryTab />
+                    </Suspense>
+                  </TabsContent>
+                  <TabsContent value="sales" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <SalesTab />
+                    </Suspense>
+                  </TabsContent>
+                  <TabsContent value="customers" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <CustomersTab />
+                    </Suspense>
+                  </TabsContent>
+                  <TabsContent value="tasks" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <TasksTab />
+                    </Suspense>
+                  </TabsContent>
+                  <TabsContent value="reports" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <ReportsTab />
+                    </Suspense>
+                  </TabsContent>
+                  <TabsContent value="website" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <WebsiteIntegrationTab />
+                    </Suspense>
+                  </TabsContent>
+                  <TabsContent value="operations" className="space-y-4">
+                    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                      <OpsTab />
+                    </Suspense>
+                  </TabsContent>
+                </Tabs>
               </main>
             </div>
           </div>
