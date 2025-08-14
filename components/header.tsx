@@ -1,27 +1,137 @@
-import Link from "next/link"
-import Image from "next/image"
 
-export function Header() {
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Badge } from "@/components/ui/badge"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { 
+  Menu, 
+  BarChart3, 
+  Package, 
+  ShoppingCart, 
+  Users, 
+  CheckSquare, 
+  FileText, 
+  Settings,
+  Globe,
+  Bell
+} from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
+
+interface HeaderProps {
+  activeTab: string
+  setActiveTab: (tab: string) => void
+  mobileMenuOpen: boolean
+  setMobileMenuOpen: (open: boolean) => void
+}
+
+const navigationItems = [
+  { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { id: "inventory", label: "Inventory", icon: Package },
+  { id: "sales", label: "Sales", icon: ShoppingCart },
+  { id: "customers", label: "Customers", icon: Users },
+  { id: "tasks", label: "Tasks", icon: CheckSquare },
+  { id: "reports", label: "Reports", icon: FileText },
+  { id: "ops", label: "Operations", icon: Settings },
+  { id: "website", label: "Website", icon: Globe },
+  { id: "notifications", label: "Notifications", icon: Bell }
+]
+
+export function Header({ activeTab, setActiveTab, mobileMenuOpen, setMobileMenuOpen }: HeaderProps) {
+  const isMobile = useIsMobile()
+
+  const NavigationContent = () => (
+    <div className="flex flex-col space-y-2 p-4">
+      {navigationItems.map((item) => {
+        const Icon = item.icon
+        return (
+          <Button
+            key={item.id}
+            variant={activeTab === item.id ? "default" : "ghost"}
+            className="justify-start w-full"
+            onClick={() => {
+              setActiveTab(item.id)
+              setMobileMenuOpen(false)
+            }}
+          >
+            <Icon className="mr-2 h-4 w-4" />
+            {item.label}
+          </Button>
+        )
+      })}
+    </div>
+  )
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 sm:gap-3">
-          <Image
-            src="/images/littleforest-logo.png"
-            alt="LittleForest Logo"
-            width={160}
-            height={43}
-            className="h-8 sm:h-10 w-auto"
-            priority
-            loading="eager"
-            sizes="(max-width: 640px) 128px, 160px"
-          />
-        </Link>
-        <div className="text-xs sm:text-sm text-primary font-medium hidden sm:block">
-          Agrisols Farm Management System
-        </div>
-        <div className="text-xs text-primary font-medium sm:hidden">
-          Farm Management
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">LF</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold">LittleForest</h1>
+                <Badge variant="secondary" className="text-xs">
+                  Demo Mode
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          {!isMobile && (
+            <nav className="hidden md:flex space-x-1">
+              {navigationItems.slice(0, 6).map((item) => {
+                const Icon = item.icon
+                return (
+                  <Button
+                    key={item.id}
+                    variant={activeTab === item.id ? "default" : "ghost"}
+                    className="flex items-center space-x-2"
+                    onClick={() => setActiveTab(item.id)}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Button>
+                )
+              })}
+            </nav>
+          )}
+
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+            
+            {/* Mobile Menu */}
+            {isMobile && (
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-80">
+                  <div className="mt-6">
+                    <div className="flex items-center space-x-2 mb-6">
+                      <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">LF</span>
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold">LittleForest</h2>
+                        <Badge variant="secondary" className="text-xs">
+                          Demo Mode
+                        </Badge>
+                      </div>
+                    </div>
+                    <NavigationContent />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
+          </div>
         </div>
       </div>
     </header>
