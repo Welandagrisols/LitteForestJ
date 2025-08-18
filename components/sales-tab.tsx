@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { demoSales } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { exportToExcel, formatSalesForExport } from "@/lib/excel-export"
-import { Download, Loader2, Trash2 } from "lucide-react"
+import { Download, Loader2, Trash2, Package } from "lucide-react"
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
