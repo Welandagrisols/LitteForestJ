@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -14,15 +14,9 @@ export function ThemeToggle() {
   }, [])
 
   const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark"
+    const currentTheme = resolvedTheme || theme
+    const newTheme = currentTheme === "dark" ? "light" : "dark"
     setTheme(newTheme)
-
-    // Force apply the theme class to document
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
   }
 
   if (!mounted) {
@@ -33,15 +27,22 @@ export function ThemeToggle() {
     )
   }
 
+  const currentTheme = resolvedTheme || theme
+  const isDark = currentTheme === "dark"
+
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={toggleTheme}
       className="theme-toggle"
-      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      title={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
-      {theme === "dark" ? <Sun className="h-4 w-4 text-primary" /> : <Moon className="h-4 w-4 text-primary" />}
+      {isDark ? (
+        <Sun className="h-4 w-4 text-primary" />
+      ) : (
+        <Moon className="h-4 w-4 text-primary" />
+      )}
     </Button>
   )
 }
