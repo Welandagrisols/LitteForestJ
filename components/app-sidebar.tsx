@@ -63,15 +63,15 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
       <SidebarHeader className="p-4 sticky top-0 bg-background border-b z-10">
         {/* Updated Header Content */}
         <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg" style={{backgroundColor: 'var(--littleforest-green)'}}>
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg" style={{backgroundColor: '#4CB76F'}}>
             <TreePine className="size-4 text-white" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
             <span className="font-semibold">
-              <span style={{color: 'var(--littleforest-orange)'}}>Little</span>
-              <span style={{color: 'var(--littleforest-green)'}}>Forest</span>
+              <span style={{color: '#FF7A29'}}>Little</span>
+              <span style={{color: '#4CB76F'}}>Forest</span>
             </span>
-            <span className="text-xs text-muted-foreground">Farm Management</span>
+            <span className="text-xs" style={{color: '#333333'}}>Farm Management</span>
           </div>
         </div>
       </SidebarHeader>
@@ -85,15 +85,41 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
                   <SidebarMenuButton
                     onClick={() => handleTabSelect(item.id)}
                     isActive={activeTab === item.id}
-                    // Updated styling for active state with exact green
                     className={cn(
-                      "transition-colors hover:bg-accent hover:text-accent-foreground rounded-lg",
-                      activeTab === item.id && "text-white hover:opacity-90 shadow-sm"
+                      "transition-all duration-200 rounded-lg group",
+                      activeTab === item.id 
+                        ? "text-white shadow-sm" 
+                        : "hover:bg-accent"
                     )}
-                    style={activeTab === item.id ? {backgroundColor: 'var(--littleforest-green)'} : {}}
+                    style={activeTab === item.id ? {backgroundColor: '#4CB76F'} : {}}
                   >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    <span>{item.title}</span>
+                    <item.icon 
+                      className="mr-2 h-4 w-4 transition-colors duration-200"
+                      style={
+                        activeTab === item.id 
+                          ? {color: 'white'} 
+                          : {color: '#4CB76F'}
+                      }
+                      onMouseEnter={(e) => {
+                        if (activeTab !== item.id) {
+                          e.currentTarget.style.color = '#FF7A29';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTab !== item.id) {
+                          e.currentTarget.style.color = '#4CB76F';
+                        }
+                      }}
+                    />
+                    <span 
+                      style={
+                        activeTab === item.id 
+                          ? {color: 'white'} 
+                          : {color: '#333333'}
+                      }
+                    >
+                      {item.title}
+                    </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react"
 import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, Package, ShoppingCart, Users, CheckSquare } from "lucide-react"
 import { demoInventory, demoSales } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 
@@ -29,6 +29,17 @@ export function DashboardTab() {
     sales: true,
   })
   const { toast } = useToast()
+
+  // Dummy data for increases, replace with actual calculations
+  const inventoryIncrease = 10;
+  const salesIncrease = 5;
+  const customerIncrease = 7;
+  const totals = {
+    inventory: inventorySummary.totalItems,
+    monthSales: salesSummary.totalAmount,
+    customers: 100, // Replace with actual customer data
+    pendingTasks: 5, // Replace with actual task data
+  }
 
   useEffect(() => {
     async function init() {
@@ -196,41 +207,49 @@ export function DashboardTab() {
   const tablesNotExist = !tablesExist.inventory || !tablesExist.sales
 
   return (
-    <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6">
+    <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6" style={{ background: '#FFFFFF' }}>
+      {/* Header */}
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight" style={{ color: '#333333' }}>Dashboard</h2>
+        <p style={{ color: '#666666' }}>
+          Overview of your farm operations
+        </p>
+      </div>
+
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card warm-card">
+        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Plants</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Total Plants</CardTitle>
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-primary">{inventorySummary.totalItems}</div>
+            <div className="text-lg sm:text-2xl lg:text-3xl font-bold" style={{ color: '#4CB76F' }}>{inventorySummary.totalItems}</div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card">
+        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Seedlings</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Total Seedlings</CardTitle>
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-primary">{inventorySummary.totalQuantity}</div>
+            <div className="text-lg sm:text-2xl lg:text-3xl font-bold" style={{ color: '#4CB76F' }}>{inventorySummary.totalQuantity}</div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card">
+        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Total Sales</CardTitle>
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-sm sm:text-xl lg:text-2xl font-bold text-secondary">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+            <div className="text-sm sm:text-xl lg:text-2xl font-bold" style={{ color: '#FF7A29' }}>Ksh {salesSummary.totalAmount.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card">
+        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Today's Sales</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Today's Sales</CardTitle>
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-secondary">{salesSummary.todaySales}</div>
+            <div className="text-lg sm:text-2xl lg:text-3xl font-bold" style={{ color: '#FF7A29' }}>{salesSummary.todaySales}</div>
           </CardContent>
         </Card>
       </div>
@@ -238,9 +257,9 @@ export function DashboardTab() {
       {/* Main Content - 2 Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         {/* Recent Sales */}
-        <Card className="mobile-card warm-card overflow-hidden">
-          <CardHeader className="bg-muted/30 px-3 py-3 sm:px-4 sm:py-4">
-            <CardTitle className="text-base sm:text-lg font-semibold">Recent Sales</CardTitle>
+        <Card className="brand-card overflow-hidden" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+          <CardHeader className="px-3 py-3 sm:px-4 sm:py-4" style={{ background: '#F5F5F5' }}>
+            <CardTitle className="text-base sm:text-lg font-semibold brand-section-heading" style={{ color: '#FF7A29' }}>Recent Sales</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -251,7 +270,7 @@ export function DashboardTab() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/50">
+                    <TableRow style={{ background: '#F5F5F5', color: '#333333' }}>
                       <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Date</TableHead>
                       <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Plant</TableHead>
                       <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Qty</TableHead>
@@ -261,10 +280,10 @@ export function DashboardTab() {
                   <TableBody>
                     {recentSales.map((sale) => (
                       <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-medium">{sale.inventory?.plant_name || "Unknown"}</TableCell>
-                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">{sale.quantity}</TableCell>
-                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-semibold">Ksh {sale.total_amount.toLocaleString()}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3" style={{ color: '#333333' }}>{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-medium" style={{ color: '#333333' }}>{sale.inventory?.plant_name || "Unknown"}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3" style={{ color: '#333333' }}>{sale.quantity}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-semibold" style={{ color: '#4CB76F' }}>Ksh {sale.total_amount.toLocaleString()}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -275,9 +294,12 @@ export function DashboardTab() {
         </Card>
 
         {/* Low Stock Items */}
-        <Card className="mobile-card warm-card overflow-hidden">
-          <CardHeader className="bg-muted/30 px-3 py-3 sm:px-4 sm:py-4">
-            <CardTitle className="text-base sm:text-lg font-semibold">Low Stock Items</CardTitle>
+        <Card className="brand-card overflow-hidden" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+          <CardHeader className="px-3 py-3 sm:px-4 sm:py-4" style={{ background: '#F5F5F5' }}>
+            <CardTitle className="text-base sm:text-lg font-semibold brand-section-heading" style={{ color: '#FF7A29' }}>Low Stock Items</CardTitle>
+            <CardDescription style={{ color: '#666666' }}>
+              Items that need restocking
+            </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -288,7 +310,7 @@ export function DashboardTab() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/50">
+                    <TableRow style={{ background: '#F5F5F5', color: '#333333' }}>
                       <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Plant</TableHead>
                       <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Quantity</TableHead>
                       <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Status</TableHead>
@@ -297,10 +319,10 @@ export function DashboardTab() {
                   <TableBody>
                     {lowStockItems.map((item) => (
                       <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-medium">{item.plant_name}</TableCell>
-                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">{item.quantity}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-medium" style={{ color: '#333333' }}>{item.plant_name}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3" style={{ color: '#333333' }}>{item.quantity}</TableCell>
                         <TableCell className="px-2 sm:px-4 py-2 sm:py-3">
-                          <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20 text-xs">
+                          <Badge variant="outline" style={{ background: '#FF7A291A', color: '#FF7A29', border: '#FF7A2940' }} className="text-xs">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Low Stock
                           </Badge>
