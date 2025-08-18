@@ -39,7 +39,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const getSession = async () => {
       try {
+        // Set a timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.log('Auth session timeout, setting loading to false')
+            setLoading(false)
+          }
+        }, 3000) // 3 second timeout
+
         const { data: { session }, error } = await supabase.auth.getSession()
+        
+        clearTimeout(timeoutId)
         
         if (mounted) {
           if (error) {

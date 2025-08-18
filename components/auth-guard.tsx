@@ -18,6 +18,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
         <div className="text-center space-y-4">
           <LoadingSpinner />
           <p className="text-sm text-muted-foreground">Authenticating...</p>
+          <p className="text-xs text-muted-foreground">
+            If this takes too long, please refresh the page
+          </p>
         </div>
       </div>
     )
