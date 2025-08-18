@@ -208,11 +208,6 @@ export function DashboardTab() {
 
   return (
     <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6" style={{ background: '#FFFFFF' }}>
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight" style={{ color: '#333333' }}>Dashboard</h2>
-      </div>
-
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
 
       {/* Summary Cards */}
