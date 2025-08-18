@@ -64,9 +64,9 @@ function AppContent() {
           <div className="ml-auto flex items-center gap-3 px-4">
             <div className="flex items-center space-x-2">
               <div className="w-6 h-6 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">LF</span>
+                <span className="text-white font-bold text-xs">AS</span>
               </div>
-              <span className="text-sm font-semibold text-foreground">LittleForest</span>
+              <span className="text-sm font-semibold text-foreground">Agrisols Systems</span>
             </div>
             <ThemeToggle />
           </div>

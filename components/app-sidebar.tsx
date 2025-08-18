@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -11,7 +10,8 @@ import {
   FileText,
   Settings,
   Globe,
-  LogOut
+  LogOut,
+  TreePine, // Import TreePine
 } from "lucide-react"
 
 import {
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
+import { cn } from "@/lib/utils" // Import cn for className merging
 
 const navigationItems = [
   { id: "dashboard", title: "Dashboard", icon: BarChart3 },
@@ -60,13 +61,14 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   return (
     <Sidebar>
       <SidebarHeader className="p-4 sticky top-0 bg-background border-b z-10">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">LF</span>
+        {/* Updated Header Content */}
+        <div className="flex items-center gap-2 px-2 py-1.5">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <TreePine className="size-4" />
           </div>
-          <div>
-            <h2 className="text-lg font-bold">LittleForest</h2>
-            <p className="text-xs text-muted-foreground">Farm Management</p>
+          <div className="flex flex-col gap-0.5 leading-none">
+            <span className="font-semibold">LittleForest</span>
+            <span className="text-xs">Farm Management</span>
           </div>
         </div>
       </SidebarHeader>
@@ -80,7 +82,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
                   <SidebarMenuButton
                     onClick={() => handleTabSelect(item.id)}
                     isActive={activeTab === item.id}
-                    className="w-full justify-start"
+                    // Updated styling for active state
+                    className={cn(
+                      "transition-colors hover:bg-accent hover:text-accent-foreground rounded-lg",
+                      activeTab === item.id && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                    )}
                   >
                     <item.icon className="mr-2 h-4 w-4" />
                     <span>{item.title}</span>
