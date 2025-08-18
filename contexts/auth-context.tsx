@@ -1,4 +1,3 @@
-
 "use client"
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
@@ -36,7 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     let mounted = true
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: NodeJS.Timeout | undefined
 
     const getSession = async () => {
       try {
@@ -48,7 +47,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }, 2000) // Reduced to 2 seconds
 
-        // Race the session check against the timeout
         const sessionPromise = supabase.auth.getSession()
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Auth timeout')), 1500)
@@ -58,43 +56,59 @@ export function AuthProvider({ children }: AuthProviderProps) {
           sessionPromise,
           timeoutPromise
         ]) as any
-        
+
         clearTimeout(timeoutId)
-        
+
         if (mounted) {
           if (error) {
-            console.error('Auth session error:', error)
+            console.error('Session error:', error)
+            setUser(null)
+            setSession(null)
+          } else {
+            setUser(session?.user ?? null)
+            setSession(session)
           }
-          setSession(session)
-          setUser(session?.user ?? null)
           setLoading(false)
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
         if (mounted) {
           clearTimeout(timeoutId)
+          setUser(null)
+          setSession(null)
           setLoading(false)
         }
       }
     }
 
+    // Always attempt to get session, but with quick fallback
     getSession()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (mounted) {
-          console.log('Auth state changed:', event, session?.user?.email)
-          setSession(session)
-          setUser(session?.user ?? null)
-          setLoading(false)
+    // Set up auth state listener with error handling
+    let subscription: any
+    try {
+      const { data } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (mounted) {
+            console.log('Auth state changed:', event)
+            setUser(session?.user ?? null)
+            setSession(session)
+            setLoading(false)
+          }
         }
+      )
+      subscription = data.subscription
+    } catch (error) {
+      console.error('Auth listener error:', error)
+      if (mounted) {
+        setLoading(false)
       }
-    )
+    }
 
     return () => {
       mounted = false
-      clearTimeout(timeoutId)
-      subscription.unsubscribe()
+      if (timeoutId) clearTimeout(timeoutId)
+      if (subscription) subscription.unsubscribe()
     }
   }, [])
 
