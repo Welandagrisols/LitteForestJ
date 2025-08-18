@@ -11,7 +11,7 @@ import {
   Settings,
   Globe,
   LogOut,
-  TreePine, // Import TreePine
+  Leaf, // Import Leaf
 } from "lucide-react"
 
 import {
@@ -64,7 +64,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
         {/* Updated Header Content */}
         <div className="flex items-center gap-2 px-2 py-1.5">
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg" style={{backgroundColor: '#4CB76F'}}>
-            <TreePine className="size-4 text-white" />
+            <Leaf className="size-4 text-white" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
             <span className="font-semibold">
