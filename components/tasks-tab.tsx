@@ -90,36 +90,59 @@ export function TasksTab() {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Tasks</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-primary">{totalTasks}</div>
+        <Card className="mobile-card bg-green-50 border-green-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-green-800">Total Tasks</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-900">{totalTasks}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Cost</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-secondary">Ksh {totalCost.toLocaleString()}</div>
+
+        <Card className="mobile-card bg-purple-50 border-purple-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-purple-800">Total Cost</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-900">Ksh {totalCost.toLocaleString()}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Completed</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-accent">{completedTasks}</div>
+
+        <Card className="mobile-card bg-blue-50 border-blue-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-blue-800">Completed</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-900">{completedTasks}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Average Cost</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-accent">Ksh {averageCost.toLocaleString()}</div>
+
+        <Card className="mobile-card bg-orange-50 border-orange-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-orange-800">Average Cost</p>
+                <p className="text-lg sm:text-2xl font-bold text-orange-900">Ksh {averageCost.toLocaleString()}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -183,11 +206,11 @@ export function TasksTab() {
       </div>
 
       {/* Tasks Table */}
-      <Card className="warm-card">
-        <CardHeader className="sage-header border-b border-border">
+      <Card>
+        <CardHeader>
           <CardTitle>Tasks</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <div className="text-center py-8">Loading tasks...</div>
           ) : filteredTasks.length === 0 ? (
@@ -195,10 +218,10 @@ export function TasksTab() {
               {tasks.length === 0 ? "No tasks found. Add your first task!" : "No tasks match your filters."}
             </div>
           ) : (
-            <ScrollArea className="h-[600px] w-full">
+            <div className="rounded-md border overflow-hidden">
               <Table>
               <TableHeader>
-                <TableRow className="sage-header">
+                <TableRow>
                   <TableHead className="min-w-[200px]">Task Details</TableHead>
                   <TableHead className="hidden md:table-cell">Date</TableHead>
                   <TableHead className="min-w-[120px]">Cost & Status</TableHead>
@@ -258,7 +281,7 @@ export function TasksTab() {
                 ))}
               </TableBody>
               </Table>
-            </ScrollArea>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -191,59 +191,84 @@ export function SalesTab() {
     <div className="space-y-6">
       {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />}
 
+      {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-secondary">Ksh {totalSales.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Seedlings Sold</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-secondary">{totalSeedlings.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">This Month</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-secondary">
-              {
-                sales.filter((sale) => {
-                  const saleDate = new Date(sale.sale_date)
-                  const now = new Date()
-                  return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
-                }).length
-              }
+        <Card className="mobile-card bg-green-50 border-green-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-green-800">Total Sales</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-900">Ksh {totalSales.toLocaleString()}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Avg Per Sale</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-secondary">
-              Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
+
+        <Card className="mobile-card bg-purple-50 border-purple-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-purple-800">Seedlings Sold</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-900">{totalSeedlings.toLocaleString()}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mobile-card bg-blue-50 border-blue-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-blue-800">This Month</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-900">
+                  {
+                    sales.filter((sale) => {
+                      const saleDate = new Date(sale.sale_date)
+                      const now = new Date()
+                      return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
+                    }).length
+                  }
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mobile-card bg-orange-50 border-orange-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-orange-800">Avg Per Sale</p>
+                <p className="text-lg sm:text-2xl font-bold text-orange-900">
+                  Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="warm-card rounded-lg shadow-sm overflow-hidden">
-        <div className="sticky top-0 z-10 bg-white border-b border-border p-6">
+      {/* Sales Table */}
+      <Card>
+        <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-2xl font-bold">Sales Records</h2>
+            <CardTitle className="text-2xl font-bold">Sales Records</CardTitle>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
-                className="flex items-center justify-center gap-2 w-full sm:w-auto bg-transparent"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
                 onClick={handleExportToExcel}
                 disabled={exporting || sales.length === 0}
               >
@@ -253,7 +278,7 @@ export function SalesTab() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="bg-secondary hover:bg-secondary/90 text-white w-full sm:w-auto"
+                    className="w-full sm:w-auto"
                     disabled={isDemoMode || !tableExists}
                     onClick={() => {
                       console.log("Record New Sale button clicked")
@@ -272,13 +297,12 @@ export function SalesTab() {
               </Dialog>
             </div>
           </div>
-        </div>
-
-        <div className="p-6">
-          <div className="rounded-md border border-border overflow-hidden">
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="sage-header hover:bg-muted/50">
+                <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Plant</TableHead>
                   <TableHead>Quantity</TableHead>
@@ -337,8 +361,8 @@ export function SalesTab() {
               </TableBody>
             </Table>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

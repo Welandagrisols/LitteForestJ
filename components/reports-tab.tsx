@@ -258,36 +258,59 @@ export function ReportsTab() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Batches</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-primary">{totalBatches}</div>
+        <Card className="mobile-card bg-green-50 border-green-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-green-800">Total Batches</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-900">{totalBatches}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-secondary">Ksh {totalRevenue.toLocaleString()}</div>
+
+        <Card className="mobile-card bg-purple-50 border-purple-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-purple-800">Total Revenue</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-900">Ksh {totalRevenue.toLocaleString()}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Profit</CardTitle>
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl font-bold text-accent">Ksh {totalProfit.toLocaleString()}</div>
+
+        <Card className="mobile-card bg-blue-50 border-blue-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-blue-800">Total Profit</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-900">Ksh {totalProfit.toLocaleString()}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Avg Profit Margin</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-accent">{averageProfitMargin.toFixed(1)}%</div>
+
+        <Card className="mobile-card bg-orange-50 border-orange-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-orange-800">Avg Profit Margin</p>
+                <p className="text-lg sm:text-2xl font-bold text-orange-900">{averageProfitMargin.toFixed(1)}%</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -306,11 +329,11 @@ export function ReportsTab() {
       </div>
 
       {/* Profitability Table */}
-      <Card className="warm-card">
-        <CardHeader className="sage-header border-b border-border">
+      <Card>
+        <CardHeader>
           <CardTitle>Profit Leaderboard</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <div className="text-center py-8">Loading profitability data...</div>
           ) : profitabilityData.length === 0 ? (
@@ -318,10 +341,10 @@ export function ReportsTab() {
               No profitability data available. Add inventory and tasks to see reports.
             </div>
           ) : (
-            <ScrollArea className="h-[600px] w-full">
+            <div className="rounded-md border overflow-hidden">
               <Table>
               <TableHeader>
-                <TableRow className="sage-header">
+                <TableRow>
                   <TableHead className="w-12">#</TableHead>
                   <TableHead className="min-w-[200px]">Plant & Batch</TableHead>
                   <TableHead className="min-w-[120px]">Performance</TableHead>
@@ -383,7 +406,7 @@ export function ReportsTab() {
                 ))}
               </TableBody>
               </Table>
-            </ScrollArea>
+            </div>
           )}
         </CardContent>
       </Card>

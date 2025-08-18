@@ -200,44 +200,60 @@ export function WebsiteIntegrationTab() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-full">
-                <Package className="h-5 w-5 text-white" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="mobile-card bg-blue-50 border-blue-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-blue-800">Total Products</p>
-                <p className="text-2xl font-bold text-blue-900">{websiteProducts.length}</p>
+                <p className="text-xs sm:text-sm font-medium text-blue-800">Total Products</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-900">{websiteProducts.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-green-50 border-green-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-600 rounded-full">
-                <Eye className="h-5 w-5 text-white" />
+        <Card className="mobile-card bg-green-50 border-green-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
+                <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-green-800">Listed</p>
-                <p className="text-2xl font-bold text-green-900">{listedCount}</p>
+                <p className="text-xs sm:text-sm font-medium text-green-800">Listed</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-900">{listedCount}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-50 border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-600 rounded-full">
-                <EyeOff className="h-5 w-5 text-white" />
+        <Card className="mobile-card bg-gray-50 border-gray-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-gray-600 rounded-full">
+                <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">Hidden</p>
-                <p className="text-2xl font-bold text-gray-900">{unlistedCount}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-800">Hidden</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{unlistedCount}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mobile-card bg-purple-50 border-purple-200">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
+                <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-purple-800">Visibility Rate</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-900">
+                  {websiteProducts.length > 0 ? Math.round((listedCount / websiteProducts.length) * 100) : 0}%
+                </p>
               </div>
             </div>
           </CardContent>
