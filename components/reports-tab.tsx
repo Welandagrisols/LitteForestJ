@@ -257,34 +257,34 @@ export function ReportsTab() {
       )}
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Batches</CardTitle>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Batches</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{totalBatches}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-primary">{totalBatches}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-secondary">Ksh {totalRevenue.toLocaleString()}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-secondary">Ksh {totalRevenue.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Profit</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Profit</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-accent">Ksh {totalProfit.toLocaleString()}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-accent">Ksh {totalProfit.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Avg Profit Margin</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Avg Profit Margin</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-accent">{averageProfitMargin.toFixed(1)}%</div>

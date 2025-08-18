@@ -191,29 +191,29 @@ export function SalesTab() {
     <div className="space-y-6">
       {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />}
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-secondary">Ksh {totalSales.toLocaleString()}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-secondary">Ksh {totalSales.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Seedlings Sold</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Seedlings Sold</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-secondary">{totalSeedlings.toLocaleString()}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-secondary">{totalSeedlings.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Sales This Month</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">This Month</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-secondary">
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-secondary">
               {
                 sales.filter((sale) => {
                   const saleDate = new Date(sale.sale_date)
@@ -221,6 +221,16 @@ export function SalesTab() {
                   return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
                 }).length
               }
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Avg Per Sale</CardTitle>
+          </CardHeader>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-secondary">
+              Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
             </div>
           </CardContent>
         </Card>

@@ -9,14 +9,14 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
   }
-  
+
   .line-clamp-2 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
-  
+
   .line-clamp-3 {
     overflow: hidden;
     display: -webkit-box;
@@ -78,12 +78,21 @@
 
   /* Mobile-optimized cards */
   .mobile-card {
+    @apply min-h-[80px] w-full;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid hsl(var(--border));
     background: hsl(var(--card));
     padding: 0.75rem;
     margin-bottom: 0.75rem;
+  }
+
+  .mobile-card .text-lg {
+    @apply leading-tight;
+  }
+
+  .mobile-card .text-xs {
+    @apply leading-none;
   }
 
   /* Enhanced mobile card hover states */
@@ -447,67 +456,6 @@
 
   .mobile-form-row {
     display: flex;
-
-
-  /* Mobile dialog improvements */
-  @media (max-width: 768px) {
-    .mobile-dialog .dialog-content {
-      margin: 0.5rem;
-      max-height: calc(100vh - 1rem);
-      width: calc(100vw - 1rem);
-    }
-    
-    /* Mobile form spacing */
-    .mobile-form-spacing {
-      padding: 1rem;
-      gap: 1rem;
-    }
-    
-    /* Mobile button improvements */
-    .mobile-button {
-      min-height: 44px;
-      min-width: 44px;
-      padding: 0.75rem 1rem;
-    }
-    
-    /* Mobile input improvements */
-    .mobile-input {
-      min-height: 44px;
-      font-size: 16px; /* Prevents zoom on iOS */
-    }
-    
-    /* Mobile card improvements */
-    .mobile-card {
-      margin: 0.5rem;
-      padding: 1rem;
-      border-radius: 0.5rem;
-    }
-    
-    /* Mobile table alternative */
-    .mobile-list-item {
-      display: block;
-      padding: 1rem;
-      border-bottom: 1px solid hsl(var(--border));
-      background: hsl(var(--card));
-    }
-    
-    .mobile-list-item:last-child {
-      border-bottom: none;
-    }
-  }
-
-  /* Touch-friendly improvements */
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  .mobile-touch-target {
-    min-height: 48px;
-    min-width: 48px;
-  }
-
-
     flex-direction: column;
     gap: 0.5rem;
   }
@@ -534,6 +482,64 @@
 
   .mobile-chart .recharts-wrapper {
     min-width: 300px;
+  }
+
+  /* Mobile dialog improvements */
+  @media (max-width: 768px) {
+    .mobile-dialog .dialog-content {
+      margin: 0.5rem;
+      max-height: calc(100vh - 1rem);
+      width: calc(100vw - 1rem);
+    }
+
+    /* Mobile form spacing */
+    .mobile-form-spacing {
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    /* Mobile button improvements */
+    .mobile-button {
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0.75rem 1rem;
+    }
+
+    /* Mobile input improvements */
+    .mobile-input {
+      min-height: 44px;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    /* Mobile card improvements */
+    .mobile-card {
+      margin: 0.5rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+    }
+
+    /* Mobile table alternative */
+    .mobile-list-item {
+      display: block;
+      padding: 1rem;
+      border-bottom: 1px solid hsl(var(--border));
+      background: hsl(var(--card));
+    }
+
+    .mobile-list-item:last-child {
+      border-bottom: none;
+    }
+  }
+
+  /* Touch-friendly improvements */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .mobile-touch-target {
+    min-height: 48px;
+    min-width: 48px;
   }
 }
 

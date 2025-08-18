@@ -28,6 +28,8 @@ interface InventoryStats {
   futurePlants: number
   totalConsumables: number
   categories: string[]
+  healthyPlants?: number; // Added for the new card
+  totalValue?: number; // Added for the new card
 }
 
 export function OpsTab() {
@@ -51,6 +53,8 @@ export function OpsTab() {
         futurePlants: 54,
         totalConsumables: 5,
         categories: ["Indigenous Trees", "Fruit Trees", "Ornamental Plants", "Medicinal Plants"],
+        healthyPlants: 9, // Demo data for new card
+        totalValue: 5000, // Demo data for new card
       })
       setLoading(false)
       return
@@ -70,12 +74,19 @@ export function OpsTab() {
 
       const categories = [...new Set(plants.map((item) => item.category).filter(Boolean))]
 
+      // Calculate healthy plants and total value
+      const healthyPlants = plants.filter((item) => item.health_status === "Healthy").length;
+      const totalValue = plants.reduce((sum, item) => sum + (item.value || 0), 0);
+
+
       setStats({
         totalPlants: plants.length,
         currentPlants: currentPlants.length,
         futurePlants: futurePlants.length,
         totalConsumables: consumables.length,
         categories,
+        healthyPlants,
+        totalValue,
       })
     } catch (error: any) {
       console.error("Error fetching stats:", error)
@@ -345,58 +356,61 @@ export function OpsTab() {
       </div>
 
       {/* Statistics Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-600 rounded-full">
-                <Package className="h-5 w-5 text-white" />
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="mobile-card">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">In Nursery</p>
-                <p className="text-2xl font-bold text-green-600">{loading ? "..." : stats.currentPlants}</p>
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Plants</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-600">{loading ? "..." : stats.totalPlants}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-full">
-                <FileText className="h-5 w-5 text-white" />
+        <Card className="mobile-card">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
+                <Database className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Future Plans</p>
-                <p className="text-2xl font-bold text-blue-600">{loading ? "..." : stats.futurePlants}</p>
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Categories</p>
+                <p className="text-lg sm:text-2xl font-bold text-orange-600">{loading ? "..." : stats.categories.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-600 rounded-full">
-                <TrendingUp className="h-5 w-5 text-white" />
+        <Card className="mobile-card">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Plants</p>
-                <p className="text-2xl font-bold text-purple-600">{loading ? "..." : stats.totalPlants}</p>
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Healthy Plants</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-600">{loading ? "..." : stats.healthyPlants}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-600 rounded-full">
-                <Database className="h-5 w-5 text-white" />
+        <Card className="mobile-card">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Categories</p>
-                <p className="text-2xl font-bold text-orange-600">{loading ? "..." : stats.categories.length}</p>
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Avg Value</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-600">
+                  {loading ? "..." : `Ksh ${stats.totalPlants > 0 ? Math.round(stats.totalValue / stats.totalPlants) : 0}`}
+                </p>
               </div>
             </div>
           </CardContent>

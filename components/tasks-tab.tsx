@@ -89,34 +89,34 @@ export function TasksTab() {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Tasks</CardTitle>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Tasks</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{totalTasks}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-primary">{totalTasks}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Cost</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Cost</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-secondary">Ksh {totalCost.toLocaleString()}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-secondary">Ksh {totalCost.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Completed</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-accent">{completedTasks}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl font-bold text-accent">{completedTasks}</div>
           </CardContent>
         </Card>
-        <Card className="warm-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Average Cost</CardTitle>
+        <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Average Cost</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-accent">Ksh {averageCost.toLocaleString()}</div>
