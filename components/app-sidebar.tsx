@@ -24,6 +24,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
@@ -46,10 +47,19 @@ interface AppSidebarProps {
 
 export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   const { signOut, user } = useAuth()
+  const { setOpenMobile, isMobile } = useSidebar()
+
+  const handleTabSelect = (tabId: string) => {
+    setActiveTab(tabId)
+    // Auto-close sidebar on mobile when tab is selected
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-4 sticky top-0 bg-background border-b z-10">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">LF</span>
@@ -68,7 +78,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => handleTabSelect(item.id)}
                     isActive={activeTab === item.id}
                     className="w-full justify-start"
                   >
@@ -82,7 +92,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 sticky bottom-0 bg-background border-t mt-auto">
         <div className="space-y-2">
           {user && (
             <div className="text-xs text-muted-foreground">
