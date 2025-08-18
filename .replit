@@ -20,7 +20,7 @@ localPort = 5000
 externalPort = 5000
 
 [workflows]
-runButton = "Quick Dev Start"
+runButton = "Simple Dev"
 
 [[workflows.workflow]]
 name = "Run Dev Server"
@@ -203,3 +203,12 @@ args = "npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev -- --hostname 0.0.0.0 --port 5000"
+
+[[workflows.workflow]]
+name = "Simple Dev"
+author = 46573247
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev -- --hostname 0.0.0.0 --port 5000 --turbo"
