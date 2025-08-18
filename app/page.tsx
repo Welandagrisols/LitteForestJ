@@ -57,11 +57,17 @@ function AppContent() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <h1 className="text-lg font-semibold">
+            <h1 className="text-lg font-semibold text-foreground">
               {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
             </h1>
           </div>
-          <div className="ml-auto px-4">
+          <div className="ml-auto flex items-center gap-3 px-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-green-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">LF</span>
+              </div>
+              <span className="text-sm font-semibold text-foreground">LittleForest</span>
+            </div>
             <ThemeToggle />
           </div>
         </header>
