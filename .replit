@@ -21,7 +21,7 @@ localPort = 5000
 externalPort = 5000
 
 [workflows]
-runButton = "Deploy Ready"
+runButton = "Build and Run"
 
 [[workflows.workflow]]
 name = "Run Dev Server"
