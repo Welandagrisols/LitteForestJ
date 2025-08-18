@@ -196,51 +196,51 @@ export function DashboardTab() {
   const tablesNotExist = !tablesExist.inventory || !tablesExist.sales
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6">
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="pb-2 px-0 pt-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Plants</CardTitle>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="mobile-card warm-card">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Plants</CardTitle>
           </CardHeader>
-          <CardContent className="px-0 pb-0">
-            <div className="text-2xl sm:text-3xl font-bold text-primary">{inventorySummary.totalItems}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-primary">{inventorySummary.totalItems}</div>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="pb-2 px-0 pt-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Seedlings</CardTitle>
+        <Card className="mobile-card warm-card">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Seedlings</CardTitle>
           </CardHeader>
-          <CardContent className="px-0 pb-0">
-            <div className="text-2xl sm:text-3xl font-bold text-primary">{inventorySummary.totalQuantity}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-primary">{inventorySummary.totalQuantity}</div>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="pb-2 px-0 pt-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
+        <Card className="mobile-card warm-card">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
           </CardHeader>
-          <CardContent className="px-0 pb-0">
-            <div className="text-xl sm:text-2xl font-bold text-secondary">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-sm sm:text-xl lg:text-2xl font-bold text-secondary">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="pb-2 px-0 pt-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Today's Sales</CardTitle>
+        <Card className="mobile-card warm-card">
+          <CardHeader className="pb-1 px-3 pt-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Today's Sales</CardTitle>
           </CardHeader>
-          <CardContent className="px-0 pb-0">
-            <div className="text-2xl sm:text-3xl font-bold text-secondary">{salesSummary.todaySales}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-2xl lg:text-3xl font-bold text-secondary">{salesSummary.todaySales}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content - 2 Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         {/* Recent Sales */}
-        <Card className="rounded-2xl shadow-md overflow-hidden">
-          <CardHeader className="bg-muted/50 px-4 py-4 sm:px-6">
-            <CardTitle className="text-lg font-semibold">Recent Sales</CardTitle>
+        <Card className="mobile-card warm-card overflow-hidden">
+          <CardHeader className="bg-muted/30 px-3 py-3 sm:px-4 sm:py-4">
+            <CardTitle className="text-base sm:text-lg font-semibold">Recent Sales</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -252,19 +252,19 @@ export function DashboardTab() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/30 hover:bg-muted/50">
-                      <TableHead className="text-sm font-medium px-4 py-3">Date</TableHead>
-                      <TableHead className="text-sm font-medium px-4 py-3">Plant</TableHead>
-                      <TableHead className="text-sm font-medium px-4 py-3">Qty</TableHead>
-                      <TableHead className="text-sm font-medium px-4 py-3">Amount</TableHead>
+                      <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Date</TableHead>
+                      <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Plant</TableHead>
+                      <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Qty</TableHead>
+                      <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Amount</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {recentSales.map((sale) => (
                       <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-sm px-4 py-3">{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-sm px-4 py-3 font-medium">{sale.inventory?.plant_name || "Unknown"}</TableCell>
-                        <TableCell className="text-sm px-4 py-3">{sale.quantity}</TableCell>
-                        <TableCell className="text-sm px-4 py-3 font-semibold">Ksh {sale.total_amount.toLocaleString()}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-medium">{sale.inventory?.plant_name || "Unknown"}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">{sale.quantity}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-semibold">Ksh {sale.total_amount.toLocaleString()}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -275,9 +275,9 @@ export function DashboardTab() {
         </Card>
 
         {/* Low Stock Items */}
-        <Card className="mobile-card mobile-table-wrapper rounded-2xl shadow-md overflow-hidden">
-          <CardHeader className="bg-muted/50 px-4 py-4 sm:px-6 mobile-section-header">
-            <CardTitle className="mobile-title text-lg font-semibold">Low Stock Items</CardTitle>
+        <Card className="mobile-card warm-card overflow-hidden">
+          <CardHeader className="bg-muted/30 px-3 py-3 sm:px-4 sm:py-4">
+            <CardTitle className="text-base sm:text-lg font-semibold">Low Stock Items</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -289,17 +289,17 @@ export function DashboardTab() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/30 hover:bg-muted/50">
-                      <TableHead className="text-sm font-medium px-4 py-3">Plant</TableHead>
-                      <TableHead className="text-sm font-medium px-4 py-3">Quantity</TableHead>
-                      <TableHead className="text-sm font-medium px-4 py-3">Status</TableHead>
+                      <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Plant</TableHead>
+                      <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Quantity</TableHead>
+                      <TableHead className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-2 sm:py-3">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {lowStockItems.map((item) => (
                       <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-sm px-4 py-3 font-medium">{item.plant_name}</TableCell>
-                        <TableCell className="text-sm px-4 py-3">{item.quantity}</TableCell>
-                        <TableCell className="px-4 py-3">
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-medium">{item.plant_name}</TableCell>
+                        <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">{item.quantity}</TableCell>
+                        <TableCell className="px-2 sm:px-4 py-2 sm:py-3">
                           <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20 text-xs">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Low Stock
