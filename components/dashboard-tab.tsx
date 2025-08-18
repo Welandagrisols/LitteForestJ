@@ -211,9 +211,6 @@ export function DashboardTab() {
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold tracking-tight" style={{ color: '#333333' }}>Dashboard</h2>
-        <p style={{ color: '#666666' }}>
-          Overview of your farm operations
-        </p>
       </div>
 
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
