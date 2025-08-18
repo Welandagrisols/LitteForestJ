@@ -36,18 +36,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     let mounted = true
+    let timeoutId: NodeJS.Timeout
 
     const getSession = async () => {
       try {
-        // Set a timeout to prevent infinite loading
-        const timeoutId = setTimeout(() => {
+        // Set a shorter timeout to prevent long loading
+        timeoutId = setTimeout(() => {
           if (mounted) {
             console.log('Auth session timeout, setting loading to false')
             setLoading(false)
           }
-        }, 3000) // 3 second timeout
+        }, 2000) // Reduced to 2 seconds
 
-        const { data: { session }, error } = await supabase.auth.getSession()
+        // Race the session check against the timeout
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Auth timeout')), 1500)
+        })
+
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any
         
         clearTimeout(timeoutId)
         
@@ -62,6 +72,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } catch (error) {
         console.error('Auth initialization error:', error)
         if (mounted) {
+          clearTimeout(timeoutId)
           setLoading(false)
         }
       }
@@ -82,6 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     return () => {
       mounted = false
+      clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [])

@@ -7,8 +7,15 @@
   "orientation": "portrait-primary",
   "background_color": "#FFF8EA",
   "theme_color": "#22A45D",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "edge_side_panel": {
+    "preferred_width": 412
+  },
   "categories": ["business", "productivity"],
   "prefer_related_applications": false,
+  "lang": "en",
+  "scope": "/",
+  "id": "littleforest-nursery-app",
   "icons": [
     {
       "src": "/icon-192x192.png",
