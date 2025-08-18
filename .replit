@@ -5,7 +5,8 @@ run = "npm run dev"
 channel = "stable-25_05"
 
 [deployment]
-run = ["sh", "-c", "npm run dev"]
+run = ["sh", "-c", "npm run start -- --hostname 0.0.0.0 --port 5000"]
+build = ["sh", "-c", "npm run build"]
 
 [[ports]]
 localPort = 3000
@@ -20,7 +21,7 @@ localPort = 5000
 externalPort = 5000
 
 [workflows]
-runButton = "Simple Dev"
+runButton = "Deploy Ready"
 
 [[workflows.workflow]]
 name = "Run Dev Server"
@@ -212,3 +213,20 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev -- --hostname 0.0.0.0 --port 5000 --turbo"
+
+[[workflows.workflow]]
+name = "Deploy Ready"
+author = 46573247
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run start -- --hostname 0.0.0.0 --port 5000"
