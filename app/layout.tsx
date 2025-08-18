@@ -1,29 +1,23 @@
 
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/contexts/auth-context"
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  display: 'swap'
-})
-
 export const metadata: Metadata = {
-  title: "Plant Nursery Management",
-  description: "Manage your plant nursery operations",
+  title: "LittleForest Nursery Management",
+  description: "Comprehensive nursery management system for inventory, sales, and operations",
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className="font-sans antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
