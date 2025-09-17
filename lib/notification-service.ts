@@ -73,6 +73,11 @@ class NotificationService {
         .eq('completed', false)
 
       if (error) {
+        // If due_date column doesn't exist, skip this check
+        if (error.code === '42703' && error.message.includes('due_date')) {
+          console.log('Due date column not found in tasks table, skipping due task notifications')
+          return
+        }
         console.error('Error checking due tasks:', error)
         return
       }
