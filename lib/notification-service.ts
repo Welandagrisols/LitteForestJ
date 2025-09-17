@@ -68,7 +68,8 @@ class NotificationService {
       const { data: tasks, error } = await supabase
         .from('tasks')
         .select('*')
-        .eq('due_date', today)
+        .lte('due_date', today)
+        .neq('status', 'Completed')
         .eq('completed', false)
 
       if (error) {

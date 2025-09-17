@@ -265,171 +265,173 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
   return (
     <div className="flex flex-col h-[70vh] max-h-[600px]">
       <div className="flex-1 overflow-y-auto pr-2">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="inventory_id">Select Plant/Seedling *</Label>
-            <Select
-              value={formData.inventory_id}
-              onValueChange={(value) => {
-                handleSelectChange("inventory_id", value);
-                setValue("inventory_id", value); // Update react-hook-form
-              }}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select plant from inventory" />
-              </SelectTrigger>
-              <SelectContent>
-                {inventory.map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.plant_name} - {item.quantity} available - Ksh {item.price}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="quantity">Quantity *</Label>
-            <Input
-              id="quantity"
-              type="number"
-              min="1"
-              max={selectedItem?.quantity || 1}
-              value={formData.quantity}
-              {...register("quantity", { required: "Quantity is required", min: { value: 1, message: "Quantity must be at least 1" } })}
-              onChange={(e) => {
-                handleChange(e);
-                setValue("quantity", Number(e.target.value)); // Update react-hook-form
-              }}
-              required
-            />
-            {selectedItem && (
-              <p className="text-sm text-muted-foreground">
-                Available: {selectedItem.quantity} | Price per unit: Ksh {selectedItem.price}
-              </p>
-            )}
-            {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="sale_date">Sale Date *</Label>
-            <Input
-              id="sale_date"
-              type="date"
-              value={formData.sale_date}
-              {...register("sale_date", { required: "Sale date is required" })}
-              onChange={(e) => {
-                handleChange(e);
-                setValue("sale_date", e.target.value); // Update react-hook-form
-              }}
-              required
-            />
-            {errors.sale_date && <p className="text-red-500 text-sm">{errors.sale_date.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="total_amount">Total Amount (Ksh) *</Label>
-            <Input
-              id="total_amount"
-              type="number"
-              value={formData.total_amount}
-              readOnly
-              className="bg-muted"
-              {...register("total_amount", { required: "Total amount is required" })}
-            />
-            {errors.total_amount && <p className="text-red-500 text-sm">{errors.total_amount.message}</p>}
-          </div>
-
-          <div className="flex items-center space-x-2 pt-2">
-            <Checkbox
-              id="new-customer"
-              checked={isNewCustomer}
-              onCheckedChange={(checked) => {
-                setIsNewCustomer(checked === true);
-              }}
-            />
-            <Label htmlFor="new-customer">Add new customer</Label>
-          </div>
-
-          {isNewCustomer ? (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="customer_name">Customer Name *</Label>
-                <Input
-                  id="customer_name"
-                  value={formData.customer_name}
-                  {...register("customer_name", { required: isNewCustomer ? "Customer name is required" : false })}
-                  onChange={(e) => {
-                    handleChange(e);
-                    setValue("customer_name", e.target.value); // Update react-hook-form
-                  }}
-                  required={isNewCustomer}
-                />
-                {errors.customer_name && <p className="text-red-500 text-sm">{errors.customer_name.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="customer_contact">Customer Contact *</Label>
-                <Input
-                  id="customer_contact"
-                  value={formData.customer_contact}
-                  {...register("customer_contact", { required: isNewCustomer ? "Customer contact is required" : false })}
-                  onChange={(e) => {
-                    handleChange(e);
-                    setValue("customer_contact", e.target.value); // Update react-hook-form
-                  }}
-                  required={isNewCustomer}
-                />
-                {errors.customer_contact && <p className="text-red-500 text-sm">{errors.customer_contact.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="customer_email">Customer Email</Label>
-                <Input
-                  id="customer_email"
-                  type="email"
-                  value={formData.customer_email}
-                  {...register("customer_email")}
-                  onChange={(e) => {
-                    handleChange(e);
-                    setValue("customer_email", e.target.value); // Update react-hook-form
-                  }}
-                />
-              </div>
-            </>
-          ) : (
+        <form id="add-sale-form" onSubmit={handleFormSubmit(handleSubmit)}>
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="customer_id">Select Customer (Optional)</Label>
-              <Select value={formData.customer_id} onValueChange={(value) => {
-                handleSelectChange("customer_id", value);
-                setValue("customer_id", value); // Update react-hook-form
-              }}>
+              <Label htmlFor="inventory_id">Select Plant/Seedling *</Label>
+              <Select
+                value={formData.inventory_id}
+                onValueChange={(value) => {
+                  handleSelectChange("inventory_id", value);
+                  setValue("inventory_id", value); // Update react-hook-form
+                }}
+                required
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select existing customer" />
+                  <SelectValue placeholder="Select plant from inventory" />
                 </SelectTrigger>
                 <SelectContent>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name} - {customer.contact}
+                  {inventory.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.plant_name} - {item.quantity} available - Ksh {item.price}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-          )}
-        </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantity *</Label>
+              <Input
+                id="quantity"
+                type="number"
+                min="1"
+                max={selectedItem?.quantity || 1}
+                value={formData.quantity}
+                {...register("quantity", { required: "Quantity is required", min: { value: 1, message: "Quantity must be at least 1" } })}
+                onChange={(e) => {
+                  handleChange(e);
+                  setValue("quantity", Number(e.target.value)); // Update react-hook-form
+                }}
+                required
+              />
+              {selectedItem && (
+                <p className="text-sm text-muted-foreground">
+                  Available: {selectedItem.quantity} | Price per unit: Ksh {selectedItem.price}
+                </p>
+              )}
+              {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sale_date">Sale Date *</Label>
+              <Input
+                id="sale_date"
+                type="date"
+                value={formData.sale_date}
+                {...register("sale_date", { required: "Sale date is required" })}
+                onChange={(e) => {
+                  handleChange(e);
+                  setValue("sale_date", e.target.value); // Update react-hook-form
+                }}
+                required
+              />
+              {errors.sale_date && <p className="text-red-500 text-sm">{errors.sale_date.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="total_amount">Total Amount (Ksh) *</Label>
+              <Input
+                id="total_amount"
+                type="number"
+                value={formData.total_amount}
+                readOnly
+                className="bg-muted"
+                {...register("total_amount", { required: "Total amount is required" })}
+              />
+              {errors.total_amount && <p className="text-red-500 text-sm">{errors.total_amount.message}</p>}
+            </div>
+
+            <div className="flex items-center space-x-2 pt-2">
+              <Checkbox
+                id="new-customer"
+                checked={isNewCustomer}
+                onCheckedChange={(checked) => {
+                  setIsNewCustomer(checked === true);
+                }}
+              />
+              <Label htmlFor="new-customer">Add new customer</Label>
+            </div>
+
+            {isNewCustomer ? (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="customer_name">Customer Name *</Label>
+                  <Input
+                    id="customer_name"
+                    value={formData.customer_name}
+                    {...register("customer_name", { required: isNewCustomer ? "Customer name is required" : false })}
+                    onChange={(e) => {
+                      handleChange(e);
+                      setValue("customer_name", e.target.value); // Update react-hook-form
+                    }}
+                    required={isNewCustomer}
+                  />
+                  {errors.customer_name && <p className="text-red-500 text-sm">{errors.customer_name.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customer_contact">Customer Contact *</Label>
+                  <Input
+                    id="customer_contact"
+                    value={formData.customer_contact}
+                    {...register("customer_contact", { required: isNewCustomer ? "Customer contact is required" : false })}
+                    onChange={(e) => {
+                      handleChange(e);
+                      setValue("customer_contact", e.target.value); // Update react-hook-form
+                    }}
+                    required={isNewCustomer}
+                  />
+                  {errors.customer_contact && <p className="text-red-500 text-sm">{errors.customer_contact.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customer_email">Customer Email</Label>
+                  <Input
+                    id="customer_email"
+                    type="email"
+                    value={formData.customer_email}
+                    {...register("customer_email")}
+                    onChange={(e) => {
+                      handleChange(e);
+                      setValue("customer_email", e.target.value); // Update react-hook-form
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="customer_id">Select Customer (Optional)</Label>
+                <Select value={formData.customer_id} onValueChange={(value) => {
+                  handleSelectChange("customer_id", value);
+                  setValue("customer_id", value); // Update react-hook-form
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select existing customer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {customer.name} - {customer.contact}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        </form>
       </div>
 
       <div className="border-t border-border bg-white pt-4 mt-4">
         <div className="flex justify-end gap-2">
           <Button
-            type="submit" // Changed to type="submit"
-            onClick={handleFormSubmit(handleSubmit)} // Use handleFormSubmit from react-hook-form
-            className="bg-secondary hover:bg-secondary/90 text-white"
-            disabled={loading}
+            type="submit"
+            form="add-sale-form"
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white"
+            disabled={loading || isDemoMode}
           >
-            {loading ? "Recording..." : "Record Sale"}
+            {loading ? "Recording Sale..." : "Record Sale"}
           </Button>
         </div>
       </div>
