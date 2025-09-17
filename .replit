@@ -230,3 +230,6 @@ args = "npm run build"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run start -- --hostname 0.0.0.0 --port 5000"
+
+[agent]
+expertMode = true
