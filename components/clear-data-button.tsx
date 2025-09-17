@@ -34,7 +34,7 @@ export function ClearDataButton({ onDataCleared }: ClearDataButtonProps) {
       const salesResult = await supabase
         .from('sales')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all records
+        .not('id', 'is', null) // Delete all records by matching all with non-null IDs
 
       if (salesResult.error) {
         throw new Error(`Failed to clear sales: ${salesResult.error.message}`)
@@ -44,7 +44,7 @@ export function ClearDataButton({ onDataCleared }: ClearDataButtonProps) {
       const customersResult = await supabase
         .from('customers')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all records
+        .not('id', 'is', null) // Delete all records by matching all with non-null IDs
 
       if (customersResult.error) {
         throw new Error(`Failed to clear customers: ${customersResult.error.message}`)
@@ -54,7 +54,7 @@ export function ClearDataButton({ onDataCleared }: ClearDataButtonProps) {
       const inventoryResult = await supabase
         .from('inventory')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all records
+        .not('id', 'is', null) // Delete all records by matching all with non-null IDs
 
       if (inventoryResult.error) {
         throw new Error(`Failed to clear inventory: ${inventoryResult.error.message}`)
