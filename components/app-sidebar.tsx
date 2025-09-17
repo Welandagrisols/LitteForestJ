@@ -71,7 +71,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
               <span style={{color: '#FF7A29'}}>Little</span>
               <span style={{color: '#4CB76F'}}>Forest</span>
             </span>
-            <span className="text-xs" style={{color: '#333333'}}>Farm Management</span>
+            <span className="text-xs" style={{color: '#4CB76F'}}>Agrisols Systems</span>
           </div>
         </div>
       </SidebarHeader>
