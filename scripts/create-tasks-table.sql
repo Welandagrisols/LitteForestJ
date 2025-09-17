@@ -1,6 +1,9 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Add due_date column to existing tasks table if it doesn't exist
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS due_date DATE;
+
 -- Create tasks table
 CREATE TABLE IF NOT EXISTS public.tasks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

@@ -18,7 +18,7 @@ async function checkAllFeatures() {
   // Check database connectivity
   console.log('1. Database Connectivity')
   try {
-    const { data, error } = await supabase.from('inventory').select('count(*)').single()
+    const { data, error } = await supabase.from('inventory').select('id').limit(1)
     if (error) throw error
     console.log('   ✅ Database connection successful\n')
   } catch (error) {
