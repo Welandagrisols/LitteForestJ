@@ -10,18 +10,14 @@ build = ["sh", "-c", "npm run build"]
 
 [[ports]]
 localPort = 3000
-externalPort = 80
-
-[[ports]]
-localPort = 3001
-externalPort = 3001
+externalPort = 3000
 
 [[ports]]
 localPort = 5000
-externalPort = 5000
+externalPort = 80
 
 [workflows]
-runButton = "Build and Run"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Run Dev Server"
@@ -111,108 +107,29 @@ args = "npm run start -- --hostname 0.0.0.0 --port 5000"
 
 [[workflows.workflow]]
 name = "Development Server"
-author = 45839792
+author = "agent"
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm install"
+args = "env -u PORT npm run dev:3000"
+waitForPort = 5000
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 3000"
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[workflows.workflow]]
-name = "Production Build"
-author = 45883764
+name = "Development Server"
+author = "agent"
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm install"
+args = "npm run dev"
+waitForPort = 5000
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run start -- --hostname 0.0.0.0 --port 3000"
-
-[[workflows.workflow]]
-name = "Clean Dev Server"
-author = 46567467
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm install"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 5000"
-
-[[workflows.workflow]]
-name = "Fresh Dev Server"
-author = 46567467
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 5000"
-
-[[workflows.workflow]]
-name = "Clean Dev Start"
-author = 46567467
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 3000"
-
-[[workflows.workflow]]
-name = "Clean Start"
-author = 46567467
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 5000"
-
-[[workflows.workflow]]
-name = "Dev Server"
-author = 46570902
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm install"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 3000"
-
-[[workflows.workflow]]
-name = "Quick Dev Start"
-author = 46573247
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm install"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 5000"
-
-[[workflows.workflow]]
-name = "Simple Dev"
-author = 46573247
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --hostname 0.0.0.0 --port 5000 --turbo"
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[workflows.workflow]]
 name = "Deploy Ready"
@@ -230,6 +147,31 @@ args = "npm run build"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run start -- --hostname 0.0.0.0 --port 5000"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Development Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Next Dev Server"
+
+[[workflows.workflow]]
+name = "Next Dev Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 3000
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 expertMode = true
