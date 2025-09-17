@@ -1,5 +1,16 @@
 
-const { supabase } = require('../lib/supabase')
+const { createClient } = require('@supabase/supabase-js')
+
+// Environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Missing Supabase environment variables')
+  process.exit(1)
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function checkAllFeatures() {
   console.log('🔍 Checking all LittleForest features...\n')
