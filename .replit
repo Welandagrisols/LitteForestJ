@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web"]
+modules = ["nodejs-20", "web", "postgresql-16"]
 run = "npm run dev"
 
 [nix]
@@ -106,32 +106,6 @@ task = "shell.exec"
 args = "npm run start -- --hostname 0.0.0.0 --port 5000"
 
 [[workflows.workflow]]
-name = "Development Server"
-author = "agent"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "env -u PORT npm run dev:3000"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[workflows.workflow]]
-name = "Development Server"
-author = "agent"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[workflows.workflow]]
 name = "Deploy Ready"
 author = 46573247
 mode = "sequential"
@@ -152,10 +126,6 @@ args = "npm run start -- --hostname 0.0.0.0 --port 5000"
 name = "Project"
 mode = "parallel"
 author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Development Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
