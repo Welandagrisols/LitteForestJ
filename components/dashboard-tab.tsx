@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { AlertCircle, Package, ShoppingCart, Users, CheckSquare } from "lucide-react"
 import { demoInventory, demoSales } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
+import { MobileFeatures } from "./mobile-features"
 
 export function DashboardTab() {
   const [inventorySummary, setInventorySummary] = useState({
@@ -209,6 +210,8 @@ export function DashboardTab() {
   return (
     <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6" style={{ background: '#FFFFFF' }}>
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
+
+      <MobileFeatures />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
