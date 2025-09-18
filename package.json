@@ -12,6 +12,7 @@
     "mobile:android": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/device": "^7.0.2",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
