@@ -49,7 +49,10 @@ export function MobileFeatures() {
         alert(`Device: ${info.model}\nPlatform: ${info.platform}\nOS: ${info.operatingSystem}`)
       } catch (error) {
         console.error('Device info error:', error)
+        alert('Device info not available in development mode')
       }
+    } else {
+      alert('Device features only available in mobile app')
     }
   }
 
