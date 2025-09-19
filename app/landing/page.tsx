@@ -74,13 +74,13 @@ export default async function LandingPage() {
             className="h-16 w-auto mb-2"
             priority
           />
-          <p className="text-primary text-lg font-medium">Agrisols Farm Management System</p>
+          <p className="text-primary text-lg font-medium">Agrisols Systems</p>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-center mb-4">Welcome to Little Forest Nursery</h1>
-        <p className="text-xl text-muted-foreground text-center mb-12">Powered by Agrisols Farm Management System</p>
+        <p className="text-xl text-muted-foreground text-center mb-12">Powered by Agrisols Systems</p>
 
         <div className="max-w-4xl mx-auto mb-16">
           <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
@@ -137,7 +137,7 @@ export default async function LandingPage() {
       <footer className="warm-header border-t border-border mt-12 py-6">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Little Forest Nursery. All rights reserved.</p>
-          <p className="text-sm mt-1">Powered by Agrisols Farm Management System</p>
+          <p className="text-sm mt-1">Powered by Agrisols Systems</p>
         </div>
       </footer>
     </div>

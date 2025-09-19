@@ -18,7 +18,7 @@ export default function SetupPage() {
             className="h-14 w-auto mb-2"
             priority
           />
-          <div className="text-primary font-medium">Agrisols Farm Management System</div>
+          <div className="text-primary font-medium">Agrisols Systems</div>
           <h1 className="text-2xl font-bold mt-2">Database Setup Guide</h1>
         </div>
       </header>
@@ -29,7 +29,7 @@ export default function SetupPage() {
             <h2 className="text-xl font-semibold mb-2">Welcome to the Farm Management System</h2>
             <p className="text-muted-foreground">
               Follow this guide to set up your database and start managing your nursery inventory, sales, and customers
-              with Agrisols Farm Management System.
+              with Agrisols Systems.
             </p>
           </div>
 

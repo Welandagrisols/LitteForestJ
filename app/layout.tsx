@@ -6,7 +6,7 @@ import { AuthProvider } from "@/contexts/auth-context"
 
 export const metadata: Metadata = {
   title: "LittleForest Nursery Management",
-  description: "Comprehensive nursery management system for inventory, sales, and operations",
+  description: "Comprehensive nursery management system by Agrisols Systems for inventory, sales, and operations",
 }
 
 export default function RootLayout({
