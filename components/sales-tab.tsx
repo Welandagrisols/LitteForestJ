@@ -46,14 +46,17 @@ export function SalesTab() {
   useEffect(() => {
     async function init() {
       if (isDemoMode) {
+        console.log("In demo mode, loading demo sales")
         loadDemoSales()
         return
       }
 
       const exists = await checkTableExists("sales")
+      console.log("Sales table exists:", exists)
       setTableExists(exists)
 
       if (!exists) {
+        console.log("Sales table does not exist, loading demo data")
         loadDemoSales()
         return
       }
@@ -283,14 +286,15 @@ export function SalesTab() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="w-full sm:w-auto"
-                    disabled={isDemoMode || !tableExists}
+                    className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
+                    disabled={loading || isDemoMode || !tableExists}
                     onClick={() => {
                       console.log("Record New Sale button clicked")
+                      console.log("Button state - isDemoMode:", isDemoMode, "tableExists:", tableExists)
                       setDialogOpen(true)
                     }}
                   >
-                    Record New Sale
+                    + Add Sale
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
