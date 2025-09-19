@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "main": "App.tsx",
   "scripts": {
-    "start": "npx expo start",
-    "dev": "npx expo start",
-    "android": "npx expo start --android",
-    "ios": "npx expo start --ios",
-    "web": "npx expo start --web",
-    "build:android": "npx eas build --platform android",
-    "build:apk": "npx eas build --platform android --profile preview"
+    "start": "next start",
+    "dev": "next dev",
+    "build": "next build && next export",
+    "mobile:build": "node scripts/build-mobile.js",
+    "mobile:dev": "node scripts/mobile-dev.js",
+    "build:apk": "node scripts/build-apk.js",
+    "android": "npx cap run android",
+    "ios": "npx cap run ios",
+    "sync": "npx cap sync"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
