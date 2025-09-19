@@ -189,7 +189,12 @@ export function SalesTab() {
 
   return (
     <div className="space-y-6">
-      {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />}
+      {(isDemoMode || !tableExists) && (
+        <DemoModeBanner 
+          isDemoMode={isDemoMode} 
+          connectionStatus={isDemoMode ? 'demo' : (!tableExists ? 'connecting' : 'connected')} 
+        />
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
