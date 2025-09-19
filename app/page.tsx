@@ -66,7 +66,7 @@ function AppContent() {
               <div className="w-6 h-6 bg-green-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xs">AS</span>
               </div>
-              <span className="text-sm font-semibold text-foreground">Agrisols Systems</span>
+              <span className="text-sm font-semibold" style={{color: '#4CB76F'}}>Agrisols Systems</span>
             </div>
             <ThemeToggle />
           </div>
