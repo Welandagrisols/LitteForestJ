@@ -211,8 +211,6 @@ export function DashboardTab() {
     <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6" style={{ background: '#FFFFFF' }}>
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={tablesNotExist} />}
 
-      <MobileFeatures />
-
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
