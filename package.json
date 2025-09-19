@@ -24,7 +24,9 @@
     "react-native-screens": "3.31.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@expo/cli": "latest",
+    "expo-config": "latest"
   },
   "private": true
 }
