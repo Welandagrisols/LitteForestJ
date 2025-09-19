@@ -192,5 +192,22 @@ args = "npm install"
 task = "shell.exec"
 args = "npm run build:apk"
 
+[[workflows.workflow]]
+name = "Build Native Android APK"
+author = 44797703
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo install --fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx eas build --platform android --profile preview"
+
 [agent]
 expertMode = true
