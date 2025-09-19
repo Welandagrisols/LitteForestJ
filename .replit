@@ -183,5 +183,18 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run build:apk"
 
+[[workflows.workflow]]
+name = "Build Native APK"
+author = 44797703
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build:apk"
+
 [agent]
 expertMode = true
