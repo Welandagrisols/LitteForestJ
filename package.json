@@ -64,7 +64,7 @@
     "lucide-react": "^0.454.0",
     "next": "^14.2.30",
     "next-themes": "latest",
-    "react": "18.2.0",
+    "react": "^18.3.1",
     "react-day-picker": "latest",
     "react-dom": "^18",
     "react-hook-form": "latest",
@@ -83,8 +83,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@expo/cli": "latest",
-    "@expo/eas-cli": "latest",
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
