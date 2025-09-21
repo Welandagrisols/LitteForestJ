@@ -1,16 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure for Replit environment
-  async rewrites() {
-    return []
-  },
-  // Allow all hosts for Replit proxy
-  allowedHosts: [
-    '.replit.dev',
-    '.repl.co',
-    'localhost',
-    '0.0.0.0',
-  ],
+  // Configure for Replit environment - allow all dev origins
+  allowedDevOrigins: ['*'],
   eslint: {
     ignoreDuringBuilds: true,
   },
