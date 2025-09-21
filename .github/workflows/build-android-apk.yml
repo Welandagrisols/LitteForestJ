@@ -1,0 +1,81 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🏗 Setup repo
+      uses: actions/checkout@v4
+
+    - name: 🏗 Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: npm
+
+    - name: 🏗 Setup EAS
+      uses: expo/expo-github-action@v8
+      with:
+        eas-version: latest
+        token: ${{ secrets.EXPO_TOKEN }}
+
+    - name: 📦 Install dependencies
+      run: npm install --legacy-peer-deps
+
+    - name: 🚀 Build Android APK
+      run: eas build --platform android --profile preview --local --output ./LittleForest-app.apk --non-interactive
+
+    - name: 📁 Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: littleforest-android-apk-${{ github.run_number }}
+        path: ./LittleForest-app.apk
+        retention-days: 30
+        compression-level: 0
+
+    - name: 📦 Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        release_name: LittleForest Android APK v1.0.${{ github.run_number }}
+        body: |
+          🌱 **LittleForest Nursery Management App - Android APK**
+          
+          📱 Ready to install on your Android device!
+          
+          **What's included:**
+          - Full nursery management features
+          - Inventory tracking
+          - Sales management
+          - Customer database
+          - Offline functionality
+          - Supabase integration
+          
+          **To install:**
+          1. Download the APK file below
+          2. Enable "Install from unknown sources" in Android settings
+          3. Install the APK on your device
+          
+          Built on: ${{ github.event.head_commit.timestamp }}
+          Commit: ${{ github.sha }}
+        draft: false
+        prerelease: false
+
+    - name: 📤 Upload APK to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./LittleForest-app.apk
+        asset_name: LittleForest-Nursery-Management.apk
+        asset_content_type: application/vnd.android.package-archive
