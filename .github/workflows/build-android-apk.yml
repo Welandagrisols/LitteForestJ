@@ -35,6 +35,16 @@ jobs:
     - name: 📦 Install dependencies
       run: npm install --legacy-peer-deps
 
+    - name: 🔧 Configure EAS Project
+      run: |
+        # Initialize EAS project if not already configured
+        if ! eas project:info >/dev/null 2>&1; then
+          echo "Initializing EAS project..."
+          eas init --id $(uuidgen) --non-interactive
+        else
+          echo "EAS project already configured"
+        fi
+
     - name: 🚀 Build APK with EAS
       run: |
         eas build --platform android --profile ${{ inputs.build_profile }} --non-interactive
