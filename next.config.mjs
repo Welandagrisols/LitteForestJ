@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure for Replit environment - allow all dev origins
-  allowedDevOrigins: ['*'],
+  // Configure for Replit environment - allow dev origins only in development
+  allowedDevOrigins: process.env.NODE_ENV === 'development' ? ['*'] : [],
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -14,7 +14,9 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ['*']
+      allowedOrigins: process.env.NODE_ENV === 'production' 
+        ? ['https://www.littleforest.co.ke'] 
+        : ['*']
     }
   },
   async headers() {

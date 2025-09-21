@@ -156,7 +156,7 @@
   }
 
   .mobile-subtitle {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
     color: hsl(var(--muted-foreground));
     line-height: 1.4;
@@ -172,7 +172,7 @@
   }
 
   .mobile-stat-label {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -207,7 +207,7 @@
     padding: 0.875rem 1.5rem;
     border-radius: 12px;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 1rem;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
     transition: all 0.2s ease;
   }

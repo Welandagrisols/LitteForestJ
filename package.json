@@ -5,7 +5,7 @@
   "scripts": {
     "start": "next start",
     "dev": "next dev",
-    "build": "next build && next export",
+    "build": "next build",
     "mobile:build": "node scripts/build-mobile.js",
     "mobile:dev": "node scripts/mobile-dev.js",
     "build:apk": "node scripts/build-apk.js",
