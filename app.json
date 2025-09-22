@@ -1,11 +1,14 @@
-
 {
   "expo": {
     "name": "LittleForest",
     "slug": "littleforest-app",
     "version": "1.0.0",
     "owner": "welandagrisols",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "orientation": "portrait",
     "icon": "./public/icon-512x512.png",
     "userInterfaceStyle": "light",
@@ -35,6 +38,11 @@
     },
     "plugins": [],
     "scheme": "littleforest",
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "eas": {
+        "projectId": "littleforest-mobile-app"
+      }
+    }
   }
 }
