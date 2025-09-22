@@ -17,10 +17,6 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 8000
-externalPort = 8000
-
-[[ports]]
 localPort = 36175
 externalPort = 3001
 
@@ -29,11 +25,15 @@ localPort = 39315
 externalPort = 3002
 
 [[ports]]
+localPort = 44781
+externalPort = 4200
+
+[[ports]]
 localPort = 46171
 externalPort = 3003
 
 [workflows]
-runButton = "Mobile Development Server"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Run Dev Server"
@@ -204,6 +204,14 @@ author = "agent"
 task = "workflow.run"
 args = "Expo Development Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Web Development Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Expo Web Server"
+
 [[workflows.workflow]]
 name = "Expo Development Server"
 author = "agent"
@@ -270,6 +278,30 @@ args = "npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx @expo/eas-cli@latest build --platform android --profile preview --non-interactive"
+
+[[workflows.workflow]]
+name = "Web Development Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo start --web --localhost --port 8081 & npx serve -s dist -l 5000"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow]]
+name = "Expo Web Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash -c 'npx expo start --web --localhost & sleep 10 && npx serve -s dist -l 5000'"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [agent]
 expertMode = true
