@@ -1,3 +1,4 @@
+
 name: Build Android APK
 
 on:
@@ -33,27 +34,29 @@ jobs:
         token: ${{ secrets.EXPO_TOKEN }}
 
     - name: 📦 Install dependencies
-      run: npm install --legacy-peer-deps
+      run: |
+        npm ci --legacy-peer-deps
+        npx expo install --fix
 
     - name: 🔧 Configure EAS Project
       run: |
-        # Check if EAS project is configured, if not initialize it
-        if ! eas project:info >/dev/null 2>&1; then
+        # Check if EAS project is configured
+        if ! npx eas project:info --non-interactive >/dev/null 2>&1; then
           echo "Initializing EAS project..."
-          eas init --non-interactive
+          npx eas init --non-interactive
         else
           echo "EAS project already configured"
         fi
 
     - name: 🚀 Build APK with EAS
       run: |
-        eas build --platform android --profile ${{ inputs.build_profile }} --non-interactive
+        npx eas build --platform android --profile ${{ inputs.build_profile }} --non-interactive --no-wait
 
     - name: ✅ Build Complete
       run: |
-        echo "🎉 APK build completed successfully!"
-        echo "📱 Your APK will be available in the EAS dashboard"
-        echo "🔗 Visit: https://expo.dev/accounts/[your-account]/projects/littleforest-app/builds"
+        echo "🎉 APK build initiated successfully!"
+        echo "📱 Your APK will be available in the EAS dashboard when complete."
+        echo "🔗 Visit: https://expo.dev/accounts/${{ github.repository_owner }}/projects/littleforest-app/builds"
         echo ""
         echo "📥 To download:"
         echo "1. Go to your EAS dashboard"
