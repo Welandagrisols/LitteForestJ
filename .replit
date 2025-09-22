@@ -237,6 +237,40 @@ args = "npx expo install --fix"
 task = "shell.exec"
 args = "npx expo start --port 8000 --tunnel"
 
+[[workflows.workflow]]
+name = "Build Native Android APK - Fixed"
+author = 45999389
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install -g @expo/eas-cli"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo install --fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx eas build --platform android --profile preview"
+
+[[workflows.workflow]]
+name = "EAS Build Android Local"
+author = 45999389
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx @expo/eas-cli@latest build --platform android --profile preview --non-interactive"
+
 [agent]
 expertMode = true
 integrations = ["javascript_supabase:1.0.0"]
