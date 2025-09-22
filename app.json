@@ -38,8 +38,6 @@
     },
     "plugins": [],
     "scheme": "littleforest",
-    "newArchEnabled": true,
-    "extra": {
-    }
+    "newArchEnabled": true
   }
 }
