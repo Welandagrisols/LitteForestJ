@@ -3,7 +3,6 @@
     "name": "LittleForest",
     "slug": "littleforest-app",
     "version": "1.0.0",
-    "owner": "welandagrisols",
     "platforms": [
       "ios",
       "android",
