@@ -25,6 +25,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/icon-192x192.png" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        {/* Capacitor script - loads conditionally in mobile environment */}
         <script src="/capacitor.js"></script>
       </head>
       <body className="font-sans antialiased">
