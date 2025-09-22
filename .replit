@@ -30,6 +30,10 @@ localPort = 39315
 externalPort = 3002
 
 [[ports]]
+localPort = 44467
+externalPort = 4200
+
+[[ports]]
 localPort = 46171
 externalPort = 3003
 
@@ -271,6 +275,23 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow]]
+name = "Build Android APK"
+author = 46050782
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo install --fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx eas build --platform android --profile preview --non-interactive"
 
 [agent]
 expertMode = true
