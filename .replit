@@ -5,7 +5,6 @@ run = "npm run dev"
 channel = "stable-25_05"
 
 [deployment]
-run = ["npm"]
 build = ["npm", "run", "build"]
 deploymentTarget = "autoscale"
 
