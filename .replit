@@ -202,27 +202,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Expo Development Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "Web Development Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Expo Web Server"
-
-[[workflows.workflow]]
-name = "Expo Development Server"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx expo start --port 8000 --tunnel"
-waitForPort = 8000
 
 [[workflows.workflow]]
 name = "Mobile Development Server"
@@ -286,18 +266,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx expo start --web --localhost --port 8081 & npx serve -s dist -l 5000"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[workflows.workflow]]
-name = "Expo Web Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "bash -c 'npx expo start --web --localhost & sleep 10 && npx serve -s dist -l 5000'"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
