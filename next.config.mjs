@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure for Replit environment - allow dev origins only in development
-  allowedDevOrigins: process.env.NODE_ENV === 'development' ? ['*'] : [],
+  // Configure for Replit environment - allow specific dev origins
+  allowedDevOrigins: process.env.NODE_ENV === 'development' ? [
+    '*.replit.dev',
+    '*.replit.app', 
+    'localhost',
+    '127.0.0.1'
+  ] : [],
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -16,7 +21,7 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: process.env.NODE_ENV === 'production' 
         ? ['https://www.littleforest.co.ke'] 
-        : ['*']
+        : ['*.replit.dev', '*.replit.app', 'localhost', '127.0.0.1']
     }
   },
   async headers() {
