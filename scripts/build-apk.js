@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-
 const { execSync } = require('child_process');
 const fs = require('fs');
 
@@ -9,7 +7,7 @@ console.log('🚀 Building LittleForest APK with Expo...\n');
 try {
   // Step 1: Install dependencies
   console.log('1. Installing dependencies...');
-  execSync('npm install', { stdio: 'inherit' });
+  execSync('npm install --legacy-peer-deps', { stdio: 'inherit' });
 
   // Step 2: Fix Expo dependencies
   console.log('2. Fixing Expo dependencies...');
