@@ -40,9 +40,6 @@
     "scheme": "littleforest",
     "newArchEnabled": true,
     "extra": {
-      "eas": {
-        "projectId": "littleforest-mobile-app"
-      }
     }
   }
 }
