@@ -19,7 +19,7 @@
     "@capacitor/core": "^7.4.3",
     "@capacitor/device": "^7.0.2",
     "@capacitor/ios": "^7.4.3",
-    "@expo/vector-icons": "^14.0.2",
+    "@expo/vector-icons": "^14.0.3",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",

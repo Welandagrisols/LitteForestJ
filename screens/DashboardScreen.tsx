@@ -12,19 +12,19 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-export default function DashboardScreen({ navigation }) {
+export default function DashboardScreen({ navigation }: { navigation: any }) {
   const stats = [
-    { label: 'Total Plants', value: '1,250', icon: 'leaf', color: '#22A45D' },
-    { label: 'Active Sales', value: '45', icon: 'trending-up', color: '#3B82F6' },
-    { label: 'Customers', value: '89', icon: 'people', color: '#8B5CF6' },
-    { label: 'Tasks', value: '12', icon: 'checkbox', color: '#F59E0B' },
+    { label: 'Total Plants', value: '1,250', icon: 'leaf' as any, color: '#22A45D' },
+    { label: 'Active Sales', value: '45', icon: 'trending-up' as any, color: '#3B82F6' },
+    { label: 'Customers', value: '89', icon: 'people' as any, color: '#8B5CF6' },
+    { label: 'Tasks', value: '12', icon: 'checkbox' as any, color: '#F59E0B' },
   ];
 
   const menuItems = [
-    { title: 'Inventory', icon: 'leaf', screen: 'Inventory', color: '#22A45D' },
-    { title: 'Sales', icon: 'trending-up', screen: 'Sales', color: '#3B82F6' },
-    { title: 'Customers', icon: 'people', screen: 'Customers', color: '#8B5CF6' },
-    { title: 'Tasks', icon: 'checkbox', screen: 'Tasks', color: '#F59E0B' },
+    { title: 'Inventory', icon: 'leaf' as any, screen: 'Inventory', color: '#22A45D' },
+    { title: 'Sales', icon: 'trending-up' as any, screen: 'Sales', color: '#3B82F6' },
+    { title: 'Customers', icon: 'people' as any, screen: 'Customers', color: '#8B5CF6' },
+    { title: 'Tasks', icon: 'checkbox' as any, screen: 'Tasks', color: '#F59E0B' },
   ];
 
   return (
