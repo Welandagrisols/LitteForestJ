@@ -37,10 +37,10 @@ jobs:
 
     - name: 🔧 Configure EAS Project
       run: |
-        # Initialize EAS project if not already configured
+        # Check if EAS project is configured, if not initialize it
         if ! eas project:info >/dev/null 2>&1; then
           echo "Initializing EAS project..."
-          eas init --id $(uuidgen) --non-interactive
+          eas init --non-interactive
         else
           echo "EAS project already configured"
         fi
