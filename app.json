@@ -5,6 +5,7 @@
     "slug": "littleforest-app",
     "version": "1.0.0",
     "owner": "welandagrisols",
+    "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "icon": "./public/icon-512x512.png",
     "userInterfaceStyle": "light",
@@ -29,7 +30,8 @@
       "versionCode": 1
     },
     "web": {
-      "favicon": "./public/icon-192x192.png"
+      "favicon": "./public/icon-192x192.png",
+      "bundler": "metro"
     },
     "plugins": [],
     "scheme": "littleforest",
