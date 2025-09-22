@@ -7,7 +7,7 @@ channel = "stable-25_05"
 [deployment]
 build = ["npm", "run"]
 deploymentTarget = "autoscale"
-run = ["npx", "serve", "-s", "dist", "-l", "5000"]
+run = ["npx", "serve", ".", "-p", "5000", "-s"]
 
 [[ports]]
 localPort = 3000
