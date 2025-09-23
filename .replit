@@ -293,6 +293,19 @@ waitForPort = 5000
 [workflows.workflow.metadata]
 outputType = "webview"
 
+[[workflows.workflow]]
+name = "Mobile Dev"
+author = 46088289
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo start --port 8000 --web"
+
 [agent]
 expertMode = true
 integrations = ["javascript_supabase:1.0.0"]
