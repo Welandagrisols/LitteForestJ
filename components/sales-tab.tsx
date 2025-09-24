@@ -191,7 +191,7 @@ export function SalesTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6">
       {(isDemoMode || !tableExists) && (
         <DemoModeBanner 
           isDemoMode={isDemoMode} 
@@ -199,45 +199,45 @@ export function SalesTab() {
         />
       )}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* Summary Cards - Mobile Optimized Grid */}
+      <div className="mobile-optimized-grid">
         <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-green-600 rounded-full flex-shrink-0">
+                <Package className="h-4 w-4 text-white" />
               </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-green-800">Total Sales</p>
-                <p className="text-lg sm:text-2xl font-bold text-green-900">Ksh {totalSales.toLocaleString()}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-green-800 truncate">Total Sales</p>
+                <p className="text-lg font-bold text-green-900 truncate">Ksh {totalSales.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-purple-600 rounded-full flex-shrink-0">
+                <Package className="h-4 w-4 text-white" />
               </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-purple-800">Seedlings Sold</p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-900">{totalSeedlings.toLocaleString()}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-purple-800 truncate">Seedlings Sold</p>
+                <p className="text-lg font-bold text-purple-900 truncate">{totalSeedlings.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-blue-600 rounded-full flex-shrink-0">
+                <Package className="h-4 w-4 text-white" />
               </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-blue-800">This Month</p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-900">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-blue-800 truncate">This Month</p>
+                <p className="text-lg font-bold text-blue-900 truncate">
                   {
                     sales.filter((sale) => {
                       const saleDate = new Date(sale.sale_date)
@@ -252,14 +252,14 @@ export function SalesTab() {
         </Card>
 
         <Card className="mobile-card bg-orange-50 border-orange-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-orange-600 rounded-full flex-shrink-0">
+                <Package className="h-4 w-4 text-white" />
               </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-orange-800">Avg Per Sale</p>
-                <p className="text-lg sm:text-2xl font-bold text-orange-900">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-orange-800 truncate">Avg Per Sale</p>
+                <p className="text-lg font-bold text-orange-900 truncate">
                   Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
                 </p>
               </div>
@@ -268,15 +268,15 @@ export function SalesTab() {
         </Card>
       </div>
 
-      {/* Sales Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="text-2xl font-bold">Sales Records</CardTitle>
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      {/* Sales Table - Mobile Responsive */}
+      <Card className="mobile-card">
+        <CardHeader className="p-3 sm:p-6">
+          <div className="flex flex-col gap-3">
+            <CardTitle className="mobile-text-lg font-bold">Sales Records</CardTitle>
+            <div className="flex flex-col gap-2">
               <Button
                 variant="outline"
-                className="flex items-center justify-center gap-2 w-full sm:w-auto"
+                className="btn-mobile flex items-center justify-center gap-2 w-full"
                 onClick={handleExportToExcel}
                 disabled={exporting || sales.length === 0}
               >
@@ -286,7 +286,7 @@ export function SalesTab() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
+                    className="btn-mobile w-full bg-green-600 hover:bg-green-700 text-white"
                     disabled={loading || isDemoMode || !tableExists}
                     onClick={() => {
                       console.log("Record New Sale button clicked")
@@ -297,7 +297,7 @@ export function SalesTab() {
                     + Add Sale
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="sm:max-w-[600px] m-2">
                   <DialogHeader>
                     <DialogTitle>Record New Sale</DialogTitle>
                   </DialogHeader>
@@ -307,61 +307,115 @@ export function SalesTab() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border overflow-hidden">
+        <CardContent className="p-0">
+          {/* Mobile Card View */}
+          <div className="block sm:hidden">
+            {loading ? (
+              <div className="text-center py-8 px-3">
+                <p className="mobile-text-sm text-muted-foreground">Loading sales records...</p>
+              </div>
+            ) : sales.length === 0 ? (
+              <div className="text-center py-8 px-3">
+                <p className="mobile-text-sm text-muted-foreground">No sales records found</p>
+              </div>
+            ) : (
+              <div className="space-y-2 p-3">
+                {sales.map((sale) => (
+                  <Card key={sale.id} className="p-3 border border-border hover:bg-muted/30">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div className="min-w-0 flex-1">
+                          <p className="mobile-text-sm font-medium truncate">{sale.inventory?.plant_name || "Unknown Plant"}</p>
+                          <p className="text-xs text-muted-foreground">{sale.inventory?.category || ""}</p>
+                        </div>
+                        <div className="text-right flex-shrink-0 ml-2">
+                          <p className="mobile-text-sm font-bold text-green-600">Ksh {sale.total_amount.toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">{sale.quantity} units</p>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-muted-foreground">
+                        <span>{new Date(sale.sale_date).toLocaleDateString()}</span>
+                        <span className="truncate max-w-[120px]">
+                          {sale.customer ? sale.customer.name : "Walk-in"}
+                        </span>
+                      </div>
+                      <div className="flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteSale(sale.id)}
+                          disabled={isDemoMode || !tableExists}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden sm:block rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Plant</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Date</TableHead>
+                  <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Plant</TableHead>
+                  <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Quantity</TableHead>
+                  <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Amount</TableHead>
+                  <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Customer</TableHead>
+                  <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8 text-sm">
                       Loading sales records...
                     </TableCell>
                   </TableRow>
                 ) : sales.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8 text-sm">
                       No sales records found
                     </TableCell>
                   </TableRow>
                 ) : (
                   sales.map((sale) => (
                     <TableRow key={sale.id} className="hover:bg-muted/50">
-                      <TableCell>{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <div className="font-medium">{sale.inventory?.plant_name || "Unknown Plant"}</div>
-                        <div className="text-sm text-muted-foreground">{sale.inventory?.category || ""}</div>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">
+                        {new Date(sale.sale_date).toLocaleDateString()}
                       </TableCell>
-                      <TableCell>{sale.quantity}</TableCell>
-                      <TableCell>Ksh {sale.total_amount.toLocaleString()}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">
+                        <div className="font-medium">{sale.inventory?.plant_name || "Unknown Plant"}</div>
+                        <div className="text-xs text-muted-foreground">{sale.inventory?.category || ""}</div>
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">{sale.quantity}</TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 font-semibold text-green-600">
+                        Ksh {sale.total_amount.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">
                         {sale.customer ? (
                           <>
-                            <div>{sale.customer.name}</div>
-                            <div className="text-sm text-muted-foreground">{sale.customer.contact}</div>
+                            <div className="font-medium">{sale.customer.name}</div>
+                            <div className="text-xs text-muted-foreground">{sale.customer.contact}</div>
                           </>
                         ) : (
                           "Walk-in Customer"
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleDeleteSale(sale.id)}
                           disabled={isDemoMode || !tableExists}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3" />
                         </Button>
                       </TableCell>
                     </TableRow>
