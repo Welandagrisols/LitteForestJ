@@ -1,3 +1,4 @@
+
 import { createClient } from "@supabase/supabase-js"
 import type { Database } from "../types/supabase"
 
@@ -33,16 +34,6 @@ if (isDemoMode) {
     hasKey: !!supabaseAnonKey,
     hasValidKey,
   })
-}
-
-// Helper function to validate URL format
-function isValidUrl(string: string): boolean {
-  try {
-    new URL(string)
-    return true
-  } catch (_) {
-    return false
-  }
 }
 
 // Use valid demo values when in demo mode to prevent URL constructor errors
