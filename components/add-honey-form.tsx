@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { supabase, isDemoMode } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -232,13 +232,22 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
   )
 }
 
+interface InventoryItem {
+  sku: string
+  name: string
+  quantity: number
+  unit: string
+  price: number
+  status: string
+}
+
 function BatchStatusManager() {
   const [showForm, setShowForm] = useState(false)
-  const [inventory, setInventory] = useState([])
+  const [inventory, setInventory] = useState<InventoryItem[]>([])
 
   // Fetch inventory data (replace with your actual fetch logic)
   // For demonstration, we'll use a mock array
-  const mockInventory = [
+  const mockInventory: InventoryItem[] = [
     { sku: "HON1234", name: "Wildflower Honey", quantity: 100, unit: "kg", price: 1500, status: "Ready" },
     { sku: "HON5678", name: "Acacia Honey", quantity: 75, unit: "kg", price: 1800, status: "Processing" },
     { sku: "HON9101", name: "Clover Honey", quantity: 120, unit: "kg", price: 1300, status: "Ready" },
@@ -246,9 +255,9 @@ function BatchStatusManager() {
   ]
 
   // Simulate fetching data on mount
-  useState(() => {
+  useEffect(() => {
     setInventory(mockInventory)
-  })
+  }, [])
 
 
   return (
