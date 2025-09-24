@@ -9,7 +9,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: any }>
-  signUp: (email: string, password: string) => Promise<{ error: any }>
+  signUp: (email: string, password: string) => Promise<{ data: any, error: any }>
   signOut: () => Promise<void>
   isAuthenticated: boolean
 }
@@ -126,13 +126,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       })
-      return { error }
+      return { data, error }
     } catch (error) {
-      return { error }
+      return { data: null, error }
     }
   }
 

@@ -31,12 +31,23 @@ export function AdminLogin() {
     setSuccess('')
     setIsLoading(true)
 
-    const { error } = await signIn(email, password)
+    // Trim email to prevent whitespace issues
+    const trimmedEmail = email.trim()
+
+    const { error } = await signIn(trimmedEmail, password)
     
     if (error) {
-      setError(error.message)
+      // Normalize error messages to prevent user enumeration
+      if (error.message?.includes('Invalid login credentials') || 
+          error.message?.includes('Email not confirmed')) {
+        setError('Invalid email or password. Please check your credentials.')
+      } else {
+        setError('Unable to sign in. Please try again.')
+      }
     }
     
+    // Clear password after attempt for security
+    setPassword('')
     setIsLoading(false)
   }
 
@@ -46,6 +57,9 @@ export function AdminLogin() {
     setSuccess('')
     setIsLoading(true)
 
+    // Trim email to prevent whitespace issues
+    const trimmedEmail = email.trim()
+
     // Validate password confirmation
     if (password !== confirmPassword) {
       setError('Passwords do not match')
@@ -53,18 +67,37 @@ export function AdminLogin() {
       return
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long')
+    // Stronger password validation
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long')
       setIsLoading(false)
       return
     }
 
-    const { error } = await signUp(email, password)
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      setError('Password must contain at least one uppercase letter, one lowercase letter, and one number')
+      setIsLoading(false)
+      return
+    }
+
+    const { data, error } = await signUp(trimmedEmail, password)
     
     if (error) {
-      setError(error.message)
+      // Normalize error messages to prevent user enumeration
+      if (error.message?.includes('User already registered')) {
+        setError('An account with this email may already exist. Please try signing in.')
+      } else if (error.message?.includes('Invalid email')) {
+        setError('Please enter a valid email address.')
+      } else {
+        setError('Unable to create account. Please try again.')
+      }
     } else {
-      setSuccess('Account created successfully! You can now sign in.')
+      // Check if email confirmation is required
+      if (data?.user && !data?.session) {
+        setSuccess('Please check your email to verify your account before signing in.')
+      } else {
+        setSuccess('Account created successfully! You can now sign in.')
+      }
       setActiveTab('signin')
       setPassword('')
       setConfirmPassword('')
@@ -125,6 +158,7 @@ export function AdminLogin() {
                       placeholder="your-email@example.com"
                       required
                       disabled={isLoading}
+                      autoComplete="email"
                       className="border-gray-200 focus:border-green-500 focus:ring-green-500"
                     />
                   </div>
@@ -142,6 +176,7 @@ export function AdminLogin() {
                         placeholder="Enter your password"
                         required
                         disabled={isLoading}
+                        autoComplete="current-password"
                         className="border-gray-200 focus:border-green-500 focus:ring-green-500 pr-10"
                       />
                       <Button
@@ -192,6 +227,7 @@ export function AdminLogin() {
                       placeholder="your-email@example.com"
                       required
                       disabled={isLoading}
+                      autoComplete="email"
                       className="border-gray-200 focus:border-green-500 focus:ring-green-500"
                     />
                   </div>
@@ -206,10 +242,11 @@ export function AdminLogin() {
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter your password (min 6 characters)"
+                        placeholder="Enter password (8+ chars, uppercase, lowercase, number)"
                         required
                         disabled={isLoading}
-                        minLength={6}
+                        minLength={8}
+                        autoComplete="new-password"
                         className="border-gray-200 focus:border-green-500 focus:ring-green-500 pr-10"
                       />
                       <Button
@@ -242,7 +279,8 @@ export function AdminLogin() {
                         placeholder="Confirm your password"
                         required
                         disabled={isLoading}
-                        minLength={6}
+                        minLength={8}
+                        autoComplete="new-password"
                         className="border-gray-200 focus:border-green-500 focus:ring-green-500 pr-10"
                       />
                       <Button
