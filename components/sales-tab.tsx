@@ -199,8 +199,8 @@ export function SalesTab() {
         />
       )}
 
-      {/* Summary Cards - Mobile Optimized Grid */}
-      <div className="mobile-optimized-grid">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="mobile-card bg-green-50 border-green-200">
           <CardContent className="p-3">
             <div className="flex items-center gap-2">
