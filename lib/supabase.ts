@@ -1,10 +1,9 @@
 import { createClient } from "@supabase/supabase-js"
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import type { Database } from "../types/supabase"
 
-// Environment variables for Expo
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// Environment variables for Next.js
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 console.log("Supabase URL:", supabaseUrl)
 console.log("Supabase Key:", supabaseAnonKey ? "Set" : "Not set")
@@ -53,7 +52,6 @@ const validSupabaseAnonKey = isDemoMode ? "demo-key" : supabaseAnonKey!
 // Create a single supabase client for internal use only
 export const supabase = createClient<Database>(validSupabaseUrl, validSupabaseAnonKey, {
   auth: {
-    storage: AsyncStorage,
     persistSession: true,
     autoRefreshToken: true,
   },
