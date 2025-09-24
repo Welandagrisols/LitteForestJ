@@ -15,6 +15,7 @@ interface Batch {
   futureCount: number
   samplePlants: string[]
   createdAt: string
+  ready_for_sale: boolean
 }
 
 export function BatchStatusManager() {
@@ -33,6 +34,7 @@ export function BatchStatusManager() {
           futureCount: 0,
           samplePlants: ["Nile Tulip", "Waterberry", "Wild Plum"],
           createdAt: "2024-01-15",
+          ready_for_sale: true,
         },
         {
           source: "Future Plants List",
@@ -41,6 +43,7 @@ export function BatchStatusManager() {
           futureCount: 54,
           samplePlants: ["Acacia", "Baobab", "Cedar"],
           createdAt: "2024-01-16",
+          ready_for_sale: false,
         },
       ])
       setLoading(false)
@@ -89,6 +92,7 @@ export function BatchStatusManager() {
         futureCount: batch.futureCount,
         samplePlants: batch.plants.slice(0, 3),
         createdAt: new Date(batch.createdAt).toLocaleDateString(),
+        ready_for_sale: batch.currentCount > batch.futureCount,
       }))
 
       setBatches(batchesArray)
@@ -272,7 +276,7 @@ export function BatchStatusManager() {
           }
 
           return (
-            <Card key={`${batch.category}-${batch.ready_for_sale}`} className={`${cardColor} border transition-colors`}>
+            <Card key={`${batch.source}-${batch.ready_for_sale}`} className={`${cardColor} border transition-colors`}>
               <CardContent className="p-3">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
