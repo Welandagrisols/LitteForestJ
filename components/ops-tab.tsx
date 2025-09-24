@@ -357,7 +357,7 @@ export function OpsTab() {
 
       {/* Statistics Dashboard */}
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 gap-2 mb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="bg-green-50 border-green-200">
           <CardContent className="p-3">
             <div className="flex items-center gap-2">
@@ -419,7 +419,7 @@ export function OpsTab() {
 
       {/* Operations Tabs */}
       <Tabs defaultValue="batch-manager" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2">
           <TabsTrigger value="batch-manager" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             Batch Manager
