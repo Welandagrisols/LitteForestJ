@@ -71,7 +71,7 @@ export function InventoryTab() {
   async function fetchInventory() {
     try {
       setLoading(true)
-      
+
       // Removed user filtering to show all data (suspended user differentiation)
       const { data, error } = await supabase
         .from("inventory")
@@ -467,7 +467,7 @@ export function InventoryTab() {
                     </SelectContent>
                   </Select>
                 )}
-                
+
                 {activeTab === "consumables" && (
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-32">
@@ -539,7 +539,7 @@ export function InventoryTab() {
                   key={item.id}
                   className={`transition-all hover:shadow-md h-fit max-w-sm mx-auto w-full`}
                 >
-                  <CardContent className="p-4">
+                  <CardContent className="p-3 sm:p-4">
                     <div className="flex justify-between items-start mb-3">
                       <Badge className="text-xs truncate max-w-[140px] bg-green-600 hover:bg-green-700 text-white">
                           🌱 Plants
@@ -576,7 +576,7 @@ export function InventoryTab() {
                         <img 
                           src={item.image_url} 
                           alt={item.plant_name}
-                          className="w-full h-32 object-cover rounded-md border border-gray-200"
+                          className="w-full h-24 sm:h-32 object-cover rounded-md border border-gray-200"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                           }}
@@ -686,7 +686,7 @@ export function InventoryTab() {
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredHoneyProducts.map((item) => (
                 <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200 h-fit max-w-sm mx-auto w-full">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3 sm:p-4">
                     <div className="flex justify-between items-start mb-3">
                       <Badge className="bg-purple-600 hover:bg-purple-700 text-white text-xs truncate max-w-[140px]">
                         🍯 Honey
@@ -723,7 +723,7 @@ export function InventoryTab() {
                         <img 
                           src={item.image_url} 
                           alt={item.plant_name}
-                          className="w-full h-32 object-cover rounded-md border border-gray-200"
+                          className="w-full h-24 sm:h-32 object-cover rounded-md border border-gray-200"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                           }}
@@ -841,7 +841,7 @@ export function InventoryTab() {
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredConsumables.map((item) => (
                 <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200 h-fit max-w-sm mx-auto w-full">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3 sm:p-4">
                     <div className="flex justify-between items-start mb-3">
                       <Badge className="bg-purple-600 hover:bg-purple-700 text-white text-xs truncate max-w-[140px]">
                         🛒 {getConsumableCategory(item)}
@@ -878,7 +878,7 @@ export function InventoryTab() {
                         <img 
                           src={item.image_url} 
                           alt={item.plant_name}
-                          className="w-full h-32 object-cover rounded-md border border-gray-200"
+                          className="w-full h-24 sm:h-32 object-cover rounded-md border border-gray-200"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                           }}
