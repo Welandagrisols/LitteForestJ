@@ -2,6 +2,24 @@
 
 import { useState, useEffect } from "react"
 import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
+
+interface SaleData {
+  id: string
+  sale_date: string
+  quantity: number
+  total_amount: number
+  inventory_id: string
+  customer_id?: string
+  inventory?: {
+    plant_name: string
+    category: string
+    price: number
+  }
+  customer?: {
+    name: string
+    contact: string
+  }
+}
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -33,7 +51,7 @@ function useIsMobile() {
 }
 
 export function SalesTab() {
-  const [sales, setSales] = useState<any[]>([])
+  const [sales, setSales] = useState<SaleData[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
   const [totalSales, setTotalSales] = useState(0)
