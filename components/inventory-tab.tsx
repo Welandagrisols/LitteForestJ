@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
+import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -33,6 +34,7 @@ export function InventoryTab() {
   const [addHoneyDialogOpen, setAddHoneyDialogOpen] = useState(false)
   const { toast } = useToast()
   const [statusFilter, setStatusFilter] = useState("all")
+  const { user } = useAuth()
 
   useEffect(() => {
     async function init() {
@@ -69,7 +71,17 @@ export function InventoryTab() {
   async function fetchInventory() {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("inventory").select("*").order("created_at", { ascending: false })
+      
+      if (!user) {
+        setInventory([])
+        return
+      }
+
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
 
       if (error) throw error
       setInventory(data || [])

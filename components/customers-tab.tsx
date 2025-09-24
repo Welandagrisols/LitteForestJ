@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { supabase, isDemoMode, checkTableExists } from "@/lib/supabase"
+import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -45,6 +46,7 @@ export function CustomersTab() {
   const [customMessage, setCustomMessage] = useState("")
   const [sendingMessages, setSendingMessages] = useState(false)
   const { toast } = useToast()
+  const { user } = useAuth()
 
   useEffect(() => {
     async function init() {
@@ -83,7 +85,17 @@ export function CustomersTab() {
   async function fetchCustomers() {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("customers").select("*").order("name", { ascending: true })
+      
+      if (!user) {
+        setCustomers([])
+        return
+      }
+
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("name", { ascending: true })
 
       if (error) throw error
       setCustomers(data || [])
@@ -97,10 +109,16 @@ export function CustomersTab() {
 
   async function fetchPlants() {
     try {
+      if (!user) {
+        setPlants([])
+        return
+      }
+
       const { data, error } = await supabase
         .from("inventory")
         .select("id, plant_name, quantity, price, status")
         .eq("status", "Current")
+        .eq("user_id", user.id)
         .gt("quantity", 0)
         .order("plant_name", { ascending: true })
 
