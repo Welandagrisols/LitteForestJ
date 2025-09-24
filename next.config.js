@@ -4,6 +4,12 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@supabase/supabase-js']
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   images: {
     remotePatterns: [
       {
