@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, Package, FileText, Settings, RefreshCw } from "lucide-react"
+import { Loader2, Package, FileText, Settings, RefreshCw, ArrowRight, ArrowLeft } from "lucide-react"
 
 interface Batch {
   source: string
@@ -272,69 +272,65 @@ export function BatchStatusManager() {
           }
 
           return (
-            <Card key={batch.source} className={cardColor}>
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-base">{batch.source}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{description}</p>
+            <Card key={`${batch.category}-${batch.ready_for_sale}`} className={`${cardColor} border transition-colors`}>
+              <CardContent className="p-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Badge className={`${badgeColor} text-white text-xs`}>
+                      {batch.count} plants
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {batch.ready_for_sale ? "Current" : "Future"}
+                    </Badge>
                   </div>
-                  <Badge className={`${badgeColor} text-white`}>{batch.count} plants</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Current Status */}
-                <div className="grid grid-cols-2 gap-2 text-sm">
+
                   <div>
-                    <span className="text-muted-foreground">In Nursery:</span>
-                    <p className="font-medium text-green-600">{batch.currentCount}</p>
+                    <h4 className="font-semibold text-sm text-gray-900 mb-1 leading-tight">{batch.source}</h4>
+                    <p className="text-xs text-gray-600 leading-tight">{description}</p>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Future Plans:</span>
-                    <p className="font-medium text-blue-600">{batch.futureCount}</p>
+
+                  <div className="grid grid-cols-2 gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs px-2 py-1 h-auto leading-tight"
+                      disabled={batch.ready_for_sale || updating}
+                      onClick={() => updateBatchStatus(batch.source, true)}
+                    >
+                      {updating === batch.source ? (
+                        <>
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          <span className="break-words">Moving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ArrowRight className="h-3 w-3 mr-1" />
+                          <span className="break-words">Move to Current</span>
+                        </>
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs px-2 py-1 h-auto leading-tight"
+                      disabled={!batch.ready_for_sale || updating}
+                      onClick={() => updateBatchStatus(batch.source, false)}
+                    >
+                      {updating === batch.source ? (
+                        <>
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          <span className="break-words">Moving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ArrowLeft className="h-3 w-3 mr-1" />
+                          <span className="break-words">Move to Future</span>
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
-
-                {/* Sample Plants */}
-                <div>
-                  <span className="text-sm text-muted-foreground">Sample plants:</span>
-                  <p className="text-sm font-medium">{batch.samplePlants.join(", ")}</p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateBatchStatus(batch.source, true)}
-                    disabled={updating === batch.source || isDemoMode}
-                    className="flex-1 text-xs"
-                  >
-                    {updating === batch.source ? (
-                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                    ) : (
-                      <Package className="h-3 w-3 mr-1" />
-                    )}
-                    Move to Current Nursery
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateBatchStatus(batch.source, false)}
-                    disabled={updating === batch.source || isDemoMode}
-                    className="flex-1 text-xs"
-                  >
-                    {updating === batch.source ? (
-                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                    ) : (
-                      <FileText className="h-3 w-3 mr-1" />
-                    )}
-                    Move to Future Plans
-                  </Button>
-                </div>
-
-                {/* Created Date */}
-                <div className="text-xs text-muted-foreground">Created: {batch.createdAt}</div>
               </CardContent>
             </Card>
           )
