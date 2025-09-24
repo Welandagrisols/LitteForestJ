@@ -34,8 +34,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     ...(Platform.OS === 'web' && {
-      minHeight: '100vh',
-      width: '100%',
+      minHeight: '100vh' as any,
+      width: '100%' as any,
     }),
   },
 });

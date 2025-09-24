@@ -33,8 +33,7 @@
     },
     "web": {
       "favicon": "./public/icon-192x192.png",
-      "bundler": "metro",
-      "hostname": "0.0.0.0"
+      "bundler": "metro"
     },
     "plugins": [],
     "scheme": "littleforest",
