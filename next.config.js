@@ -5,10 +5,15 @@ const nextConfig = {
     serverComponentsExternalPackages: ['@supabase/supabase-js']
   },
   images: {
-    domains: ['localhost', 'mjsuwlpixcregiikiusd.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'mjsuwlpixcregiikiusd.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      }
+    ],
     unoptimized: false
   },
-  // Remove Replit-specific origins for Vercel
   async headers() {
     return [
       {
@@ -18,19 +23,17 @@ const nextConfig = {
             key: 'Cache-Control',
             value: process.env.NODE_ENV === 'development' 
               ? 'no-cache, no-store, must-revalidate'
-              : 'public, max-age=31536000, immutable'
+              : 'public, max-age=3600, must-revalidate'
           }
         ]
       }
     ]
   },
-  // Vercel-optimized output
-  output: 'standalone',
   swcMinify: true,
-  // Disable source maps in production for smaller builds
   productionBrowserSourceMaps: false,
-  // Optimize for Vercel
-  compress: true
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true
 }
 
 module.exports = nextConfig
