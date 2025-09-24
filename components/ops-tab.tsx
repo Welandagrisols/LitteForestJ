@@ -356,61 +356,68 @@ export function OpsTab() {
       </div>
 
       {/* Statistics Dashboard */}
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
-                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-green-800">Plants</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-green-900">{loading ? "..." : stats.totalPlants}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
-                <Database className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-purple-800">Categories</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-purple-900">{loading ? "..." : stats.categories.length}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200/50 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-600 rounded-lg shadow-sm">
+                  <Package className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-green-800">Total Plants</p>
+                  <p className="text-2xl font-bold text-green-900">{loading ? "..." : stats.totalPlants}</p>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-blue-800">Healthy</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-blue-900">{loading ? "..." : stats.healthyPlants}</p>
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200/50 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-600 rounded-lg shadow-sm">
+                  <Database className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-purple-800">Categories</p>
+                  <p className="text-2xl font-bold text-purple-900">{loading ? "..." : stats.categories.length}</p>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-orange-50 border-orange-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
-                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200/50 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-600 rounded-lg shadow-sm">
+                  <TrendingUp className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-blue-800">Healthy Plants</p>
+                  <p className="text-2xl font-bold text-blue-900">{loading ? "..." : stats.healthyPlants}</p>
+                </div>
               </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-orange-800">Avg Value</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-orange-900">
-                  {loading ? "..." : `${stats.totalPlants > 0 ? Math.round(stats.totalValue / stats.totalPlants) : 0}`}
-                </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200/50 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-600 rounded-lg shadow-sm">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-orange-800">Avg Value</p>
+                  <p className="text-2xl font-bold text-orange-900">
+                    {loading ? "..." : `$${stats.totalPlants > 0 ? Math.round((stats.totalValue || 0) / stats.totalPlants) : 0}`}
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -419,22 +426,38 @@ export function OpsTab() {
 
       {/* Operations Tabs */}
       <Tabs defaultValue="batch-manager" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2">
-          <TabsTrigger value="batch-manager" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-1 bg-muted/50 p-1 rounded-lg">
+          <TabsTrigger 
+            value="batch-manager" 
+            className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+          >
             <Settings className="h-4 w-4" />
-            Batch Manager
+            <span className="hidden sm:inline">Batch Manager</span>
+            <span className="sm:hidden">Batches</span>
           </TabsTrigger>
-          <TabsTrigger value="bulk-import" className="flex items-center gap-2">
+          <TabsTrigger 
+            value="bulk-import" 
+            className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+          >
             <Upload className="h-4 w-4" />
-            Bulk Import
+            <span className="hidden sm:inline">Bulk Import</span>
+            <span className="sm:hidden">Import</span>
           </TabsTrigger>
-          <TabsTrigger value="demo-data" className="flex items-center gap-2">
+          <TabsTrigger 
+            value="demo-data" 
+            className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+          >
             <Database className="h-4 w-4" />
-            Demo Data
+            <span className="hidden sm:inline">Demo Data</span>
+            <span className="sm:hidden">Demo</span>
           </TabsTrigger>
-          <TabsTrigger value="data-management" className="flex items-center gap-2">
+          <TabsTrigger 
+            value="data-management" 
+            className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+          >
             <Trash2 className="h-4 w-4" />
-            Data Management
+            <span className="hidden sm:inline">Data Management</span>
+            <span className="sm:hidden">Manage</span>
           </TabsTrigger>
         </TabsList>
 
@@ -711,22 +734,35 @@ export function OpsTab() {
       </Tabs>
 
       {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+      <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200/50 shadow-sm">
+        <CardHeader className="border-b border-slate-200/50 bg-white/50">
+          <CardTitle className="flex items-center gap-2 text-slate-800">
+            <Settings className="h-5 w-5" />
+            Quick Actions Guide
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h4 className="font-medium">Status Management</h4>
-              <p className="text-sm text-muted-foreground">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-blue-100 rounded-md">
+                  <Settings className="h-4 w-4 text-blue-600" />
+                </div>
+                <h4 className="font-semibold text-slate-900">Status Management</h4>
+              </div>
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Use the Batch Manager to move plants between "In Nursery" and "Future Plans" status. This affects
                 website listing and inventory organization.
               </p>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-medium">Bulk Operations</h4>
-              <p className="text-sm text-muted-foreground">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-green-100 rounded-md">
+                  <Upload className="h-4 w-4 text-green-600" />
+                </div>
+                <h4 className="font-semibold text-slate-900">Bulk Operations</h4>
+              </div>
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Import multiple plants at once using the Bulk Import feature. Plants are automatically categorized and
                 assigned appropriate statuses.
               </p>
