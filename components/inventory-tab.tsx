@@ -274,8 +274,8 @@ export function InventoryTab() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Inventory Management</h2>
-          <p className="text-muted-foreground">Manage your plants and consumables inventory</p>
+          <h2 className="mobile-text-lg sm:text-2xl font-bold">Inventory Management</h2>
+          <p className="mobile-text-sm text-muted-foreground">Manage your plants and consumables inventory</p>
         </div>
       </div>
 
@@ -288,8 +288,8 @@ export function InventoryTab() {
                 <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-green-800">Plants</p>
-                <p className="text-lg sm:text-2xl font-bold text-green-900">{currentPlants.length}</p>
+                <p className="mobile-text-sm font-medium text-green-800">Plants</p>
+                <p className="mobile-text-lg sm:text-2xl font-bold text-green-900">{currentPlants.length}</p>
               </div>
             </div>
           </CardContent>
@@ -302,8 +302,8 @@ export function InventoryTab() {
                 <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-purple-800">Consumables</p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-900">{totalConsumables.length}</p>
+                <p className="mobile-text-sm font-medium text-purple-800">Consumables</p>
+                <p className="mobile-text-lg sm:text-2xl font-bold text-purple-900">{totalConsumables.length}</p>
               </div>
             </div>
           </CardContent>
@@ -316,8 +316,8 @@ export function InventoryTab() {
                 <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-800">Total Items</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">{inventory.length}</p>
+                <p className="mobile-text-sm font-medium text-gray-800">Total Items</p>
+                <p className="mobile-text-lg sm:text-2xl font-bold text-gray-900">{inventory.length}</p>
               </div>
             </div>
           </CardContent>
@@ -330,8 +330,8 @@ export function InventoryTab() {
                 <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-blue-800">Categories</p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-900">
+                <p className="mobile-text-sm font-medium text-blue-800">Categories</p>
+                <p className="mobile-text-lg sm:text-2xl font-bold text-blue-900">
                   {new Set(inventory.map(item => item.category)).size}
                 </p>
               </div>
@@ -367,6 +367,7 @@ export function InventoryTab() {
                   <Button 
                     variant="default"
                     disabled={isDemoMode || !tableExists}
+                    className="btn-mobile"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Plant
@@ -437,7 +438,7 @@ export function InventoryTab() {
                   placeholder={`Search ${activeTab === "plants" ? "plants" : activeTab === "consumables" ? "consumables" : "honey"}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
+                  className="w-full input-mobile"
                 />
               </div>
               <div className="flex gap-2">
@@ -586,24 +587,24 @@ export function InventoryTab() {
 
                     <div className="space-y-3">
                       <div>
-                        <h3 className="font-semibold text-base leading-tight line-clamp-2">{item.plant_name}</h3>
+                        <h3 className="font-semibold mobile-text-base leading-tight line-clamp-2">{item.plant_name}</h3>
                         {item.scientific_name && (
-                          <p className="text-xs text-muted-foreground italic truncate">{item.scientific_name}</p>
+                          <p className="mobile-text-xs text-muted-foreground italic truncate">{item.scientific_name}</p>
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="grid grid-cols-2 gap-2 mobile-text-sm">
                         <div>
-                          <span className="text-muted-foreground block">Qty:</span>
+                          <span className="text-muted-foreground block mobile-text-xs">Qty:</span>
                           <p className="font-medium truncate">{item.quantity}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">Price:</span>
+                          <span className="text-muted-foreground block mobile-text-xs">Price:</span>
                           <p className="font-medium truncate">Ksh {item.price}</p>
                         </div>
                         <div className="col-span-2">
-                          <span className="text-muted-foreground block">Category:</span>
-                          <p className="font-medium text-xs truncate">{item.category}</p>
+                          <span className="text-muted-foreground block mobile-text-xs">Category:</span>
+                          <p className="font-medium mobile-text-xs truncate">{item.category}</p>
                         </div>
                         <div className="col-span-2">
                           <span className="text-muted-foreground block">Status:</span>
