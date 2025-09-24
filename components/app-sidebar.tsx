@@ -48,7 +48,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   const { signOut, user } = useAuth()
-  const { setOpenMobile, isMobile } = useSidebar()
+  const { setOpenMobile, isMobile, open } = useSidebar()
 
   const handleTabSelect = (tabId: string) => {
     setActiveTab(tabId)
@@ -59,7 +59,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   }
 
   return (
-    <Sidebar>
+    <Sidebar className="border-r-0 md:border-r">
       <SidebarHeader className="p-4 sticky top-0 bg-background border-b z-10">
         {/* Updated Header Content */}
         <div className="flex items-center gap-2 px-2 py-1.5">
@@ -88,7 +88,7 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
                     onClick={() => handleTabSelect(item.id)}
                     isActive={activeTab === item.id}
                     className={cn(
-                      "transition-all duration-200 rounded-lg group",
+                      "transition-all duration-200 rounded-lg group h-12 text-base font-medium",
                       activeTab === item.id 
                         ? "text-white shadow-sm" 
                         : "hover:bg-accent"
