@@ -121,7 +121,7 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
 
       const { data, error } = await supabase
         .from("inventory")
-        .insert([insertData as any])
+        .insert([insertData] as any)
         .select()
 
       if (error) {

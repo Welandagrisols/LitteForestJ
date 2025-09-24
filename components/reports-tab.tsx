@@ -130,12 +130,12 @@ export function ReportsTab() {
       // Calculate profitability for each batch
       const profitabilityMap = new Map()
 
-      inventory?.forEach((item) => {
+      inventory?.forEach((item: any) => {
         const batchSku = item.sku
         const batchCost = item.batch_cost || 0
         const taskCostsForBatch = taskCosts
-          ?.filter((task) => task.batch_sku === batchSku)
-          .reduce((sum, task) => sum + (task.total_cost || 0), 0) || 0
+          ?.filter((task: any) => task.batch_sku === batchSku)
+          .reduce((sum: any, task: any) => sum + (task.total_cost || 0), 0) || 0
 
         const totalCostPerSeedling = item.quantity > 0 
           ? (batchCost + taskCostsForBatch) / item.quantity 
@@ -145,9 +145,9 @@ export function ReportsTab() {
         const profitMargin = item.price > 0 ? (profitPerSeedling / item.price) * 100 : 0
 
         // Calculate sales data for this batch
-        const batchSales = sales?.filter((sale) => sale.inventory?.sku === batchSku) || []
-        const seedlingsSold = batchSales.reduce((sum, sale) => sum + sale.quantity, 0)
-        const revenueGenerated = batchSales.reduce((sum, sale) => sum + sale.total_amount, 0)
+        const batchSales = sales?.filter((sale: any) => sale.inventory?.sku === batchSku) || []
+        const seedlingsSold = batchSales.reduce((sum: any, sale: any) => sum + sale.quantity, 0)
+        const revenueGenerated = batchSales.reduce((sum: any, sale: any) => sum + sale.total_amount, 0)
         const profitRealized = seedlingsSold * profitPerSeedling
 
         profitabilityMap.set(batchSku, {
@@ -253,7 +253,7 @@ export function ReportsTab() {
   return (
     <div className="space-y-6">
       {(isDemoMode || !tablesExist) && (
-        <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tablesExist} />
+        <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={tablesExist ? 'connected' : 'demo'} />
       )}
 
       {/* Summary Cards */}

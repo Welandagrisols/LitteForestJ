@@ -56,6 +56,12 @@ export function BatchStatusManager() {
         .from("inventory")
         .select("source, plant_name, ready_for_sale, created_at")
         .order("created_at", { ascending: false })
+        .returns<Array<{
+          source: string | null
+          plant_name: string
+          ready_for_sale: boolean | null
+          created_at: string
+        }>>()
 
       if (error) throw error
 
@@ -120,8 +126,8 @@ export function BatchStatusManager() {
 
     setUpdating(source)
     try {
-      const { error } = await supabase
-        .from("inventory")
+      const { error } = await (supabase
+        .from("inventory") as any)
         .update({
           ready_for_sale: newStatus,
           age: newStatus ? "6 months" : null,
@@ -166,8 +172,8 @@ export function BatchStatusManager() {
 
       if (indigenousBatch) {
         // Set 9-plant batch as current
-        await supabase
-          .from("inventory")
+        await (supabase
+          .from("inventory") as any)
           .update({
             ready_for_sale: true,
             age: "6 months",
@@ -179,8 +185,8 @@ export function BatchStatusManager() {
       // Set all other batches as future
       const otherBatches = batches.filter((batch) => batch.count !== 9)
       for (const batch of otherBatches) {
-        await supabase
-          .from("inventory")
+        await (supabase
+          .from("inventory") as any)
           .update({
             ready_for_sale: false,
             age: null,
@@ -298,7 +304,7 @@ export function BatchStatusManager() {
                       variant="outline"
                       size="sm"
                       className="text-xs px-2 py-1 h-auto leading-tight"
-                      disabled={batch.ready_for_sale || updating}
+                      disabled={!!batch.ready_for_sale || !!updating}
                       onClick={() => updateBatchStatus(batch.source, true)}
                     >
                       {updating === batch.source ? (
@@ -318,7 +324,7 @@ export function BatchStatusManager() {
                       variant="outline"
                       size="sm"
                       className="text-xs px-2 py-1 h-auto leading-tight"
-                      disabled={!batch.ready_for_sale || updating}
+                      disabled={!batch.ready_for_sale || !!updating}
                       onClick={() => updateBatchStatus(batch.source, false)}
                     >
                       {updating === batch.source ? (

@@ -206,22 +206,22 @@ export function InventoryTab() {
 
   const plantCategories = [
     "All Categories",
-    ...new Set(inventory.filter((item) => !isConsumable(item) && item.item_type !== "Honey" && item.category).map((item) => item.category)),
+    ...Array.from(new Set(inventory.filter((item) => !isConsumable(item) && item.item_type !== "Honey" && item.category).map((item) => item.category))),
   ].filter(Boolean)
 
   const consumableCategories = [
     "All Categories",
-    ...new Set(
+    ...Array.from(new Set(
       inventory
         .filter((item) => isConsumable(item))
         .map((item) => getConsumableCategory(item))
         .filter(Boolean),
-    ),
+    )),
   ].filter(Boolean)
 
   const honeyCategories = [
     "All Categories",
-    ...new Set(inventory.filter((item) => item.item_type === "Honey" || item.category === "Organic Honey").map((item) => item.category)),
+    ...Array.from(new Set(inventory.filter((item) => item.item_type === "Honey" || item.category === "Organic Honey").map((item) => item.category))),
   ].filter(Boolean)
 
   const handleExportToExcel = async () => {
@@ -267,7 +267,7 @@ export function InventoryTab() {
     <div className="space-y-6">
       {(isDemoMode || !tableExists) && (
         <div className="p-6 border-b">
-          <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />
+          <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={tableExists ? 'connected' : 'demo'} />
         </div>
       )}
 

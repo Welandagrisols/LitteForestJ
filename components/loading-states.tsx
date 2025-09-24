@@ -1,7 +1,7 @@
 
 "use client"
 
-import { Loader2, Seedling } from "lucide-react"
+import { Loader2, Sprout } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface LoadingStateProps {
@@ -19,7 +19,7 @@ export function LoadingState({
     return (
       <div className={cn("flex items-center justify-center p-8", className)}>
         <div className="flex flex-col items-center gap-3">
-          <Seedling className="h-8 w-8 animate-bounce text-green-600" />
+          <Sprout className="h-8 w-8 animate-bounce text-green-600" />
           <p className="text-sm text-muted-foreground">{message}</p>
         </div>
       </div>

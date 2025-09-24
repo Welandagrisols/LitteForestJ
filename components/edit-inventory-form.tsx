@@ -246,7 +246,7 @@ export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFo
       // Upload image if selected and link it to the inventory item
       let imageUrl = formData.image_url
       if (imageFile) {
-        const { publicUrl, error } = await uploadImageAndLinkToInventory(imageFile, item.id);
+        const { publicUrl, error } = await uploadImageAndLinkToInventory(imageFile, item.id) as any;
         if (error) {
           console.error("Image upload and linking error:", error);
           toast({
@@ -298,7 +298,7 @@ export function EditInventoryForm({ item, onSuccess, onCancel }: EditInventoryFo
         updated_at: new Date().toISOString(),
       }
 
-      const { data, error } = await supabase.from("inventory").update(updateData).eq("id", item.id)
+      const { data, error } = await (supabase.from("inventory") as any).update(updateData).eq("id", item.id)
 
       if (error) {
         console.error("Update error:", error)

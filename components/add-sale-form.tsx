@@ -192,7 +192,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
         p_customer_contact: isNewCustomer ? dataFromForm.customer_contact?.trim() : null,
         p_customer_email: isNewCustomer ? (dataFromForm.customer_email?.trim() || null) : null,
         p_total_amount: Number(dataFromForm.total_amount)
-      })
+      } as any)
 
       if (error) {
         console.error("RPC Error:", error)
@@ -207,10 +207,10 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       console.log("RPC Response:", data)
 
       // Handle the response from the atomic function
-      if (!data?.success) {
-        const errorMessage = data?.message || "Unknown error occurred"
+      if (!(data as any)?.success) {
+        const errorMessage = (data as any)?.message || "Unknown error occurred"
         
-        switch (data?.error) {
+        switch ((data as any)?.error) {
           case 'ITEM_NOT_FOUND':
             toast({
               title: "Item Not Found",
@@ -221,7 +221,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
           case 'INSUFFICIENT_STOCK':
             toast({
               title: "Insufficient Stock",
-              description: `${errorMessage}. Available: ${data.available_quantity || 0}`,
+              description: `${errorMessage}. Available: ${(data as any).available_quantity || 0}`,
               variant: "destructive",
             })
             // Refresh inventory to show current quantities
@@ -249,7 +249,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       
       toast({
         title: "Success",
-        description: data.message || "Sale recorded successfully",
+        description: (data as any).message || "Sale recorded successfully",
       })
 
       // Reset form

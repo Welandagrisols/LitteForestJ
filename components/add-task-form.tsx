@@ -196,7 +196,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
           consumables_cost: consumablesCost,
           status: formData.status,
           assigned_to: formData.assigned_to,
-        })
+        } as any)
         .select()
         .single()
 
@@ -207,7 +207,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         const usageInserts = consumableUsages
           .filter((usage) => usage.consumable_sku && usage.quantity_used > 0)
           .map((usage) => ({
-            task_id: taskData.id,
+            task_id: (taskData as any).id,
             consumable_sku: usage.consumable_sku,
             consumable_name: usage.consumable_name,
             quantity_used: usage.quantity_used,
@@ -216,7 +216,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
           }))
 
         if (usageInserts.length > 0) {
-          const { error: usageError } = await supabase.from("task_consumables").insert(usageInserts)
+          const { error: usageError } = await supabase.from("task_consumables").insert(usageInserts as any)
           if (usageError) throw usageError
         }
       }

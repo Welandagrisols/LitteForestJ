@@ -19,6 +19,7 @@ export interface Database {
           row: string | null
           source: string | null
           user_id: string | null
+          ready_for_sale: boolean | null
           created_at: string
           updated_at: string
         }
@@ -37,6 +38,7 @@ export interface Database {
           row?: string | null
           source?: string | null
           user_id?: string | null
+          ready_for_sale?: boolean | null
           created_at?: string
           updated_at?: string
         }
@@ -55,6 +57,13 @@ export interface Database {
           row?: string | null
           source?: string | null
           user_id?: string | null
+          ready_for_sale?: boolean | null
+          batch_cost?: number
+          cost_per_seedling?: number
+          item_type?: string
+          description?: string | null
+          image_url?: string | null
+          unit?: string | null
           created_at?: string
           updated_at?: string
         }

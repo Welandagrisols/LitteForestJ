@@ -211,7 +211,7 @@ export function BulkImportForm({ onSuccess }: BulkImportFormProps) {
 
       // Get existing SKUs to avoid duplicates
       const { data: existingSKUs } = await supabase.from("inventory").select("sku").not("sku", "is", null)
-      const existingSKUSet = new Set(existingSKUs?.map((item) => item.sku) || [])
+      const existingSKUSet = new Set(existingSKUs?.map((item: any) => item.sku) || [])
 
       const batchSize = 5
       let imported = 0
@@ -261,7 +261,7 @@ export function BulkImportForm({ onSuccess }: BulkImportFormProps) {
           insertData.map((item) => ({ name: item.plant_name, sku: item.sku, current: item.ready_for_sale })),
         )
 
-        const { data, error } = await supabase.from("inventory").insert(insertData).select()
+        const { data, error } = await supabase.from("inventory").insert(insertData as any).select()
 
         if (error) {
           console.error("Batch import error:", error)
@@ -281,7 +281,7 @@ export function BulkImportForm({ onSuccess }: BulkImportFormProps) {
                 existingSKUSet.add(retrySKU)
 
                 const retryItem = { ...item, sku: retrySKU }
-                const { error: retryError } = await supabase.from("inventory").insert([retryItem])
+                const { error: retryError } = await supabase.from("inventory").insert([retryItem] as any)
 
                 if (!retryError) {
                   imported += 1

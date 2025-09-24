@@ -145,7 +145,7 @@ export function DashboardTab() {
       const lowStockThreshold = 10
       const lowStockItemsList: any[] = []
 
-      inventoryData?.forEach((item) => {
+      inventoryData?.forEach((item: any) => {
         totalQuantity += item.quantity
         if (item.quantity < lowStockThreshold) {
           lowStock++
@@ -181,7 +181,7 @@ export function DashboardTab() {
       let todaySalesCount = 0
       const today = new Date().toISOString().split("T")[0]
 
-      salesData?.forEach((sale) => {
+      salesData?.forEach((sale: any) => {
         totalAmount += sale.total_amount
         if (sale.sale_date.startsWith(today)) {
           todaySalesCount++

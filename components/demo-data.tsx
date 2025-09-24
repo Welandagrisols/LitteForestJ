@@ -188,15 +188,15 @@ export function DemoData({ onDataChange }: DemoDataProps) {
       await supabase.from("customers").delete().neq("id", "")
 
       // Insert demo customers
-      const { error: customersError } = await supabase.from("customers").insert(demoCustomers)
+      const { error: customersError } = await supabase.from("customers").insert(demoCustomers as any)
       if (customersError) throw customersError
 
       // Insert demo inventory
-      const { error: inventoryError } = await supabase.from("inventory").insert(demoInventory)
+      const { error: inventoryError } = await supabase.from("inventory").insert(demoInventory as any)
       if (inventoryError) throw inventoryError
 
       // Insert demo sales
-      const { error: salesError } = await supabase.from("sales").insert(demoSales)
+      const { error: salesError } = await supabase.from("sales").insert(demoSales as any)
       if (salesError) throw salesError
 
       toast({

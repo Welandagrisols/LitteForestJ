@@ -66,17 +66,17 @@ export function OpsTab() {
 
       if (error) throw error
 
-      const plants = inventory?.filter((item) => !item.category?.startsWith("Consumable:")) || []
-      const consumables = inventory?.filter((item) => item.category?.startsWith("Consumable:")) || []
+      const plants = inventory?.filter((item: any) => !item.category?.startsWith("Consumable:")) || []
+      const consumables = inventory?.filter((item: any) => item.category?.startsWith("Consumable:")) || []
 
-      const currentPlants = plants.filter((item) => item.ready_for_sale === true)
-      const futurePlants = plants.filter((item) => item.ready_for_sale === false)
+      const currentPlants = plants.filter((item: any) => item.ready_for_sale === true)
+      const futurePlants = plants.filter((item: any) => item.ready_for_sale === false)
 
-      const categories = [...new Set(plants.map((item) => item.category).filter(Boolean))]
+      const categories = [...Array.from(new Set(plants.map((item: any) => item.category).filter(Boolean)))]
 
       // Calculate healthy plants and total value
-      const healthyPlants = plants.filter((item) => item.health_status === "Healthy").length;
-      const totalValue = plants.reduce((sum, item) => sum + (item.value || 0), 0);
+      const healthyPlants = plants.filter((item: any) => item.health_status === "Healthy").length;
+      const totalValue = plants.reduce((sum: any, item: any) => sum + (item.value || 0), 0);
 
 
       setStats({
@@ -227,7 +227,7 @@ export function OpsTab() {
       // Group items by plant name (case-insensitive)
       const itemGroups: { [name: string]: any[] } = {};
 
-      inventory?.forEach((item) => {
+      inventory?.forEach((item: any) => {
         const name = item.plant_name.toLowerCase().trim();
         if (!itemGroups[name]) {
           itemGroups[name] = [];

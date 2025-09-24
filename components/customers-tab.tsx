@@ -357,7 +357,7 @@ export function CustomersTab() {
 
   return (
     <div className="space-y-6">
-      {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />}
+      {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={tableExists ? "connected" : "demo"} />}
 
       <Tabs defaultValue="directory" className="w-full">
         <TabsList className="grid w-full grid-cols-2">

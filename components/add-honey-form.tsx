@@ -138,7 +138,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
         updated_at: new Date().toISOString(),
       }
 
-      const { data, error } = await supabase.from("inventory").insert([insertData]).select()
+      const { data, error } = await supabase.from("inventory").insert([insertData] as any).select()
 
       if (error) {
         console.error("Insert error:", error)
@@ -157,7 +157,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
           category: "Infrastructure",
         }
 
-        await supabase.from("tasks").insert([apiaryTaskData])
+        await supabase.from("tasks").insert([apiaryTaskData] as any)
       }
 
       toast({

@@ -86,7 +86,7 @@ export function AlertsPanel({ inventory, sales }: AlertsPanelProps) {
   }, [inventory, sales, dismissedAlerts])
 
   const dismissAlert = (alertId: string) => {
-    setDismissedAlerts(prev => new Set([...prev, alertId]))
+    setDismissedAlerts(prev => new Set(Array.from(prev).concat(alertId)))
   }
 
   if (alerts.length === 0) {

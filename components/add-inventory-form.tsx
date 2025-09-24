@@ -116,8 +116,8 @@ export function AddInventoryForm({ onSuccess, onClose }: AddInventoryFormProps) 
       console.log("Inserting plant data:", insertData)
 
       const { data, error } = await supabase
-        .from<any>("inventory")   // 👈 this tells TypeScript to stop complaining
-        .insert([insertData])
+        .from("inventory")
+        .insert([insertData] as any)
         .select()
 
       if (error) {

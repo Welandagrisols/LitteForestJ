@@ -65,8 +65,8 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
           email: formData.email || null,
           user_id: user.id,
           created_at: new Date().toISOString(),
-        } as any, // Temporary type assertion until Supabase types are regenerated
-      ])
+        },
+      ] as any)
 
       if (error) throw error
 
