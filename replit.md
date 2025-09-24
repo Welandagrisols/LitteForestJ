@@ -12,11 +12,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend Architecture
 - **Framework**: Next.js 14 with TypeScript and App Router
-- **UI Components**: Radix UI primitives with shadcn/ui design system
+- **UI Components**: Radix UI primitives with shadcn/ui design system  
 - **Styling**: Tailwind CSS with CSS custom properties for theming
-- **Mobile Support**: Capacitor for cross-platform mobile deployment (Android/iOS)
 - **State Management**: React hooks and context providers for authentication and app state
-- **Offline Support**: IndexedDB for local storage with automatic sync when online
+- **Development**: Hot module replacement and fast refresh for rapid development
 
 ## Backend Architecture
 - **Database**: Supabase (PostgreSQL) with real-time subscriptions
