@@ -63,9 +63,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
       <SidebarHeader className="p-4 sticky top-0 bg-background border-b z-10">
         {/* Updated Header Content */}
         <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg" style={{backgroundColor: '#4CB76F'}}>
-            <Leaf className="size-4 text-white" />
-          </div>
+          <img 
+            src="/images/littleforest-logo.png" 
+            alt="LittleForest Logo" 
+            className="size-8 rounded-lg object-contain"
+          />
           <div className="flex flex-col gap-0.5 leading-none">
             <span className="font-semibold">
               <span style={{color: '#FF7A29'}}>Little</span>

@@ -12,13 +12,12 @@ import { WebsiteIntegrationTab } from '@/components/website-integration-tab'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { DemoModeBanner } from '@/components/demo-mode-banner'
-import { Header } from '@/components/header'
+// Header removed for mobile-first sidebar-only design
 import { ErrorBoundary } from '@/components/error-boundary'
 import { supabase, isDemoMode } from '@/lib/supabase'
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <ErrorBoundary>
@@ -26,12 +25,7 @@ export default function HomePage() {
         <SidebarProvider>
           <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <SidebarInset className="flex-1">
-            <Header 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab}
-              mobileMenuOpen={mobileMenuOpen}
-              setMobileMenuOpen={setMobileMenuOpen}
-            />
+            {/* Header removed for mobile-first sidebar-only design */}
             
             <main className="flex-1 overflow-auto p-6">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

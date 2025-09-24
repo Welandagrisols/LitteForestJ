@@ -86,15 +86,10 @@ export function CustomersTab() {
     try {
       setLoading(true)
       
-      if (!user) {
-        setCustomers([])
-        return
-      }
-
+      // Removed user filtering to show all data (suspended user differentiation)
       const { data, error } = await supabase
         .from("customers")
         .select("*")
-        .eq("user_id", user.id)
         .order("name", { ascending: true })
 
       if (error) throw error
@@ -109,16 +104,11 @@ export function CustomersTab() {
 
   async function fetchPlants() {
     try {
-      if (!user) {
-        setPlants([])
-        return
-      }
-
+      // Removed user filtering to show all data (suspended user differentiation)
       const { data, error } = await supabase
         .from("inventory")
         .select("id, plant_name, quantity, price, status")
         .eq("status", "Current")
-        .eq("user_id", user.id)
         .gt("quantity", 0)
         .order("plant_name", { ascending: true })
 

@@ -70,14 +70,13 @@ export function Header({ activeTab, setActiveTab, mobileMenuOpen, setMobileMenuO
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">LF</span>
-              </div>
+              <img 
+                src="/images/littleforest-logo.png" 
+                alt="LittleForest Logo" 
+                className="w-8 h-8 rounded-lg object-contain"
+              />
               <div>
                 <h1 className="text-xl font-bold">LittleForest</h1>
-                <Badge variant="secondary" className="text-xs">
-                  Demo Mode
-                </Badge>
               </div>
             </div>
           </div>
@@ -116,14 +115,13 @@ export function Header({ activeTab, setActiveTab, mobileMenuOpen, setMobileMenuO
                 <SheetContent side="left" className="w-80">
                   <div className="mt-6">
                     <div className="flex items-center space-x-2 mb-6">
-                      <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">LF</span>
-                      </div>
+                      <img 
+                        src="/images/littleforest-logo.png" 
+                        alt="LittleForest Logo" 
+                        className="w-8 h-8 rounded-lg object-contain"
+                      />
                       <div>
                         <h2 className="text-lg font-bold">LittleForest</h2>
-                        <Badge variant="secondary" className="text-xs">
-                          Demo Mode
-                        </Badge>
                       </div>
                     </div>
                     <NavigationContent />

@@ -72,15 +72,10 @@ export function InventoryTab() {
     try {
       setLoading(true)
       
-      if (!user) {
-        setInventory([])
-        return
-      }
-
+      // Removed user filtering to show all data (suspended user differentiation)
       const { data, error } = await supabase
         .from("inventory")
         .select("*")
-        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
 
       if (error) throw error
