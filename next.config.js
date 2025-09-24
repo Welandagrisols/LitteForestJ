@@ -7,6 +7,8 @@ const nextConfig = {
     domains: ['localhost'],
     unoptimized: true
   },
+  // Allow cross-origin requests from Replit domains
+  allowedDevOrigins: ['*.replit.dev', '*.replit.co'],
   async headers() {
     return [
       {
