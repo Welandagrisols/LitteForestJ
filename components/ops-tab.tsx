@@ -357,58 +357,58 @@ export function OpsTab() {
 
       {/* Statistics Dashboard */}
       {/* Summary Cards */}
-      <div className="mobile-optimized-grid">
-        <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
-                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
+        <Card className="bg-green-50 border-green-200">
+          <CardContent className="p-2 sm:p-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="p-1 sm:p-1.5 bg-green-600 rounded-full flex-shrink-0">
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-green-800 truncate">Total Plants</p>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-green-900">{loading ? "..." : stats.totalPlants}</p>
+                <p className="text-xs font-medium text-green-800 truncate">Total Plants</p>
+                <p className="text-sm sm:text-lg font-bold text-green-900">{loading ? "..." : stats.totalPlants}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
-                <Database className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <Card className="bg-purple-50 border-purple-200">
+          <CardContent className="p-2 sm:p-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="p-1 sm:p-1.5 bg-purple-600 rounded-full flex-shrink-0">
+                <Database className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-purple-800 truncate">Categories</p>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-purple-900">{loading ? "..." : stats.categories.length}</p>
+                <p className="text-xs font-medium text-purple-800 truncate">Categories</p>
+                <p className="text-sm sm:text-lg font-bold text-purple-900">{loading ? "..." : stats.categories.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-2 sm:p-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="p-1 sm:p-1.5 bg-blue-600 rounded-full flex-shrink-0">
+                <Package className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-blue-800 truncate">Healthy Plants</p>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-blue-900">{loading ? "..." : stats.healthyPlants}</p>
+                <p className="text-xs font-medium text-blue-800 truncate">Healthy Plants</p>
+                <p className="text-sm sm:text-lg font-bold text-blue-900">{loading ? "..." : stats.healthyPlants}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-orange-50 border-orange-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
-                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <Card className="bg-orange-50 border-orange-200">
+          <CardContent className="p-2 sm:p-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="p-1 sm:p-1.5 bg-orange-600 rounded-full flex-shrink-0">
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-orange-800 truncate">Avg Value</p>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-orange-900">
+                <p className="text-xs font-medium text-orange-800 truncate">Avg Value</p>
+                <p className="text-sm sm:text-lg font-bold text-orange-900">
                   {loading ? "..." : `Ksh ${stats.totalPlants > 0 ? Math.round(stats.totalValue / stats.totalPlants) : 0}`}
                 </p>
               </div>
