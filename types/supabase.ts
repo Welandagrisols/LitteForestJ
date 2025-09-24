@@ -18,6 +18,7 @@ export interface Database {
           section: string | null
           row: string | null
           source: string | null
+          user_id: string | null
           created_at: string
           updated_at: string
         }
@@ -35,6 +36,7 @@ export interface Database {
           section?: string | null
           row?: string | null
           source?: string | null
+          user_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -52,6 +54,7 @@ export interface Database {
           section?: string | null
           row?: string | null
           source?: string | null
+          user_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -64,6 +67,7 @@ export interface Database {
           sale_date: string
           customer_id: string | null
           total_amount: number
+          user_id: string | null
           created_at: string
         }
         Insert: {
@@ -73,6 +77,7 @@ export interface Database {
           sale_date?: string
           customer_id?: string | null
           total_amount: number
+          user_id?: string | null
           created_at?: string
         }
         Update: {
@@ -82,6 +87,7 @@ export interface Database {
           sale_date?: string
           customer_id?: string | null
           total_amount?: number
+          user_id?: string | null
           created_at?: string
         }
       }
@@ -91,6 +97,7 @@ export interface Database {
           name: string
           contact: string
           email: string | null
+          user_id: string | null
           created_at: string
         }
         Insert: {
@@ -98,6 +105,7 @@ export interface Database {
           name: string
           contact: string
           email?: string | null
+          user_id?: string | null
           created_at?: string
         }
         Update: {
@@ -105,6 +113,7 @@ export interface Database {
           name?: string
           contact?: string
           email?: string | null
+          user_id?: string | null
           created_at?: string
         }
       }

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { isDemoMode } from "@/lib/supabase"
+import { useAuth } from "@/contexts/auth-context"
 
 interface AddCustomerFormProps {
   onSuccess: () => void
@@ -17,6 +18,7 @@ interface AddCustomerFormProps {
 export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { user } = useAuth()
 
   const [formData, setFormData] = useState({
     name: "",
@@ -44,6 +46,15 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
       return
     }
 
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to add customers",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -52,8 +63,9 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
           name: formData.name,
           contact: formData.contact,
           email: formData.email || null,
+          user_id: user.id,
           created_at: new Date().toISOString(),
-        },
+        } as any, // Temporary type assertion until Supabase types are regenerated
       ])
 
       if (error) throw error
