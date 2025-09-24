@@ -8,7 +8,13 @@ const nextConfig = {
     unoptimized: true
   },
   // Allow cross-origin requests from Replit domains and localhost
-  allowedDevOrigins: ['*.replit.dev', '*.replit.co', '127.0.0.1', 'localhost'],
+  allowedDevOrigins: [
+    '*.replit.dev', 
+    '*.replit.co', 
+    '*.janeway.replit.dev',
+    '127.0.0.1', 
+    'localhost'
+  ],
   async headers() {
     return [
       {
