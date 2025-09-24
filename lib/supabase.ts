@@ -82,13 +82,13 @@ export const checkTableExists = async (tableName: string): Promise<boolean> => {
       console.error(`Supabase error for table ${tableName}:`, error)
 
       // If we get a specific error about the table not existing, return false
-      if (error.message.includes('does not exist') || 
+      if (error.message.includes('does not exist') ||
           error.message.includes('relation') && error.message.includes('does not exist')) {
         return false
       }
 
       // For network errors, throw to trigger demo mode
-      if (error.message.includes('Failed to fetch') || 
+      if (error.message.includes('Failed to fetch') ||
           error.message.includes('NetworkError') ||
           error.message.includes('TypeError')) {
         throw new Error(`Network error: ${error.message}`)
