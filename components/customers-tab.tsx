@@ -85,7 +85,7 @@ export function CustomersTab() {
   async function fetchCustomers() {
     try {
       setLoading(true)
-      
+
       // Removed user filtering to show all data (suspended user differentiation)
       const { data, error } = await supabase
         .from("customers")
@@ -423,89 +423,156 @@ export function CustomersTab() {
                 />
               </div>
 
-              <div className="rounded-md border border-border overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/50">
-                      <TableHead>Name</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Added On</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loading ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8">
-                          Loading customers...
-                        </TableCell>
-                      </TableRow>
-                    ) : filteredCustomers.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8">
-                          No customers found
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredCustomers.map((customer) => (
-                        <TableRow key={customer.id} className="hover:bg-muted/50">
-                          <TableCell className="font-medium">{customer.name}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Phone className="h-4 w-4 text-muted-foreground" />
-                              {customer.contact}
+              {/* Mobile-first responsive layout */}
+          <div className="block md:hidden">
+            {/* Mobile Card Layout */}
+            {loading ? (
+              <div className="text-center py-8">Loading customers...</div>
+            ) : filteredCustomers.length === 0 ? (
+              <div className="text-center py-8">No customers found</div>
+            ) : (
+              <div className="space-y-3">
+                {filteredCustomers.map((customer) => (
+                  <Card key={customer.id} className="mobile-card">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-semibold text-sm sm:text-base">{customer.name}</h3>
+                          <Badge variant="secondary" className="text-xs">
+                            {new Date(customer.created_at).toLocaleDateString()}
+                          </Badge>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Phone className="h-3 w-3 text-muted-foreground" />
+                            <span className="font-mono">{customer.contact}</span>
+                          </div>
+                          {customer.email && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Mail className="h-3 w-3 text-muted-foreground" />
+                              <span className="truncate">{customer.email}</span>
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            {customer.email ? (
-                              <div className="flex items-center gap-2">
-                                <Mail className="h-4 w-4 text-muted-foreground" />
-                                {customer.email}
-                              </div>
-                            ) : (
-                              "-"
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {new Date(customer.created_at).toLocaleDateString()}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  sendWhatsAppMessage(
-                                    customer.contact,
-                                    `Hi ${customer.name.split(" ")[0]}, thank you for being our valued customer!`,
-                                  )
-                                }
-                                className="flex items-center gap-1"
-                              >
-                                <MessageSquare className="h-3 w-3" />
-                                WhatsApp
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteCustomer(customer.id, customer.name)}
-                                disabled={isDemoMode || !tableExists}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              sendWhatsAppMessage(
+                                customer.contact,
+                                `Hi ${customer.name.split(" ")[0]}, thank you for being our valued customer!`,
+                              )
+                            }
+                            className="flex-1 text-xs"
+                          >
+                            <MessageSquare className="h-3 w-3 mr-1" />
+                            WhatsApp
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteCustomer(customer.id, customer.name)}
+                            disabled={isDemoMode || !tableExists}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
+            )}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden md:block rounded-md border border-border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead>Name</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Added On</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8">
+                      Loading customers...
+                    </TableCell>
+                  </TableRow>
+                ) : filteredCustomers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8">
+                      No customers found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCustomers.map((customer) => (
+                    <TableRow key={customer.id} className="hover:bg-muted/50">
+                      <TableCell className="font-medium">{customer.name}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          {customer.contact}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {customer.email ? (
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            {customer.email}
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          {new Date(customer.created_at).toLocaleDateString()}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              sendWhatsAppMessage(
+                                customer.contact,
+                                `Hi ${customer.name.split(" ")[0]}, thank you for being our valued customer!`,
+                              )
+                            }
+                            className="flex items-center gap-1"
+                          >
+                            <MessageSquare className="h-3 w-3" />
+                            WhatsApp
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteCustomer(customer.id, customer.name)}
+                            disabled={isDemoMode || !tableExists}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
             </CardContent>
           </Card>
         </TabsContent>
