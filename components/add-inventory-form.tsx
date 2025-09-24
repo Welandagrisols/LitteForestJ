@@ -12,6 +12,14 @@ import { useToast } from "@/components/ui/use-toast"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { uploadImageToSupabase, uploadImageAndLinkToInventory } from "@/lib/image-upload"
 import { notificationService } from "@/lib/notification-service"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface AddInventoryFormProps {
   onSuccess: () => void

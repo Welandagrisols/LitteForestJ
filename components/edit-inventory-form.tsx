@@ -14,6 +14,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { uploadImageToSupabase, uploadImageAndLinkToInventory, deleteImageFromSupabase } from "@/lib/image-upload"
 import { notificationService } from "@/lib/notification-service"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface EditInventoryFormProps {
   item: any

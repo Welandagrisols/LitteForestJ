@@ -11,6 +11,14 @@ import { useToast } from "@/components/ui/use-toast"
 import { Checkbox } from "@/components/ui/checkbox"
 import { isDemoMode } from "@/lib/supabase"
 import { useForm } from "react-hook-form" // Import useForm
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface SaleFormData {
   inventory_id: string
@@ -166,6 +174,8 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
         description: `Cannot sell ${dataFromForm.quantity} units. Only ${selectedInventoryItem.quantity} available.`,
         variant: "destructive",
       })
+      // Refresh inventory to show current quantities
+      fetchInventory()
       return
     }
 
@@ -209,7 +219,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       // Handle the response from the atomic function
       if (!(data as any)?.success) {
         const errorMessage = (data as any)?.message || "Unknown error occurred"
-        
+
         switch ((data as any)?.error) {
           case 'ITEM_NOT_FOUND':
             toast({
@@ -246,7 +256,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
 
       // Success! The sale was recorded atomically
       console.log("Sale transaction completed successfully via RPC")
-      
+
       toast({
         title: "Success",
         description: (data as any).message || "Sale recorded successfully",

@@ -10,6 +10,14 @@ import { useToast } from "@/components/ui/use-toast"
 import { supabase, isDemoMode } from "@/lib/supabase"
 import { Upload, FileText, CheckCircle, Play } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface BulkImportFormProps {
   onSuccess?: () => void
@@ -345,10 +353,104 @@ export function BulkImportForm({ onSuccess }: BulkImportFormProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="h-5 w-5" />
-          Bulk Import Plants
-        </CardTitle>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="ml-auto gap-1">
+              <Upload className="h-4 w-4" />
+              <span className="sr-only sm:not-sr-only sm:inline-block">Import Plants</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Bulk Import Plants</DialogTitle>
+              <DialogDescription>Import multiple plants at once using CSV or manual entry</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="document">Or Upload Future Plants Document</Label>
+                <Input id="document" type="file" accept=".doc,.docx,.txt" onChange={handleFileChange} disabled={loading} />
+                <p className="text-sm text-muted-foreground">
+                  Upload a document containing plants you plan to grow (will be marked as "Future Plans")
+                </p>
+              </div>
+
+              {file && (
+                <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-sm">{file.name}</span>
+                </div>
+              )}
+
+              {parsedData.length > 0 && (
+                <Button
+                  onClick={handleBulkImport}
+                  disabled={loading || parsedData.length === 0}
+                  className="w-full bg-primary hover:bg-primary/90"
+                  size="lg"
+                >
+                  {importStatus === "importing" ? "Importing..." : `Import ${parsedData.length} Plants`}
+                </Button>
+              )}
+
+              {importStatus === "importing" && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Import Progress</span>
+                    <span>{Math.round(importProgress)}%</span>
+                  </div>
+                  <Progress value={importProgress} className="w-full" />
+                  <p className="text-xs text-muted-foreground">Importing plants... First 9 will be marked as "In Nursery"</p>
+                </div>
+              )}
+
+              {parsedData.length > 0 && importStatus !== "importing" && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Ready to import {parsedData.length} plants</span>
+                  </div>
+
+                  <div className="max-h-40 overflow-y-auto border rounded-md p-2 bg-muted/50">
+                    <div className="text-xs font-medium mb-2">Preview - Auto Status Assignment:</div>
+                    {parsedData.slice(0, 5).map((plant, index) => (
+                      <div key={index} className="text-xs py-2 border-b last:border-b-0">
+                        <div className="flex justify-between items-center">
+                          <span>
+                            <strong>{plant.plant_name}</strong>
+                          </span>
+                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
+                            🌱 Will be in Nursery
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    {parsedData.length > 5 && (
+                      <div className="text-xs text-muted-foreground mt-1">...and {parsedData.length - 5} more items</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {importStatus === "complete" && (
+                <div className="flex items-center gap-2 text-sm text-green-600">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Import completed successfully!</span>
+                </div>
+              )}
+
+              <div className="text-xs text-muted-foreground space-y-2">
+                <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                  <p className="font-medium text-blue-900 mb-1">Smart Status Assignment:</p>
+                  <div className="space-y-1 text-blue-800">
+                    <p>• First 9 plants uploaded → "In Nursery" (ready for sale)</p>
+                    <p>• Additional plants → "Future Plans" (planning stage)</p>
+                    <p>• Click the arrow buttons to move plants between statuses</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-4">

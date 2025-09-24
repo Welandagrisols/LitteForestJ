@@ -4,8 +4,8 @@ const nextConfig = {
     serverComponentsExternalPackages: ['@supabase/supabase-js']
   },
   images: {
-    domains: ['localhost'],
-    unoptimized: true
+    domains: ['localhost', 'mjsuwlpixcregiikiusd.supabase.co'],
+    unoptimized: process.env.NODE_ENV === 'development'
   },
   // Allow cross-origin requests from Replit domains and localhost
   allowedDevOrigins: [
@@ -23,12 +23,16 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate'
+            value: process.env.NODE_ENV === 'development' 
+              ? 'no-cache, no-store, must-revalidate'
+              : 'public, max-age=31536000, immutable'
           }
         ]
       }
     ]
-  }
+  },
+  output: 'standalone',
+  swcMinify: true
 }
 
 module.exports = nextConfig

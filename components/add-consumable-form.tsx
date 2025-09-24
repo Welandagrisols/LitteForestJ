@@ -3,6 +3,14 @@
 import type React from "react"
 import { useState } from "react"
 import { supabase, isDemoMode } from "@/lib/supabase"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 type Inventory = {
   plant_name: string;

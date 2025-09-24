@@ -282,7 +282,7 @@ export function BatchStatusManager() {
           }
 
           return (
-            <Card key={`${batch.source}-${batch.ready_for_sale}`} className={`${cardColor} border transition-colors`}>
+            <Card key={`${batch.source}-${batch.count}-${batch.ready_for_sale ? 'current' : 'future'}`} className={`${cardColor} border transition-colors`}>
               <CardContent className="p-3">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">

@@ -1,4 +1,3 @@
-
 "use client"
 
 import type React from "react"
@@ -12,6 +11,15 @@ import { useToast } from "@/components/ui/use-toast"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 
 interface AddHoneyFormProps {
   onSuccess: () => void
@@ -106,7 +114,7 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
 
       // Calculate production cost from tasks and apiary investment
       let totalProductionCost = totalApiaryInvestment;
-      
+
       // If no apiary data provided, set minimal batch cost
       if (totalProductionCost === 0) {
         totalProductionCost = finalFormData.quantity * 50; // Default cost estimation
@@ -209,318 +217,84 @@ export function AddHoneyForm({ onSuccess, onClose }: AddHoneyFormProps) {
   const isMobile = useIsMobile()
 
   return (
-    <div className="flex flex-col max-h-[80vh]">
-      <div className="flex-1 overflow-y-auto px-1">
-        <div className="space-y-6">
-          {/* Product Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`grid grid-cols-1 ${isMobile ? "gap-6" : "md:grid-cols-2 gap-4"}`}>
-                <div className="space-y-2">
-                  <Label htmlFor="product_name">Product Name *</Label>
-                  <Input 
-                    id="product_name" 
-                    name="product_name" 
-                    value={formData.product_name} 
-                    onChange={handleChange} 
-                    placeholder="e.g., Organic Wildflower Honey"
-                    required 
-                  />
-                </div>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="ml-auto">Add New Product</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add New Honey Product</DialogTitle>
+          <DialogDescription>Add a new honey product to your inventory</DialogDescription>
+        </DialogHeader>
+        <AddHoneyForm onSuccess={onSuccess} onClose={onClose} />
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-                <div className="space-y-2">
-                  <Label htmlFor="honey_type">Honey Type *</Label>
-                  <Select value={formData.honey_type} onValueChange={(value) => handleSelectChange("honey_type", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select honey type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Raw Honey">Raw Honey</SelectItem>
-                      <SelectItem value="Wildflower Honey">Wildflower Honey</SelectItem>
-                      <SelectItem value="Acacia Honey">Acacia Honey</SelectItem>
-                      <SelectItem value="Clover Honey">Clover Honey</SelectItem>
-                      <SelectItem value="Manuka Honey">Manuka Honey</SelectItem>
-                      <SelectItem value="Multi-floral Honey">Multi-floral Honey</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+function BatchStatusManager() {
+  const [showForm, setShowForm] = useState(false)
+  const [inventory, setInventory] = useState([])
 
-                <div className="space-y-2">
-                  <Label htmlFor="quantity">Quantity *</Label>
-                  <Input
-                    id="quantity"
-                    name="quantity"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value={formData.quantity}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+  // Fetch inventory data (replace with your actual fetch logic)
+  // For demonstration, we'll use a mock array
+  const mockInventory = [
+    { sku: "HON1234", name: "Wildflower Honey", quantity: 100, unit: "kg", price: 1500, status: "Ready" },
+    { sku: "HON5678", name: "Acacia Honey", quantity: 75, unit: "kg", price: 1800, status: "Processing" },
+    { sku: "HON9101", name: "Clover Honey", quantity: 120, unit: "kg", price: 1300, status: "Ready" },
+    { sku: "HON1121", name: "Manuka Honey", quantity: 50, unit: "kg", price: 3000, status: "Processing" },
+  ]
 
-                <div className="space-y-2">
-                  <Label htmlFor="unit">Unit</Label>
-                  <Select value={formData.unit} onValueChange={(value) => handleSelectChange("unit", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="kg">Kilograms (kg)</SelectItem>
-                      <SelectItem value="liters">Liters</SelectItem>
-                      <SelectItem value="jars">Jars</SelectItem>
-                      <SelectItem value="bottles">Bottles</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+  // Simulate fetching data on mount
+  useState(() => {
+    setInventory(mockInventory)
+  })
 
-                <div className="space-y-2">
-                  <Label htmlFor="packaging_type">Packaging Type</Label>
-                  <Select value={formData.packaging_type} onValueChange={(value) => handleSelectChange("packaging_type", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select packaging" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Glass Jar">Glass Jar</SelectItem>
-                      <SelectItem value="Plastic Container">Plastic Container</SelectItem>
-                      <SelectItem value="Squeeze Bottle">Squeeze Bottle</SelectItem>
-                      <SelectItem value="Bulk Container">Bulk Container</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="packaging_size">Package Size</Label>
-                  <Input
-                    id="packaging_size"
-                    name="packaging_size"
-                    value={formData.packaging_size}
-                    onChange={handleChange}
-                    placeholder="e.g., 500g, 1kg, 250ml"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="batch_cost">Total Production Cost (Ksh)</Label>
-                  <Input
-                    id="batch_cost"
-                    name="batch_cost"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.batch_cost}
-                    onChange={handleChange}
-                    placeholder="Will be calculated from tasks and consumables"
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Production cost will be automatically calculated from related tasks and consumables used
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="price">Selling Price per {formData.unit} (Ksh) *</Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="harvest_date">Harvest Date</Label>
-                  <Input
-                    id="harvest_date"
-                    name="harvest_date"
-                    type="date"
-                    value={formData.harvest_date}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="source_hives">Source Hives</Label>
-                  <Input
-                    id="source_hives"
-                    name="source_hives"
-                    value={formData.source_hives}
-                    onChange={handleChange}
-                    placeholder="e.g., Hive 1-5, Block A"
-                  />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="description">Product Description</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder="Describe the honey for your website customers..."
-                    rows={3}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="sku">SKU (Auto-generated if empty)</Label>
-                  <Input id="sku" name="sku" value={formData.sku} onChange={handleChange} />
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="ready_for_sale"
-                      checked={formData.ready_for_sale}
-                      onChange={(e) => setFormData(prev => ({ ...prev, ready_for_sale: e.target.checked }))}
-                    />
-                    <Label htmlFor="ready_for_sale">List on Website</Label>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formData.ready_for_sale 
-                      ? "✅ This honey product will be visible to website visitors" 
-                      : "⏸️ This honey product will be hidden from website visitors"}
-                  </p>
-                </div>
-
-                {formData.quantity > 0 && (totalApiaryInvestment > 0 || formData.price > 0) && (
-                  <div className="space-y-2 md:col-span-2">
-                    <div className="p-3 bg-muted rounded-md border">
-                      <div className="text-sm font-medium text-muted-foreground">Cost Analysis:</div>
-                      {totalApiaryInvestment > 0 ? (
-                        <>
-                          <div className="text-lg font-bold text-primary">Cost per {formData.unit}: Ksh {(totalApiaryInvestment / formData.quantity).toFixed(2)}</div>
-                          <div className="text-sm text-green-600">Profit per {formData.unit}: Ksh {(formData.price - (totalApiaryInvestment / formData.quantity)).toFixed(2)}</div>
-                        </>
-                      ) : (
-                        <div className="text-sm text-amber-600">Add apiary investment details above to calculate production costs automatically</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Apiary Investment Tracking */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Apiary Investment Tracking (Optional)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`grid grid-cols-1 ${isMobile ? "gap-6" : "md:grid-cols-2 gap-4"}`}>
-                <div className="space-y-2">
-                  <Label htmlFor="number_of_hives">Number of Hives</Label>
-                  <Input
-                    id="number_of_hives"
-                    name="number_of_hives"
-                    type="number"
-                    min="0"
-                    value={apiaryData.number_of_hives}
-                    onChange={handleApiaryChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cost_per_hive">Cost per Hive (Ksh)</Label>
-                  <Input
-                    id="cost_per_hive"
-                    name="cost_per_hive"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={apiaryData.cost_per_hive}
-                    onChange={handleApiaryChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="purchase_date">Purchase Date</Label>
-                  <Input
-                    id="purchase_date"
-                    name="purchase_date"
-                    type="date"
-                    value={apiaryData.purchase_date}
-                    onChange={handleApiaryChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="apiary_construction_cost">Apiary Construction Cost (Ksh)</Label>
-                  <Input
-                    id="apiary_construction_cost"
-                    name="apiary_construction_cost"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={apiaryData.apiary_construction_cost}
-                    onChange={handleApiaryChange}
-                  />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="other_equipment_cost">Other Equipment Cost (Ksh)</Label>
-                  <Input
-                    id="other_equipment_cost"
-                    name="other_equipment_cost"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={apiaryData.other_equipment_cost}
-                    onChange={handleApiaryChange}
-                    placeholder="Smokers, suits, extractors, etc."
-                  />
-                </div>
-
-                {totalApiaryInvestment > 0 && (
-                  <div className="space-y-2 md:col-span-2">
-                    <div className="p-3 bg-blue-50 rounded-md border border-blue-200">
-                      <div className="text-sm font-medium text-blue-700">Total Apiary Investment:</div>
-                      <div className="text-xl font-bold text-blue-800">Ksh {totalApiaryInvestment.toLocaleString()}</div>
-                      <div className="text-xs text-blue-600">
-                        Hives: Ksh {(apiaryData.number_of_hives * apiaryData.cost_per_hive).toLocaleString()} | 
-                        Construction: Ksh {apiaryData.apiary_construction_cost.toLocaleString()} | 
-                        Equipment: Ksh {apiaryData.other_equipment_cost.toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+  return (
+    <div className="container mx-auto py-8">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Inventory Status</h1>
+        <AddHoneyForm
+          onSuccess={() => console.log("Form submitted successfully!")}
+          onClose={() => setShowForm(false)}
+        />
       </div>
-
-      <div className="border-t border-border bg-white pt-4 mt-4 flex-shrink-0">
-        <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-end space-x-2"}`}>
-          {onClose && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={loading}
-              className={isMobile ? "mobile-touch-target w-full" : ""}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={loading}
-            className={`bg-primary hover:bg-primary/90 text-white ${isMobile ? "mobile-touch-target w-full" : ""}`}
-          >
-            {loading ? "Adding..." : "Add Honey Product"}
-          </Button>
-        </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="py-3 px-4 border-b text-left">SKU</th>
+              <th className="py-3 px-4 border-b text-left">Product Name</th>
+              <th className="py-3 px-4 border-b text-left">Quantity</th>
+              <th className="py-3 px-4 border-b text-left">Unit</th>
+              <th className="py-3 px-4 border-b text-left">Price</th>
+              <th className="py-3 px-4 border-b text-left">Status</th>
+              <th className="py-3 px-4 border-b text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inventory.map((item) => (
+              <tr key={item.sku} className="hover:bg-gray-50">
+                <td className="py-3 px-4 border-b">{item.sku}</td>
+                <td className="py-3 px-4 border-b">{item.name}</td>
+                <td className="py-3 px-4 border-b">{item.quantity}</td>
+                <td className="py-3 px-4 border-b">{item.unit}</td>
+                <td className="py-3 px-4 border-b">{item.price}</td>
+                <td className="py-3 px-4 border-b">
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    item.status === "Ready" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                  }`}>
+                    {item.status}
+                  </span>
+                </td>
+                <td className="py-3 px-4 border-b">
+                  <Button variant="ghost" size="sm">View Details</Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
