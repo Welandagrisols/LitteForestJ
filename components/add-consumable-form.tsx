@@ -3,6 +3,21 @@
 import type React from "react"
 import { useState } from "react"
 import { supabase, isDemoMode } from "@/lib/supabase"
+
+type Inventory = {
+  plant_name: string;
+  scientific_name: string;
+  category: string;
+  quantity: number;
+  age: number | null;
+  date_planted: string | null;
+  status: string;
+  price: number;
+  batch_cost: number;
+  cost_per_seedling: number;
+  created_at?: string;
+  updated_at?: string;
+};
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -105,8 +120,8 @@ export function AddConsumableForm({ onSuccess, onClose }: AddConsumableFormProps
       console.log("Inserting consumable data:", insertData)
 
       const { data, error } = await supabase
-        .from<any>("inventory")   // 👈 this tells TypeScript to stop complaining
-        .insert([insertData])
+        .from<Inventory>("inventory")
+        .insert([insertData as Inventory])
         .select()
 
       if (error) {
