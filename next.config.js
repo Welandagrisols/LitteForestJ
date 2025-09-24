@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -5,17 +6,9 @@ const nextConfig = {
   },
   images: {
     domains: ['localhost', 'mjsuwlpixcregiikiusd.supabase.co'],
-    unoptimized: process.env.NODE_ENV === 'development'
+    unoptimized: false
   },
-  // Allow cross-origin requests from Replit domains and localhost
-  allowedDevOrigins: [
-    '*.replit.dev', 
-    '*.replit.co', 
-    '*.janeway.replit.dev',
-    '*.riker.replit.dev',
-    '127.0.0.1', 
-    'localhost'
-  ],
+  // Remove Replit-specific origins for Vercel
   async headers() {
     return [
       {
@@ -31,8 +24,13 @@ const nextConfig = {
       }
     ]
   },
+  // Vercel-optimized output
   output: 'standalone',
-  swcMinify: true
+  swcMinify: true,
+  // Disable source maps in production for smaller builds
+  productionBrowserSourceMaps: false,
+  // Optimize for Vercel
+  compress: true
 }
 
 module.exports = nextConfig
