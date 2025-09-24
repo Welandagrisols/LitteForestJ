@@ -32,7 +32,6 @@ export default function HomePage() {
               mobileMenuOpen={mobileMenuOpen}
               setMobileMenuOpen={setMobileMenuOpen}
             />
-            <DemoModeBanner isDemoMode={isDemoMode} connectionStatus="connected" />
             
             <main className="flex-1 overflow-auto p-6">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
