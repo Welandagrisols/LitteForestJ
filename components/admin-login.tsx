@@ -122,8 +122,8 @@ export function AdminLogin() {
               >
                 {isLoading ? (
                   <>
-                    <LoadingSpinner className="mr-2 h-4 w-4" />
-                    Signing in...
+                    <LoadingSpinner />
+                    <span className="ml-2">Signing in...</span>
                   </>
                 ) : (
                   'Sign In as Admin'
