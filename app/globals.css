@@ -130,40 +130,63 @@
   }
 
   /* Mobile typography utilities */
-  .mobile-text-xs { font-size: 0.75rem; line-height: 1.4; }
-  .mobile-text-sm { font-size: 0.875rem; line-height: 1.4; }
-  .mobile-text-base { font-size: 1rem; line-height: 1.5; }
-  .mobile-text-lg { font-size: 1.125rem; line-height: 1.5; }
+  .mobile-text-xs { font-size: 0.8125rem; line-height: 1.4; }
+  .mobile-text-sm { font-size: 0.9375rem; line-height: 1.4; }
+  .mobile-text-base { font-size: 1.0625rem; line-height: 1.5; }
+  .mobile-text-lg { font-size: 1.1875rem; line-height: 1.5; }
+  .mobile-text-xl { font-size: 1.3125rem; line-height: 1.4; }
 
-  @media (max-width: 639px) {
-    .mobile-text-xs { font-size: 0.8125rem; }
-    .mobile-text-sm { font-size: 0.9375rem; }
-    .mobile-text-base { font-size: 1.0625rem; }
-    .mobile-text-lg { font-size: 1.1875rem; }
+  @media (min-width: 640px) {
+    .mobile-text-xs { font-size: 0.75rem; }
+    .mobile-text-sm { font-size: 0.875rem; }
+    .mobile-text-base { font-size: 1rem; }
+    .mobile-text-lg { font-size: 1.125rem; }
+    .mobile-text-xl { font-size: 1.25rem; }
+  }
+
+  @media (min-width: 1024px) {
+    .mobile-text-xs { font-size: 0.75rem; }
+    .mobile-text-sm { font-size: 0.875rem; }
+    .mobile-text-base { font-size: 1rem; }
+    .mobile-text-lg { font-size: 1.125rem; }
+    .mobile-text-xl { font-size: 1.25rem; }
   }
 
   /* Button text optimization */
   .btn-mobile {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 500;
     letter-spacing: 0.025em;
+    line-height: 1.4;
   }
 
   @media (min-width: 640px) {
     .btn-mobile {
-      font-size: 1rem;
+      font-size: 0.9375rem;
     }
   }
 
   /* Form input optimization */
   .input-mobile {
-    font-size: 1rem;
+    font-size: 1.0625rem; /* Prevents zoom on iOS */
     line-height: 1.4;
   }
 
-  @media (max-width: 639px) {
+  @media (min-width: 640px) {
     .input-mobile {
-      font-size: 1.0625rem; /* Prevents zoom on iOS */
+      font-size: 1rem;
+    }
+  }
+
+  /* Card content optimization */
+  .card-mobile {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 640px) {
+    .card-mobile {
+      font-size: 0.875rem;
     }
   }
 }

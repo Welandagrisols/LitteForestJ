@@ -587,24 +587,24 @@ export function InventoryTab() {
 
                     <div className="space-y-3">
                       <div>
-                        <h3 className="font-semibold mobile-text-base leading-tight line-clamp-2">{item.plant_name}</h3>
+                        <h3 className="font-semibold mobile-text-lg leading-tight line-clamp-2">{item.plant_name}</h3>
                         {item.scientific_name && (
-                          <p className="mobile-text-xs text-muted-foreground italic truncate">{item.scientific_name}</p>
+                          <p className="mobile-text-sm text-muted-foreground italic truncate">{item.scientific_name}</p>
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 mobile-text-sm">
+                      <div className="grid grid-cols-2 gap-2 card-mobile">
                         <div>
-                          <span className="text-muted-foreground block mobile-text-xs">Qty:</span>
-                          <p className="font-medium truncate">{item.quantity}</p>
+                          <span className="text-muted-foreground block mobile-text-sm">Qty:</span>
+                          <p className="font-medium truncate mobile-text-base">{item.quantity}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block mobile-text-xs">Price:</span>
-                          <p className="font-medium truncate">Ksh {item.price}</p>
+                          <span className="text-muted-foreground block mobile-text-sm">Price:</span>
+                          <p className="font-medium truncate mobile-text-base">Ksh {item.price}</p>
                         </div>
                         <div className="col-span-2">
-                          <span className="text-muted-foreground block mobile-text-xs">Category:</span>
-                          <p className="font-medium mobile-text-xs truncate">{item.category}</p>
+                          <span className="text-muted-foreground block mobile-text-sm">Category:</span>
+                          <p className="font-medium mobile-text-sm truncate">{item.category}</p>
                         </div>
                         <div className="col-span-2">
                           <span className="text-muted-foreground block">Status:</span>
