@@ -4,7 +4,7 @@ import type { Database } from "../types/supabase"
 
 // Environment variables for Next.js
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANAON_KEY
 
 console.log("Supabase URL:", supabaseUrl)
 console.log("Supabase Key:", supabaseAnonKey ? "Set" : "Not set")

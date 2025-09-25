@@ -53,7 +53,7 @@ export function TasksTab() {
   }
 
   // Get unique task types for filter
-  const taskTypes = ["All Types", ...new Set(tasks.map((task) => task.task_type))]
+  const taskTypes = ["All Types", ...Array.from(new Set(tasks.map((task) => task.task_type)))]
   const statusOptions = ["All Status", "Planned", "In Progress", "Completed"]
 
   // Filter tasks

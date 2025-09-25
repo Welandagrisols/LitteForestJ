@@ -124,7 +124,7 @@ export function SalesTab() {
       let salesTotal = 0
       let seedlingsTotal = 0
 
-      data?.forEach((sale) => {
+      data?.forEach((sale: any) => {
         salesTotal += sale.total_amount
         seedlingsTotal += sale.quantity
       })
