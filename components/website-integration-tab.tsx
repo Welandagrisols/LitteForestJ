@@ -89,8 +89,7 @@ export function WebsiteIntegrationTab() {
 
     try {
       setUpdating(itemId)
-      const { error } = await supabase
-        .from("inventory")
+      const { error } = await (supabase.from("inventory") as any)
         .update({ 
           ready_for_sale: !currentStatus,
           updated_at: new Date().toISOString()
@@ -174,7 +173,7 @@ export function WebsiteIntegrationTab() {
 
   const categories = [
     "All Categories",
-    ...new Set(websiteProducts.map(item => item.category).filter(Boolean))
+    ...Array.from(new Set(websiteProducts.map(item => item.category).filter(Boolean)))
   ]
 
   const listedCount = websiteProducts.filter(item => item.ready_for_sale).length
@@ -184,7 +183,7 @@ export function WebsiteIntegrationTab() {
     <div className="space-y-6">
       {(isDemoMode || !tableExists) && (
         <div className="p-6 border-b">
-          <DemoModeBanner isDemoMode={isDemoMode} tablesNotFound={!tableExists} />
+          <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={isDemoMode ? 'demo' : 'connected'} />
         </div>
       )}
 

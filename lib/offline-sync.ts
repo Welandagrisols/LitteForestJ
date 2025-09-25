@@ -45,8 +45,7 @@ class OfflineSync {
         break
         
       case 'UPDATE':
-        const { error: updateError } = await supabase
-          .from(table)
+        const { error: updateError } = await (supabase.from(table) as any)
           .update(data)
           .eq('id', data.id)
         if (updateError) throw updateError

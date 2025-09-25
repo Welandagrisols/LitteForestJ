@@ -131,8 +131,7 @@ export async function uploadImageAndLinkToInventory(
     }
 
     // Then update the inventory item with the image URL
-    const { error: updateError } = await supabase
-      .from('inventory')
+    const { error: updateError } = await (supabase.from('inventory') as any)
       .update({ 
         image_url: uploadResult.url,
         updated_at: new Date().toISOString()
