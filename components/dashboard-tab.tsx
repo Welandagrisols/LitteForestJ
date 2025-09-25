@@ -207,41 +207,60 @@ export function DashboardTab() {
   const tablesNotExist = !tablesExist.inventory || !tablesExist.sales
 
   return (
-    <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6" style={{ background: '#FFFFFF' }}>
+    <div className="space-y-6 p-4 lg:p-8 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={isDemoMode ? 'demo' : 'connecting'} />}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Total Plants</CardTitle>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <Card className="border-0 bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-100 hover:shadow-lg hover:shadow-emerald-100/50 transition-all duration-300 transform hover:-translate-y-1">
+          <CardHeader className="pb-2 px-4 pt-4">
+            <CardTitle className="text-xs sm:text-sm font-semibold text-emerald-700 flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Total Plants
+            </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-bold" style={{ color: '#4CB76F' }}>{inventorySummary.totalItems}</div>
+          <CardContent className="px-4 pb-4">
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800 mb-1">{inventorySummary.totalItems}</div>
+            <div className="text-xs text-emerald-600">Active inventory items</div>
           </CardContent>
         </Card>
-        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Total Seedlings</CardTitle>
+        
+        <Card className="border-0 bg-gradient-to-br from-blue-50 via-sky-50 to-blue-100 hover:shadow-lg hover:shadow-blue-100/50 transition-all duration-300 transform hover:-translate-y-1">
+          <CardHeader className="pb-2 px-4 pt-4">
+            <CardTitle className="text-xs sm:text-sm font-semibold text-blue-700 flex items-center gap-2">
+              <CheckSquare className="h-4 w-4" />
+              Total Seedlings
+            </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-bold" style={{ color: '#4CB76F' }}>{inventorySummary.totalQuantity}</div>
+          <CardContent className="px-4 pb-4">
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-800 mb-1">{inventorySummary.totalQuantity.toLocaleString()}</div>
+            <div className="text-xs text-blue-600">Plants in stock</div>
           </CardContent>
         </Card>
-        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Total Sales</CardTitle>
+        
+        <Card className="border-0 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 hover:shadow-lg hover:shadow-orange-100/50 transition-all duration-300 transform hover:-translate-y-1">
+          <CardHeader className="pb-2 px-4 pt-4">
+            <CardTitle className="text-xs sm:text-sm font-semibold text-orange-700 flex items-center gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              Total Sales
+            </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-sm sm:text-xl lg:text-2xl font-bold" style={{ color: '#FF7A29' }}>Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+          <CardContent className="px-4 pb-4">
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-800 mb-1">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+            <div className="text-xs text-orange-600">All time revenue</div>
           </CardContent>
         </Card>
-        <Card className="brand-card" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <CardHeader className="pb-1 px-3 pt-3">
-            <CardTitle className="text-xs sm:text-sm font-medium" style={{ color: '#333333' }}>Today's Sales</CardTitle>
+        
+        <Card className="border-0 bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 hover:shadow-lg hover:shadow-purple-100/50 transition-all duration-300 transform hover:-translate-y-1">
+          <CardHeader className="pb-2 px-4 pt-4">
+            <CardTitle className="text-xs sm:text-sm font-semibold text-purple-700 flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Today's Sales
+            </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-bold" style={{ color: '#FF7A29' }}>{salesSummary.todaySales}</div>
+          <CardContent className="px-4 pb-4">
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-800 mb-1">{salesSummary.todaySales}</div>
+            <div className="text-xs text-purple-600">Sales today</div>
           </CardContent>
         </Card>
       </div>
@@ -249,9 +268,12 @@ export function DashboardTab() {
       {/* Main Content - 2 Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         {/* Recent Sales */}
-        <Card className="brand-card overflow-hidden" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <CardHeader className="px-3 py-3 sm:px-4 sm:py-4" style={{ background: '#F5F5F5' }}>
-            <CardTitle className="text-base sm:text-lg font-semibold brand-section-heading" style={{ color: '#FF7A29' }}>Recent Sales</CardTitle>
+        <Card className="border-0 bg-white shadow-lg shadow-gray-100/50 overflow-hidden hover:shadow-xl transition-all duration-300">
+          <CardHeader className="px-4 py-4 bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100/50">
+            <CardTitle className="text-lg font-bold text-orange-800 flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              Recent Sales
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -286,10 +308,13 @@ export function DashboardTab() {
         </Card>
 
         {/* Low Stock Items */}
-        <Card className="brand-card overflow-hidden" style={{ background: '#FFFFFF', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <CardHeader className="px-3 py-3 sm:px-4 sm:py-4" style={{ background: '#F5F5F5' }}>
-            <CardTitle className="text-base sm:text-lg font-semibold brand-section-heading" style={{ color: '#FF7A29' }}>Low Stock Items</CardTitle>
-            <CardDescription style={{ color: '#666666' }}>
+        <Card className="border-0 bg-white shadow-lg shadow-gray-100/50 overflow-hidden hover:shadow-xl transition-all duration-300">
+          <CardHeader className="px-4 py-4 bg-gradient-to-r from-red-50 to-pink-50 border-b border-red-100/50">
+            <CardTitle className="text-lg font-bold text-red-800 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Low Stock Items
+            </CardTitle>
+            <CardDescription className="text-red-600">
               Items that need restocking
             </CardDescription>
           </CardHeader>
