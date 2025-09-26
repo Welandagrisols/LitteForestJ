@@ -63,22 +63,48 @@
   /* Mobile-optimized typography */
   @media (max-width: 640px) {
     body {
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 500;
     }
 
     h1 {
-      font-size: 1.5rem;
-      line-height: 1.4;
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.3;
     }
 
     h2 {
-      font-size: 1.25rem;
-      line-height: 1.4;
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.3;
     }
 
     h3 {
-      font-size: 1.125rem;
-      line-height: 1.4;
+      font-size: 1.375rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    p {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    button {
+      font-size: 16px;
+      font-weight: 600;
     }
   }
 
@@ -130,11 +156,11 @@
   }
 
   /* Mobile typography utilities */
-  .mobile-text-xs { font-size: 0.8125rem; line-height: 1.4; }
-  .mobile-text-sm { font-size: 0.9375rem; line-height: 1.4; }
-  .mobile-text-base { font-size: 1.0625rem; line-height: 1.5; }
-  .mobile-text-lg { font-size: 1.1875rem; line-height: 1.5; }
-  .mobile-text-xl { font-size: 1.3125rem; line-height: 1.4; }
+  .mobile-text-xs { font-size: 0.9375rem; font-weight: 500; line-height: 1.4; }
+  .mobile-text-sm { font-size: 1rem; font-weight: 500; line-height: 1.4; }
+  .mobile-text-base { font-size: 1.125rem; font-weight: 500; line-height: 1.5; }
+  .mobile-text-lg { font-size: 1.25rem; font-weight: 600; line-height: 1.5; }
+  .mobile-text-xl { font-size: 1.5rem; font-weight: 600; line-height: 1.4; }
 
   @media (min-width: 640px) {
     .mobile-text-xs { font-size: 0.75rem; }
@@ -154,39 +180,45 @@
 
   /* Button text optimization */
   .btn-mobile {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.125rem;
+    font-weight: 600;
     letter-spacing: 0.025em;
     line-height: 1.4;
+    padding: 0.75rem 1.5rem;
   }
 
   @media (min-width: 640px) {
     .btn-mobile {
-      font-size: 0.9375rem;
+      font-size: 1rem;
+      padding: 0.625rem 1rem;
     }
   }
 
   /* Form input optimization */
   .input-mobile {
-    font-size: 1.0625rem; /* Prevents zoom on iOS */
+    font-size: 1.125rem; /* Prevents zoom on iOS */
+    font-weight: 500;
     line-height: 1.4;
+    padding: 0.75rem;
   }
 
   @media (min-width: 640px) {
     .input-mobile {
       font-size: 1rem;
+      padding: 0.5rem;
     }
   }
 
   /* Card content optimization */
   .card-mobile {
-    font-size: 0.9375rem;
-    line-height: 1.4;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
   }
 
   @media (min-width: 640px) {
     .card-mobile {
-      font-size: 0.875rem;
+      font-size: 0.9375rem;
     }
   }
 }
