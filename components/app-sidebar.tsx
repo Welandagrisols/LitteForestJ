@@ -59,8 +59,8 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
   }
 
   return (
-    <Sidebar className="border-r-0 md:border-r">
-      <SidebarHeader className="p-4 sticky top-0 bg-background border-b z-10">
+    <Sidebar className="border-r-0 md:border-r bg-gray-50">
+      <SidebarHeader className="p-4 sticky top-0 bg-gray-50 border-b border-gray-200 z-10">
         {/* Updated Header Content */}
         <div className="flex items-center gap-2 px-2 py-1.5">
           <img 
@@ -78,25 +78,25 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="bg-gray-50 px-2">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2">
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => handleTabSelect(item.id)}
                     isActive={activeTab === item.id}
                     className={cn(
-                      "transition-all duration-200 rounded-lg group h-12 text-base font-medium",
+                      "transition-all duration-200 rounded-lg group h-12 text-base font-semibold border",
                       activeTab === item.id 
-                        ? "text-white shadow-sm" 
-                        : "hover:bg-accent"
+                        ? "text-white shadow-md border-green-600" 
+                        : "hover:bg-green-50 hover:border-green-200 bg-white border-gray-200 text-gray-800"
                     )}
                     style={activeTab === item.id ? {backgroundColor: '#4CB76F'} : {}}
                   >
                     <item.icon 
-                      className="mr-2 h-4 w-4 transition-colors duration-200"
+                      className="mr-3 h-5 w-5 transition-colors duration-200 flex-shrink-0"
                       style={
                         activeTab === item.id 
                           ? {color: 'white'} 
@@ -114,10 +114,11 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
                       }}
                     />
                     <span 
+                      className="font-semibold text-base leading-tight"
                       style={
                         activeTab === item.id 
                           ? {color: 'white'} 
-                          : {color: '#333333'}
+                          : {color: '#1a1a1a', fontWeight: '600'}
                       }
                     >
                       {item.title}
@@ -130,10 +131,10 @@ export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 sticky bottom-0 bg-background border-t mt-auto">
+      <SidebarFooter className="p-4 sticky bottom-0 bg-gray-50 border-t border-gray-200 mt-auto">
         <div className="space-y-2">
           {user && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm font-medium text-gray-700 bg-white px-2 py-1 rounded border">
               {user.email}
             </div>
           )}
