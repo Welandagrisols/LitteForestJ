@@ -488,8 +488,8 @@ export function InventoryTab() {
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Plants Tab */}
         <TabsContent value="plants" className="space-y-4">
