@@ -487,7 +487,6 @@ export function InventoryTab() {
                   </SelectContent>
                 </Select>
               )}
-              </div>
             </div>
           </div>
         </div>
