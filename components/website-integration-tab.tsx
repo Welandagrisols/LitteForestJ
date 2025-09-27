@@ -9,51 +9,113 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { EditInventoryForm } from "@/components/edit-inventory-form"
+import { AddImpactStoryForm } from "@/components/add-impact-story-form"
+import { EditImpactStoryForm } from "@/components/edit-impact-story-form"
 import { demoInventory } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
-import { Globe, Edit, Trash2, Eye, EyeOff, Package, Loader2 } from "lucide-react"
+import { LoadingSpinner } from "@/components/loading-spinner"
+import { 
+  Globe, 
+  Edit, 
+  Trash2, 
+  Eye, 
+  EyeOff, 
+  Package, 
+  Loader2,
+  Droplets,
+  Wheat,
+  Trees,
+  ArrowUp,
+  ArrowDown,
+  Image as ImageIcon
+} from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+interface ImpactStory {
+  id: string
+  title: string
+  text: string
+  media_urls: string[] | null
+  category: 'water' | 'food_security' | 'beautification'
+  display_order: number
+  is_published: boolean
+  created_at: string
+  updated_at: string
+}
 
 export function WebsiteIntegrationTab() {
   const [inventory, setInventory] = useState<any[]>([])
+  const [stories, setStories] = useState<ImpactStory[]>([])
   const [loading, setLoading] = useState(true)
+  const [storiesLoading, setStoriesLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("All Categories")
   const [statusFilter, setStatusFilter] = useState("all")
   const [editItem, setEditItem] = useState<any>(null)
   const [tableExists, setTableExists] = useState(true)
+  const [storiesTableExists, setStoriesTableExists] = useState(false)
+  const [activeTab, setActiveTab] = useState("products")
   const { toast } = useToast()
 
   useEffect(() => {
     async function init() {
       if (isDemoMode) {
         setInventory(demoInventory)
+        setStories([])
         setLoading(false)
+        setStoriesLoading(false)
         return
       }
 
-      const exists = await checkTableExists("inventory")
-      setTableExists(exists)
+      const [inventoryExists, storiesExists] = await Promise.all([
+        checkTableExists("inventory"),
+        checkTableExists("impact_stories")
+      ])
+      
+      setTableExists(inventoryExists)
+      setStoriesTableExists(storiesExists)
 
-      if (!exists) {
+      if (!inventoryExists) {
         setInventory(demoInventory)
         setLoading(false)
-        return
-      }
-
-      fetchInventory().catch((error) => {
-        console.log("Falling back to demo mode due to:", error.message)
-        toast({
-          title: "Connection Issue",
-          description: "Unable to connect to database. Using demo data.",
-          variant: "destructive",
+      } else {
+        fetchInventory().catch((error) => {
+          console.log("Falling back to demo mode due to:", error.message)
+          toast({
+            title: "Connection Issue",
+            description: "Unable to connect to database. Using demo data.",
+            variant: "destructive",
+          })
+          setInventory(demoInventory)
+          setLoading(false)
         })
-        setInventory(demoInventory)
-        setLoading(false)
-      })
+      }
+
+      if (storiesExists) {
+        fetchStories().catch((error) => {
+          console.log("Error loading stories:", error.message)
+          setStories([])
+          setStoriesLoading(false)
+        })
+      } else {
+        setStories([])
+        setStoriesLoading(false)
+      }
     }
 
     init()
@@ -147,6 +209,149 @@ export function WebsiteIntegrationTab() {
     }
   }
 
+  async function fetchStories() {
+    try {
+      setStoriesLoading(true)
+      const { data, error } = await supabase
+        .from('impact_stories')
+        .select('*')
+        .order('category', { ascending: true })
+        .order('display_order', { ascending: true })
+
+      if (error) throw error
+      setStories(data || [])
+    } catch (error: any) {
+      console.error('Error loading stories:', error)
+      throw error
+    } finally {
+      setStoriesLoading(false)
+    }
+  }
+
+  const handleStoryAdded = (newStory: ImpactStory) => {
+    setStories(prev => [...prev, newStory])
+    toast({
+      title: "Success",
+      description: "Impact story added successfully",
+    })
+  }
+
+  const handleStoryUpdated = (updatedStory: ImpactStory) => {
+    setStories(prev => prev.map(story => 
+      story.id === updatedStory.id ? updatedStory : story
+    ))
+    toast({
+      title: "Success",
+      description: "Impact story updated successfully",
+    })
+  }
+
+  const toggleStoryPublished = async (story: ImpactStory) => {
+    if (isDemoMode || !storiesTableExists) {
+      toast({
+        title: "Demo Mode",
+        description: "Connect to Supabase to manage story visibility",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('impact_stories')
+        .update({ is_published: !story.is_published, updated_at: new Date().toISOString() })
+        .eq('id', story.id)
+
+      if (error) throw error
+
+      setStories(prev => prev.map(s => 
+        s.id === story.id ? { ...s, is_published: !s.is_published } : s
+      ))
+
+      toast({
+        title: "Success",
+        description: `Story ${!story.is_published ? 'published' : 'hidden'}`,
+      })
+    } catch (error: any) {
+      console.error('Error toggling published status:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update story status",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const updateStoryOrder = async (storyId: string, newOrder: number) => {
+    if (isDemoMode || !storiesTableExists) {
+      toast({
+        title: "Demo Mode",
+        description: "Connect to Supabase to reorder stories",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('impact_stories')
+        .update({ display_order: newOrder, updated_at: new Date().toISOString() })
+        .eq('id', storyId)
+
+      if (error) throw error
+
+      await fetchStories()
+      toast({
+        title: "Success",
+        description: "Story order updated",
+      })
+    } catch (error: any) {
+      console.error('Error updating order:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update story order",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const deleteStory = async (storyId: string) => {
+    if (isDemoMode || !storiesTableExists) {
+      toast({
+        title: "Demo Mode",
+        description: "Connect to Supabase to delete stories",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('impact_stories')
+        .delete()
+        .eq('id', storyId)
+
+      if (error) throw error
+
+      setStories(prev => prev.filter(story => story.id !== storyId))
+      toast({
+        title: "Success",
+        description: "Story deleted successfully",
+      })
+    } catch (error: any) {
+      console.error('Error deleting story:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete story",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const getStoriesByCategory = (category: string) => {
+    return stories.filter(story => story.category === category)
+  }
+
   // Filter products that can be listed on website (excluding consumables marked with internal categories)
   const websiteProducts = inventory.filter(item => {
     // Include plants, honey, and consumables that are not marked as internal-only
@@ -179,9 +384,17 @@ export function WebsiteIntegrationTab() {
   const listedCount = websiteProducts.filter(item => item.ready_for_sale).length
   const unlistedCount = websiteProducts.filter(item => !item.ready_for_sale).length
 
+  const storyStats = {
+    total: stories.length,
+    published: stories.filter(s => s.is_published).length,
+    water: getStoriesByCategory('water').length,
+    food_security: getStoriesByCategory('food_security').length,
+    beautification: getStoriesByCategory('beautification').length,
+  }
+
   return (
     <div className="space-y-6">
-      {(isDemoMode || !tableExists) && (
+      {(isDemoMode || !tableExists || !storiesTableExists) && (
         <div className="p-6 border-b">
           <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={isDemoMode ? 'demo' : 'connected'} />
         </div>
@@ -194,12 +407,27 @@ export function WebsiteIntegrationTab() {
             <Globe className="h-6 w-6" />
             Website Management
           </h2>
-          <p className="text-muted-foreground">Manage which products are visible on your website</p>
+          <p className="text-muted-foreground">Manage products and content visible on your website</p>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* Main Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 md:w-auto">
+          <TabsTrigger value="products" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            Products
+          </TabsTrigger>
+          <TabsTrigger value="impact" className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            Our Impact Page
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="products" className="space-y-6 mt-6">
+
+      {/* Products Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="mobile-card bg-blue-50 border-blue-200">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -452,6 +680,300 @@ export function WebsiteIntegrationTab() {
           </DialogContent>
         </Dialog>
       )}
+      </TabsContent>
+
+      <TabsContent value="impact" className="space-y-6 mt-6">
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold">Our Impact Page Content</h3>
+            <p className="text-muted-foreground">Manage the stories that appear in the "Our Impact" section of your About Us page</p>
+          </div>
+
+          {/* Impact Stories Summary Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Stories</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{storyStats.total}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Published</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{storyStats.published}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Water</CardTitle>
+                <Droplets className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{storyStats.water}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Food Security</CardTitle>
+                <Wheat className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{storyStats.food_security}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Beautification</CardTitle>
+                <Trees className="h-4 w-4 text-purple-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{storyStats.beautification}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Impact Stories Category Tabs */}
+          <Tabs defaultValue="water" className="w-full">
+            <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <TabsList className="grid w-full grid-cols-3 md:w-auto">
+                <TabsTrigger value="water" className="flex items-center gap-2">
+                  <Droplets className="h-4 w-4" />
+                  Water
+                </TabsTrigger>
+                <TabsTrigger value="food_security" className="flex items-center gap-2">
+                  <Wheat className="h-4 w-4" />
+                  Food Security
+                </TabsTrigger>
+                <TabsTrigger value="beautification" className="flex items-center gap-2">
+                  <Trees className="h-4 w-4" />
+                  Beautification
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="water" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-blue-100 text-blue-800">
+                    {getStoriesByCategory('water').length} stories
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    Springs rehabilitation stories
+                  </span>
+                </div>
+                {storiesTableExists && (
+                  <AddImpactStoryForm 
+                    category="water"
+                    onStoryAdded={handleStoryAdded}
+                  />
+                )}
+              </div>
+              <StoryList 
+                stories={getStoriesByCategory('water')}
+                onTogglePublished={toggleStoryPublished}
+                onUpdateOrder={updateStoryOrder}
+                onDelete={deleteStory}
+                onStoryUpdated={handleStoryUpdated}
+                isDemo={isDemoMode || !storiesTableExists}
+              />
+            </TabsContent>
+
+            <TabsContent value="food_security" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-green-100 text-green-800">
+                    {getStoriesByCategory('food_security').length} stories
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    Food security impact stories
+                  </span>
+                </div>
+                {storiesTableExists && (
+                  <AddImpactStoryForm 
+                    category="food_security"
+                    onStoryAdded={handleStoryAdded}
+                  />
+                )}
+              </div>
+              <StoryList 
+                stories={getStoriesByCategory('food_security')}
+                onTogglePublished={toggleStoryPublished}
+                onUpdateOrder={updateStoryOrder}
+                onDelete={deleteStory}
+                onStoryUpdated={handleStoryUpdated}
+                isDemo={isDemoMode || !storiesTableExists}
+              />
+            </TabsContent>
+
+            <TabsContent value="beautification" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-purple-100 text-purple-800">
+                    {getStoriesByCategory('beautification').length} stories
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    Community beautification projects
+                  </span>
+                </div>
+                {storiesTableExists && (
+                  <AddImpactStoryForm 
+                    category="beautification"
+                    onStoryAdded={handleStoryAdded}
+                  />
+                )}
+              </div>
+              <StoryList 
+                stories={getStoriesByCategory('beautification')}
+                onTogglePublished={toggleStoryPublished}
+                onUpdateOrder={updateStoryOrder}
+                onDelete={deleteStory}
+                onStoryUpdated={handleStoryUpdated}
+                isDemo={isDemoMode || !storiesTableExists}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
+interface StoryListProps {
+  stories: ImpactStory[]
+  onTogglePublished: (story: ImpactStory) => void
+  onUpdateOrder: (storyId: string, newOrder: number) => void
+  onDelete: (storyId: string) => void
+  onStoryUpdated: (story: ImpactStory) => void
+  isDemo: boolean
+}
+
+function StoryList({ stories, onTogglePublished, onUpdateOrder, onDelete, onStoryUpdated, isDemo }: StoryListProps) {
+  if (stories.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-medium">No stories yet</h3>
+            <p className="text-muted-foreground">
+              Add your first impact story to get started
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {stories.map((story, index) => (
+        <Card key={story.id} className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1 space-y-3">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-semibold">{story.title}</h3>
+                  <Badge variant={story.is_published ? "default" : "secondary"}>
+                    {story.is_published ? "Published" : "Draft"}
+                  </Badge>
+                  {story.media_urls && story.media_urls.length > 0 && (
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      <ImageIcon className="h-3 w-3" />
+                      {story.media_urls.length} media
+                    </Badge>
+                  )}
+                </div>
+                
+                <p className="text-muted-foreground line-clamp-3">
+                  {story.text}
+                </p>
+                
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>Order: {story.display_order}</span>
+                  <span>•</span>
+                  <span>Updated: {new Date(story.updated_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 ml-4">
+                {/* Order controls */}
+                <div className="flex flex-col gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onUpdateOrder(story.id, story.display_order - 1)}
+                    disabled={index === 0 || isDemo}
+                  >
+                    <ArrowUp className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onUpdateOrder(story.id, story.display_order + 1)}
+                    disabled={index === stories.length - 1 || isDemo}
+                  >
+                    <ArrowDown className="h-3 w-3" />
+                  </Button>
+                </div>
+
+                {/* Visibility toggle */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onTogglePublished(story)}
+                  disabled={isDemo}
+                >
+                  {story.is_published ? (
+                    <Eye className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  )}
+                </Button>
+
+                {/* Edit button */}
+                <EditImpactStoryForm 
+                  story={story}
+                  onStoryUpdated={onStoryUpdated}
+                />
+
+                {/* Delete button */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="sm" disabled={isDemo}>
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Story</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{story.title}"? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => onDelete(story.id)}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   )
 }
