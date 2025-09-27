@@ -224,7 +224,7 @@ export function DashboardTab() {
             <div className="text-xs text-emerald-600">Active inventory items</div>
           </CardContent>
         </Card>
-        
+
         <Card className="border-0 bg-gradient-to-br from-blue-50 via-sky-50 to-blue-100 hover:shadow-lg hover:shadow-blue-100/50 transition-all duration-300 transform hover:-translate-y-1">
           <CardHeader className="pb-2 px-4 pt-4">
             <CardTitle className="text-xs sm:text-sm font-semibold text-blue-700 flex items-center gap-2">
@@ -237,7 +237,7 @@ export function DashboardTab() {
             <div className="text-xs text-blue-600">Plants in stock</div>
           </CardContent>
         </Card>
-        
+
         <Card className="border-0 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 hover:shadow-lg hover:shadow-orange-100/50 transition-all duration-300 transform hover:-translate-y-1">
           <CardHeader className="pb-2 px-4 pt-4">
             <CardTitle className="text-xs sm:text-sm font-semibold text-orange-700 flex items-center gap-2">
@@ -250,7 +250,7 @@ export function DashboardTab() {
             <div className="text-xs text-orange-600">All time revenue</div>
           </CardContent>
         </Card>
-        
+
         <Card className="border-0 bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 hover:shadow-lg hover:shadow-purple-100/50 transition-all duration-300 transform hover:-translate-y-1">
           <CardHeader className="pb-2 px-4 pt-4">
             <CardTitle className="text-xs sm:text-sm font-semibold text-purple-700 flex items-center gap-2">

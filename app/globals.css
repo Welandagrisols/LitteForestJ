@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 240 10% 96%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 240 10% 3.9%;
     --primary: 142.1 76.2% 36.3%;
     --primary-foreground: 355.7 100% 97.3%;
     --secondary: 210 40% 98%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 98%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 98%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -58,6 +58,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     font-size: 14px;
     line-height: 1.5;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   }
 
   /* Mobile-optimized typography */
@@ -292,6 +293,118 @@
   @media (min-width: 640px) {
     .card-mobile {
       font-size: 0.9375rem;
+    }
+  }
+
+  /* Modern Dashboard Card Styles */
+  .dashboard-card {
+    background: linear-gradient(135deg, var(--card-bg), var(--card-bg-secondary));
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--card-accent);
+    border-radius: 16px 16px 0 0;
+  }
+
+  /* Card variants */
+  .card-plants {
+    --card-bg: #f0fdf4;
+    --card-bg-secondary: #f7fef9;
+    --card-border: #bbf7d0;
+    --card-accent: #22c55e;
+  }
+
+  .card-seedlings {
+    --card-bg: #eff6ff;
+    --card-bg-secondary: #f8fafc;
+    --card-border: #bfdbfe;
+    --card-accent: #3b82f6;
+  }
+
+  .card-sales {
+    --card-bg: #fef3c7;
+    --card-bg-secondary: #fffbeb;
+    --card-border: #fed7aa;
+    --card-accent: #f59e0b;
+  }
+
+  .card-today-sales {
+    --card-bg: #faf5ff;
+    --card-bg-secondary: #fdf4ff;
+    --card-border: #e9d5ff;
+    --card-accent: #a855f7;
+  }
+
+  .card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    background: linear-gradient(135deg, var(--card-accent), #1f2937);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .card-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--card-accent);
+  }
+
+  @media (max-width: 640px) {
+    .dashboard-card {
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .card-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .card-title {
+      font-size: 0.8125rem;
+    }
+
+    .card-description {
+      font-size: 0.8125rem;
     }
   }
 }
