@@ -18,29 +18,33 @@ export interface Database {
           section: string | null
           row: string | null
           source: string | null
-          user_id: string | null
-          ready_for_sale: boolean | null
           created_at: string
           updated_at: string
+          batch_cost: number | null
+          image_url: string | null
+          description: string | null
+          ready_for_sale: boolean | null
         }
         Insert: {
           id?: string
           plant_name: string
           scientific_name?: string | null
           category: string
-          quantity: number
+          quantity?: number
           age?: string | null
           date_planted?: string | null
-          status: string
-          price: number
+          status?: string
+          price?: number
           sku: string
           section?: string | null
           row?: string | null
           source?: string | null
-          user_id?: string | null
-          ready_for_sale?: boolean | null
           created_at?: string
           updated_at?: string
+          batch_cost?: number | null
+          image_url?: string | null
+          description?: string | null
+          ready_for_sale?: boolean | null
         }
         Update: {
           id?: string
@@ -56,14 +60,45 @@ export interface Database {
           section?: string | null
           row?: string | null
           source?: string | null
-          user_id?: string | null
-          ready_for_sale?: boolean | null
-          batch_cost?: number
-          cost_per_seedling?: number
-          item_type?: string
-          description?: string | null
+          created_at?: string
+          updated_at?: string
+          batch_cost?: number | null
           image_url?: string | null
-          unit?: string | null
+          description?: string | null
+          ready_for_sale?: boolean | null
+        }
+      }
+      impact_stories: {
+        Row: {
+          id: string
+          title: string
+          text: string
+          media_urls: string[] | null
+          category: 'water' | 'food_security' | 'beautification'
+          display_order: number
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          text: string
+          media_urls?: string[] | null
+          category: 'water' | 'food_security' | 'beautification'
+          display_order?: number
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          text?: string
+          media_urls?: string[] | null
+          category?: 'water' | 'food_security' | 'beautification'
+          display_order?: number
+          is_published?: boolean
           created_at?: string
           updated_at?: string
         }

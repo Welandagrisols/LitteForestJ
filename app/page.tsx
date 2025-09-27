@@ -9,6 +9,7 @@ import { CustomersTab } from '@/components/customers-tab'
 import { TasksTab } from '@/components/tasks-tab'
 import { ReportsTab } from '@/components/reports-tab'
 import { WebsiteIntegrationTab } from '@/components/website-integration-tab'
+import { ImpactStoriesTab } from '@/components/impact-stories-tab'
 import { OpsTab } from '@/components/ops-tab'
 import { AppSidebar } from '@/components/app-sidebar'
 import { AppHeader } from '@/components/app-header'
@@ -58,6 +59,10 @@ export default function HomePage() {
                 
                 <TabsContent value="website" className="mt-0">
                   <WebsiteIntegrationTab />
+                </TabsContent>
+                
+                <TabsContent value="impact" className="mt-0">
+                  <ImpactStoriesTab />
                 </TabsContent>
                 
                 <TabsContent value="ops" className="mt-0">
