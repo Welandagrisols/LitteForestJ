@@ -131,6 +131,41 @@
       font-size: 14px !important;
       font-weight: 600 !important;
     }
+
+    /* Alerts and notifications */
+    .alert-title {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+    }
+
+    .alert-description {
+      font-size: 15px !important;
+      font-weight: 500 !important;
+    }
+
+    /* Dialog and modal content */
+    .dialog-title {
+      font-size: 18px !important;
+      font-weight: 700 !important;
+    }
+
+    .dialog-description {
+      font-size: 16px !important;
+      font-weight: 500 !important;
+    }
+
+    /* Tabs */
+    .tabs-trigger {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      min-height: 44px !important;
+    }
+
+    /* Navigation and sidebar text */
+    .nav-text {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+    }
   }
 
   /* Tablet and up */
