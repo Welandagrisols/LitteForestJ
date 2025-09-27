@@ -261,7 +261,7 @@ export function InventoryTab() {
 
   // Summary calculations
   const currentPlants = inventory.filter((item) => !isConsumable(item))
-  const totalConsumables = inventory.filter((item) => isConsumable(item))
+  const totalConsumables = inventory.filter((item) => isConsumable(item)).length
 
   return (
     <div className="modern-page space-y-8">
