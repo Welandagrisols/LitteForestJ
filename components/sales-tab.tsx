@@ -209,7 +209,7 @@ export function SalesTab() {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-6 p-2 sm:p-4 lg:p-6">
+    <div className="modern-page space-y-8">
       {(isDemoMode || !tableExists) && (
         <DemoModeBanner 
           isDemoMode={isDemoMode} 
@@ -217,84 +217,89 @@ export function SalesTab() {
         />
       )}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-green-600 rounded-full flex-shrink-0">
-                <Package className="h-4 w-4 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-green-800 truncate">Total Sales</p>
-                <p className="text-lg font-bold text-green-900 truncate">Ksh {totalSales.toLocaleString()}</p>
-              </div>
-            </div>
+      {/* Modern Header */}
+      <div className="modern-header">
+        <h1 className="modern-title">Sales Management</h1>
+        <p className="modern-subtitle">Track your sales performance and revenue</p>
+      </div>
+
+      {/* Modern Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="modern-card card-sales">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Total Sales
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">Ksh {totalSales.toLocaleString()}</div>
+            <div className="card-description">All time revenue</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-purple-600 rounded-full flex-shrink-0">
-                <Package className="h-4 w-4 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-purple-800 truncate">Seedlings Sold</p>
-                <p className="text-lg font-bold text-purple-900 truncate">{totalSeedlings.toLocaleString()}</p>
-              </div>
-            </div>
+        <Card className="modern-card card-purple">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Items Sold
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">{totalSeedlings.toLocaleString()}</div>
+            <div className="card-description">Total units sold</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-blue-600 rounded-full flex-shrink-0">
-                <Package className="h-4 w-4 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-blue-800 truncate">This Month</p>
-                <p className="text-lg font-bold text-blue-900 truncate">
-                  {
-                    sales.filter((sale) => {
-                      const saleDate = new Date(sale.sale_date)
-                      const now = new Date()
-                      return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
-                    }).length
-                  }
-                </p>
-              </div>
+        <Card className="modern-card card-blue">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              This Month
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">
+              {
+                sales.filter((sale) => {
+                  const saleDate = new Date(sale.sale_date)
+                  const now = new Date()
+                  return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
+                }).length
+              }
             </div>
+            <div className="card-description">Sales this month</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-orange-50 border-orange-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-orange-600 rounded-full flex-shrink-0">
-                <Package className="h-4 w-4 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-orange-800 truncate">Avg Per Sale</p>
-                <p className="text-lg font-bold text-orange-900 truncate">
-                  Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
-                </p>
-              </div>
+        <Card className="modern-card card-orange">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Average Sale
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">
+              Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
             </div>
+            <div className="card-description">Average per sale</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Sales Table - Mobile Responsive */}
-      <Card className="mobile-card">
-        <CardHeader className="p-3 sm:p-6">
-          <div className="flex flex-col gap-3">
-            <CardTitle className="mobile-text-lg font-bold">Sales Records</CardTitle>
-            <div className="flex flex-col gap-2">
+      {/* Modern Sales Table */}
+      <Card className="modern-card">
+        <CardHeader className="p-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+              <CardTitle className="text-2xl font-bold text-foreground">Sales Records</CardTitle>
+              <p className="text-muted-foreground mt-2">Track and manage all sales transactions</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button
                 variant="outline"
-                className="btn-mobile flex items-center justify-center gap-2 w-full"
+                className="modern-button flex items-center justify-center gap-2"
                 onClick={handleExportToExcel}
                 disabled={exporting || sales.length === 0}
               >
@@ -304,7 +309,7 @@ export function SalesTab() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="btn-mobile w-full bg-green-600 hover:bg-green-700 text-white"
+                    className="modern-button bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
                     disabled={loading || isDemoMode || !tableExists}
                     onClick={() => {
                       console.log("Record New Sale button clicked")

@@ -264,78 +264,70 @@ export function InventoryTab() {
   const totalConsumables = inventory.filter((item) => isConsumable(item))
 
   return (
-    <div className="space-y-6">
+    <div className="modern-page space-y-8">
       {(isDemoMode || !tableExists) && (
-        <div className="p-6 border-b">
-          <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={tableExists ? 'connected' : 'demo'} />
-        </div>
+        <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={tableExists ? 'connected' : 'demo'} />
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="mobile-text-lg sm:text-2xl font-bold">Inventory Management</h2>
-          <p className="mobile-text-sm text-muted-foreground">Manage your plants and consumables inventory</p>
-        </div>
+      {/* Modern Header */}
+      <div className="modern-header">
+        <h1 className="modern-title">Inventory Management</h1>
+        <p className="modern-subtitle">Manage your plants, consumables, and honey products inventory</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-green-800">Plants</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-green-900">{currentPlants.length}</p>
-              </div>
-            </div>
+      {/* Modern Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="modern-card card-plants">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Plants
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">{currentPlants.length}</div>
+            <div className="card-description">Active plant varieties</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
-                <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-purple-800">Consumables</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-purple-900">{totalConsumables.length}</p>
-              </div>
-            </div>
+        <Card className="modern-card card-purple">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <ShoppingCart className="card-icon" />
+              Consumables
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">{totalConsumables.length}</div>
+            <div className="card-description">Supply items</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-gray-50 border-gray-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-gray-600 rounded-full">
-                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-gray-800">Total Items</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-gray-900">{inventory.length}</p>
-              </div>
-            </div>
+        <Card className="modern-card card-blue">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <TrendingUp className="card-icon" />
+              Total Items
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">{inventory.length}</div>
+            <div className="card-description">Inventory items</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
-                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-blue-800">Categories</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-blue-900">
-                  {new Set(inventory.map(item => item.category)).size}
-                </p>
-              </div>
+        <Card className="modern-card card-orange">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <FileText className="card-icon" />
+              Categories
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">
+              {new Set(inventory.map(item => item.category)).size}
             </div>
+            <div className="card-description">Product types</div>
           </CardContent>
         </Card>
       </div>
@@ -429,31 +421,30 @@ export function InventoryTab() {
           </div>
         </div>
 
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <Input
-                  placeholder={`Search ${activeTab === "plants" ? "plants" : activeTab === "consumables" ? "consumables" : "honey"}...`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full input-mobile"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(activeTab === "plants" ? plantCategories : activeTab === "honey" ? honeyCategories : consumableCategories).map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        {/* Modern Filters */}
+        <div className="modern-filters">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1">
+              <Input
+                placeholder={`Search ${activeTab === "plants" ? "plants" : activeTab === "consumables" ? "consumables" : "honey"}...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="modern-input text-lg font-medium"
+              />
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-48 modern-button">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(activeTab === "plants" ? plantCategories : activeTab === "honey" ? honeyCategories : consumableCategories).map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
                 {activeTab === "plants" && (
                   <Select value={statusFilter} onValueChange={setStatusFilter}>

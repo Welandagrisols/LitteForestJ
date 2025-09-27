@@ -87,128 +87,135 @@ export function TasksTab() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-green-800">Total Tasks</p>
-                <p className="text-lg sm:text-2xl font-bold text-green-900">{totalTasks}</p>
-              </div>
-            </div>
+    <div className="modern-page space-y-8">
+      {/* Modern Header */}
+      <div className="modern-header">
+        <h1 className="modern-title">Task Management</h1>
+        <p className="modern-subtitle">Track nursery operations and maintenance tasks</p>
+      </div>
+
+      {/* Modern Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="modern-card card-plants">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Total Tasks
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">{totalTasks}</div>
+            <div className="card-description">All tasks created</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-purple-800">Total Cost</p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-900">Ksh {totalCost.toLocaleString()}</p>
-              </div>
-            </div>
+        <Card className="modern-card card-purple">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Total Cost
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">Ksh {totalCost.toLocaleString()}</div>
+            <div className="card-description">Overall expenses</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-blue-800">Completed</p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-900">{completedTasks}</p>
-              </div>
-            </div>
+        <Card className="modern-card card-blue">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Completed
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">{completedTasks}</div>
+            <div className="card-description">Finished tasks</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-orange-50 border-orange-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-orange-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-orange-800">Average Cost</p>
-                <p className="text-lg sm:text-2xl font-bold text-orange-900">Ksh {averageCost.toLocaleString()}</p>
-              </div>
-            </div>
+        <Card className="modern-card card-orange">
+          <CardHeader className="pb-3">
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Average Cost
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="card-value">Ksh {averageCost.toLocaleString()}</div>
+            <div className="card-description">Cost per task</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Add Button */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search tasks, SKU, or assignee..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+      {/* Modern Filters and Add Button */}
+      <div className="modern-filters">
+        <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+          <div className="flex flex-col lg:flex-row gap-4 flex-1">
+            <div className="relative flex-1 max-w-lg">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+              <Input
+                placeholder="Search tasks, SKU, or assignee..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 text-lg font-medium"
+              />
+            </div>
+            <div className="flex gap-4">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-48 modern-button">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-48 modern-button">
+                  <SelectValue placeholder="Filter by type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {taskTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              {statusOptions.map((status) => (
-                <SelectItem key={status} value={status}>
-                  {status}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              {taskTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="modern-button bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Task
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add New Task</DialogTitle>
+              </DialogHeader>
+              <AddTaskForm
+                onSuccess={() => {
+                  setIsAddDialogOpen(false)
+                  fetchTasks()
+                }}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary/90">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Task
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Task</DialogTitle>
-            </DialogHeader>
-            <AddTaskForm
-              onSuccess={() => {
-                setIsAddDialogOpen(false)
-                fetchTasks()
-              }}
-            />
-          </DialogContent>
-        </Dialog>
       </div>
 
-      {/* Tasks Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Tasks</CardTitle>
+      {/* Modern Tasks Table */}
+      <Card className="modern-card">
+        <CardHeader className="p-6">
+          <CardTitle className="text-2xl font-bold text-foreground">Task List</CardTitle>
+          <p className="text-muted-foreground mt-2">Manage and track all nursery tasks</p>
         </CardHeader>
         <CardContent>
           {loading ? (
