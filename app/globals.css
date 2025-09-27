@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
     --primary: 142 76% 36%;
-    --primary-foreground: 356 100% 97%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
     --ring: 142 76% 36%;
     --radius: 0.75rem;
   }
@@ -58,8 +58,12 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     font-size: 16px;
     line-height: 1.6;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+    transition: background 0.3s ease;
+  }
+
+  .dark body {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-    color: #f1f5f9;
   }
 
   /* Mobile-optimized typography */
@@ -303,15 +307,23 @@
     border: 1px solid var(--card-border);
     border-radius: 20px;
     padding: 28px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
   }
 
+  .dark .dashboard-card {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+
   .dashboard-card:hover {
     transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 15px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .dashboard-card:hover {
     box-shadow: 0 30px 40px -10px rgba(0, 0, 0, 0.5), 0 20px 20px -10px rgba(0, 0, 0, 0.3);
   }
 
@@ -326,8 +338,16 @@
     border-radius: 20px 20px 0 0;
   }
 
-  /* Card variants with dark theme */
+  /* Card variants with light/dark theme support */
   .card-plants {
+    --card-bg: rgba(34, 197, 94, 0.1);
+    --card-bg-secondary: rgba(34, 197, 94, 0.05);
+    --card-border: rgba(34, 197, 94, 0.2);
+    --card-accent: #16a34a;
+    --card-accent-secondary: #15803d;
+  }
+
+  .dark .card-plants {
     --card-bg: rgba(34, 197, 94, 0.15);
     --card-bg-secondary: rgba(34, 197, 94, 0.08);
     --card-border: rgba(34, 197, 94, 0.3);
@@ -336,6 +356,14 @@
   }
 
   .card-seedlings {
+    --card-bg: rgba(59, 130, 246, 0.1);
+    --card-bg-secondary: rgba(59, 130, 246, 0.05);
+    --card-border: rgba(59, 130, 246, 0.2);
+    --card-accent: #2563eb;
+    --card-accent-secondary: #1d4ed8;
+  }
+
+  .dark .card-seedlings {
     --card-bg: rgba(59, 130, 246, 0.15);
     --card-bg-secondary: rgba(59, 130, 246, 0.08);
     --card-border: rgba(59, 130, 246, 0.3);
@@ -344,6 +372,14 @@
   }
 
   .card-sales {
+    --card-bg: rgba(245, 158, 11, 0.1);
+    --card-bg-secondary: rgba(245, 158, 11, 0.05);
+    --card-border: rgba(245, 158, 11, 0.2);
+    --card-accent: #d97706;
+    --card-accent-secondary: #b45309;
+  }
+
+  .dark .card-sales {
     --card-bg: rgba(245, 158, 11, 0.15);
     --card-bg-secondary: rgba(245, 158, 11, 0.08);
     --card-border: rgba(245, 158, 11, 0.3);
@@ -352,6 +388,14 @@
   }
 
   .card-today-sales {
+    --card-bg: rgba(168, 85, 247, 0.1);
+    --card-bg-secondary: rgba(168, 85, 247, 0.05);
+    --card-border: rgba(168, 85, 247, 0.2);
+    --card-accent: #9333ea;
+    --card-accent-secondary: #7c3aed;
+  }
+
+  .dark .card-today-sales {
     --card-bg: rgba(168, 85, 247, 0.15);
     --card-bg-secondary: rgba(168, 85, 247, 0.08);
     --card-border: rgba(168, 85, 247, 0.3);
@@ -386,8 +430,13 @@
 
   .card-description {
     font-size: 0.875rem;
-    color: #cbd5e1;
+    color: #64748b;
     font-weight: 600;
+    text-shadow: none;
+  }
+
+  .dark .card-description {
+    color: #cbd5e1;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
