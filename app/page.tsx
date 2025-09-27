@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DashboardTab } from '@/components/dashboard-tab'
-import { InventoryTab } from '@/components/inventory-tab'
+import { InventoryTab } from '@/components/inventory-tab-simple'
 import { SalesTab } from '@/components/sales-tab'
 import { CustomersTab } from '@/components/customers-tab'
 import { TasksTab } from '@/components/tasks-tab'

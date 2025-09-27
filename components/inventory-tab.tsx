@@ -446,46 +446,47 @@ export function InventoryTab() {
                 </SelectContent>
               </Select>
 
-                {activeTab === "plants" && (
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Plants</SelectItem>
-                      <SelectItem value="Healthy">Healthy</SelectItem>
-                      <SelectItem value="Attention">Needs Attention</SelectItem>
-                      <SelectItem value="Critical">Critical</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
+              {activeTab === "plants" && (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Plants</SelectItem>
+                    <SelectItem value="Healthy">Healthy</SelectItem>
+                    <SelectItem value="Attention">Needs Attention</SelectItem>
+                    <SelectItem value="Critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
 
-                {activeTab === "consumables" && (
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Condition" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="Available">Available</SelectItem>
-                      <SelectItem value="Low Stock">Low Stock</SelectItem>
-                      <SelectItem value="Out of Stock">Out of Stock</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-                {activeTab === "honey" && (
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="Available">Available</SelectItem>
-                      <SelectItem value="Low Stock">Low Stock</SelectItem>
-                      <SelectItem value="Out of Stock">Out of Stock</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
+              {activeTab === "consumables" && (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="Available">Available</SelectItem>
+                    <SelectItem value="Low Stock">Low Stock</SelectItem>
+                    <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+
+              {activeTab === "honey" && (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="Available">Available</SelectItem>
+                    <SelectItem value="Low Stock">Low Stock</SelectItem>
+                    <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
               </div>
             </div>
           </div>
