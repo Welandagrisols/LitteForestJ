@@ -46,7 +46,14 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
   const [newMediaFiles, setNewMediaFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const { toast } = useToast()
+
+  // Track changes to show unsaved indicator
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    setHasUnsavedChanges(true)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -115,6 +122,7 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
       }
 
       onStoryUpdated(data)
+      setHasUnsavedChanges(false)
       setOpen(false)
 
       toast({
@@ -187,9 +195,16 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Impact Story</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            Edit Impact Story
+            {hasUnsavedChanges && (
+              <Badge variant="outline" className="text-xs bg-orange-100 text-orange-800">
+                Unsaved changes
+              </Badge>
+            )}
+          </DialogTitle>
           <DialogDescription>
-            Update the story details and media
+            Update the story details and media, then click "Save Changes" to apply your edits
           </DialogDescription>
         </DialogHeader>
 
@@ -199,7 +214,7 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
             <Input
               id="edit-title"
               value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) => handleInputChange('title', e.target.value)}
               placeholder="Enter story title"
               required
             />
@@ -210,7 +225,7 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
             <Textarea
               id="edit-text"
               value={formData.text}
-              onChange={(e) => setFormData(prev => ({ ...prev, text: e.target.value }))}
+              onChange={(e) => handleInputChange('text', e.target.value)}
               placeholder="Write your impact story here..."
               rows={6}
               required
@@ -303,7 +318,7 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
             )}
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end gap-2 pt-4 border-t bg-gray-50 p-4 -mx-6 -mb-6 rounded-b-lg">
             <Button
               type="button"
               variant="outline"
@@ -312,8 +327,12 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || uploading}>
-              {loading ? "Updating..." : uploading ? "Uploading..." : "Update Story"}
+            <Button 
+              type="submit" 
+              disabled={loading || uploading}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+            >
+              {loading ? "Saving Changes..." : uploading ? "Uploading Files..." : "Save Changes"}
             </Button>
           </div>
         </form>
