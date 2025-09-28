@@ -257,7 +257,7 @@ export function WebsiteIntegrationTab() {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('impact_stories')
         .update({ is_published: !story.is_published, updated_at: new Date().toISOString() })
         .eq('id', story.id)
@@ -293,7 +293,7 @@ export function WebsiteIntegrationTab() {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('impact_stories')
         .update({ display_order: newOrder, updated_at: new Date().toISOString() })
         .eq('id', storyId)
@@ -420,7 +420,7 @@ export function WebsiteIntegrationTab() {
           </TabsTrigger>
           <TabsTrigger value="impact" className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
-            Our Impact Page
+            Impact Stories
           </TabsTrigger>
         </TabsList>
 

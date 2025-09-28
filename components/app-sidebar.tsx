@@ -38,7 +38,6 @@ const navigationItems = [
   { id: "tasks", title: "Tasks", icon: CheckSquare },
   { id: "reports", title: "Reports", icon: FileText },
   { id: "website", title: "Website", icon: Globe },
-  { id: "impact", title: "Impact Stories", icon: Leaf },
   { id: "ops", title: "Operations", icon: Settings },
 ]
 
