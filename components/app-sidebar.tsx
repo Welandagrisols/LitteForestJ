@@ -11,7 +11,6 @@ import {
   Settings,
   Globe,
   LogOut,
-  Leaf, // Import Leaf
 } from "lucide-react"
 
 import {
