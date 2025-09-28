@@ -9,8 +9,8 @@ export interface ImageUploadResult {
 }
 
 /**
- * Upload an image to Supabase Storage with public access
- * @param file - The image file to upload
+ * Upload a media file (image or video) to Supabase Storage with public access
+ * @param file - The media file to upload
  * @param folder - Optional folder within plant-images bucket (defaults to 'plants')
  * @returns Promise with upload result
  */
@@ -19,20 +19,24 @@ export async function uploadImageToSupabase(
   folder: string = 'plants'
 ): Promise<ImageUploadResult> {
   try {
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    // Validate file type (images and videos)
+    const isImage = file.type.startsWith('image/')
+    const isVideo = file.type.startsWith('video/')
+    
+    if (!isImage && !isVideo) {
       return {
         success: false,
-        error: 'File must be an image'
+        error: 'File must be an image or video'
       }
     }
 
-    // Validate file size (5MB limit)
-    const maxSize = 5 * 1024 * 1024 // 5MB
+    // Validate file size (10MB limit for videos, 5MB for images)
+    const maxSize = isVideo ? 10 * 1024 * 1024 : 5 * 1024 * 1024
     if (file.size > maxSize) {
+      const sizeLimit = isVideo ? '10MB' : '5MB'
       return {
         success: false,
-        error: 'Image must be smaller than 5MB'
+        error: `${isVideo ? 'Video' : 'Image'} must be smaller than ${sizeLimit}`
       }
     }
 
