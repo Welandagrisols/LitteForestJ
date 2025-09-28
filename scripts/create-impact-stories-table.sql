@@ -1,27 +1,25 @@
-
--- Create impact_stories table for managing "Our Impact" page content
+-- Create impact_stories table for website management
 CREATE TABLE IF NOT EXISTS public.impact_stories (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  title VARCHAR(255) NOT NULL,
-  text TEXT NOT NULL,
-  media_urls TEXT[], -- Array of image/video URLs
-  category VARCHAR(50) NOT NULL CHECK (category IN ('water', 'food_security', 'beautification')),
-  display_order INTEGER DEFAULT 0,
-  is_published BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    text TEXT NOT NULL,
+    media_urls TEXT[],
+    category TEXT NOT NULL CHECK (category IN ('water', 'food_security', 'beautification')),
+    display_order INTEGER NOT NULL DEFAULT 1,
+    is_published BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Create index for efficient querying by category
-CREATE INDEX IF NOT EXISTS idx_impact_stories_category ON public.impact_stories(category);
-CREATE INDEX IF NOT EXISTS idx_impact_stories_display_order ON public.impact_stories(display_order);
+-- Create index for better performance
+CREATE INDEX IF NOT EXISTS idx_impact_stories_category_order ON public.impact_stories(category, display_order);
 
--- Enable Row Level Security
+-- Enable RLS
 ALTER TABLE public.impact_stories ENABLE ROW LEVEL SECURITY;
 
--- Create policy for authenticated users
+-- Create policy to allow all operations for authenticated users
 CREATE POLICY "Enable all operations for authenticated users" ON public.impact_stories
-  FOR ALL USING (auth.role() = 'authenticated');
+    FOR ALL USING (auth.role() = 'authenticated');
 
 -- Insert sample data for the 11 springs (Water category)
 INSERT INTO public.impact_stories (title, text, category, display_order) VALUES
