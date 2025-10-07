@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -13,8 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { EditInventoryForm } from "@/components/edit-inventory-form"
-import { AddImpactStoryForm } from "@/components/add-impact-story-form"
-import { EditImpactStoryForm } from "@/components/edit-impact-story-form"
 import { demoInventory } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { LoadingSpinner } from "@/components/loading-spinner"
@@ -27,11 +24,11 @@ import {
   Package, 
   Loader2,
   Droplets,
-  Wheat,
-  Trees,
+  School,
   ArrowUp,
   ArrowDown,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Plus
 } from "lucide-react"
 import {
   AlertDialog,
@@ -45,30 +42,43 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-interface ImpactStory {
+interface WaterSource {
   id: string
-  title: string
-  text: string
-  media_urls: string[] | null
-  category: 'water' | 'food_security' | 'beautification'
+  spring_name: string | null
+  media_url: string
+  media_type: string
+  story: string | null
   display_order: number
-  is_published: boolean
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+interface GreenChampion {
+  id: string
+  school_name: string | null
+  media_url: string
+  story: string | null
+  display_order: number
+  is_active: boolean
   created_at: string
   updated_at: string
 }
 
 export function WebsiteIntegrationTab() {
   const [inventory, setInventory] = useState<any[]>([])
-  const [stories, setStories] = useState<ImpactStory[]>([])
+  const [waterSources, setWaterSources] = useState<WaterSource[]>([])
+  const [greenChampions, setGreenChampions] = useState<GreenChampion[]>([])
   const [loading, setLoading] = useState(true)
-  const [storiesLoading, setStoriesLoading] = useState(true)
+  const [greenTownsLoading, setGreenTownsLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("All Categories")
   const [statusFilter, setStatusFilter] = useState("all")
   const [editItem, setEditItem] = useState<any>(null)
   const [tableExists, setTableExists] = useState(true)
-  const [storiesTableExists, setStoriesTableExists] = useState(false)
+  const [waterSourcesTableExists, setWaterSourcesTableExists] = useState(false)
+  const [greenChampionsTableExists, setGreenChampionsTableExists] = useState(false)
   const [activeTab, setActiveTab] = useState("products")
   const { toast } = useToast()
 
@@ -76,19 +86,22 @@ export function WebsiteIntegrationTab() {
     async function init() {
       if (isDemoMode) {
         setInventory(demoInventory)
-        setStories([])
+        setWaterSources([])
+        setGreenChampions([])
         setLoading(false)
-        setStoriesLoading(false)
+        setGreenTownsLoading(false)
         return
       }
 
-      const [inventoryExists, storiesExists] = await Promise.all([
+      const [inventoryExists, waterExists, championsExists] = await Promise.all([
         checkTableExists("inventory"),
-        checkTableExists("impact_stories")
+        checkTableExists("water_source_gallery"),
+        checkTableExists("green_champions_gallery")
       ])
       
       setTableExists(inventoryExists)
-      setStoriesTableExists(storiesExists)
+      setWaterSourcesTableExists(waterExists)
+      setGreenChampionsTableExists(championsExists)
 
       if (!inventoryExists) {
         setInventory(demoInventory)
@@ -106,15 +119,17 @@ export function WebsiteIntegrationTab() {
         })
       }
 
-      if (storiesExists) {
-        fetchStories().catch((error) => {
-          console.log("Error loading stories:", error.message)
-          setStories([])
-          setStoriesLoading(false)
+      if (waterExists && championsExists) {
+        Promise.all([fetchWaterSources(), fetchGreenChampions()]).catch((error) => {
+          console.log("Error loading Green Towns data:", error.message)
+          setWaterSources([])
+          setGreenChampions([])
+          setGreenTownsLoading(false)
         })
       } else {
-        setStories([])
-        setStoriesLoading(false)
+        setWaterSources([])
+        setGreenChampions([])
+        setGreenTownsLoading(false)
       }
     }
 
@@ -136,6 +151,39 @@ export function WebsiteIntegrationTab() {
       throw error
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function fetchWaterSources() {
+    try {
+      setGreenTownsLoading(true)
+      const { data, error } = await supabase
+        .from('water_source_gallery')
+        .select('*')
+        .order('display_order', { ascending: true })
+
+      if (error) throw error
+      setWaterSources(data || [])
+    } catch (error: any) {
+      console.error('Error loading water sources:', error)
+      throw error
+    } finally {
+      setGreenTownsLoading(false)
+    }
+  }
+
+  async function fetchGreenChampions() {
+    try {
+      const { data, error } = await supabase
+        .from('green_champions_gallery')
+        .select('*')
+        .order('display_order', { ascending: true })
+
+      if (error) throw error
+      setGreenChampions(data || [])
+    } catch (error: any) {
+      console.error('Error loading green champions:', error)
+      throw error
     }
   }
 
@@ -209,154 +257,10 @@ export function WebsiteIntegrationTab() {
     }
   }
 
-  async function fetchStories() {
-    try {
-      setStoriesLoading(true)
-      const { data, error } = await supabase
-        .from('impact_stories')
-        .select('*')
-        .order('category', { ascending: true })
-        .order('display_order', { ascending: true })
-
-      if (error) throw error
-      setStories(data || [])
-    } catch (error: any) {
-      console.error('Error loading stories:', error)
-      throw error
-    } finally {
-      setStoriesLoading(false)
-    }
-  }
-
-  const handleStoryAdded = (newStory: ImpactStory) => {
-    setStories(prev => [...prev, newStory])
-    toast({
-      title: "Success",
-      description: "Impact story added successfully",
-    })
-  }
-
-  const handleStoryUpdated = (updatedStory: ImpactStory) => {
-    setStories(prev => prev.map(story => 
-      story.id === updatedStory.id ? updatedStory : story
-    ))
-    toast({
-      title: "Success",
-      description: "Impact story updated successfully",
-    })
-  }
-
-  const toggleStoryPublished = async (story: ImpactStory) => {
-    if (isDemoMode || !storiesTableExists) {
-      toast({
-        title: "Demo Mode",
-        description: "Connect to Supabase to manage story visibility",
-        variant: "destructive",
-      })
-      return
-    }
-
-    try {
-      const { error } = await (supabase as any)
-        .from('impact_stories')
-        .update({ is_published: !story.is_published, updated_at: new Date().toISOString() })
-        .eq('id', story.id)
-
-      if (error) throw error
-
-      setStories(prev => prev.map(s => 
-        s.id === story.id ? { ...s, is_published: !s.is_published } : s
-      ))
-
-      toast({
-        title: "Success",
-        description: `Story ${!story.is_published ? 'published' : 'hidden'}`,
-      })
-    } catch (error: any) {
-      console.error('Error toggling published status:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update story status",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const updateStoryOrder = async (storyId: string, newOrder: number) => {
-    if (isDemoMode || !storiesTableExists) {
-      toast({
-        title: "Demo Mode",
-        description: "Connect to Supabase to reorder stories",
-        variant: "destructive",
-      })
-      return
-    }
-
-    try {
-      const { error } = await (supabase as any)
-        .from('impact_stories')
-        .update({ display_order: newOrder, updated_at: new Date().toISOString() })
-        .eq('id', storyId)
-
-      if (error) throw error
-
-      await fetchStories()
-      toast({
-        title: "Success",
-        description: "Story order updated",
-      })
-    } catch (error: any) {
-      console.error('Error updating order:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update story order",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const deleteStory = async (storyId: string) => {
-    if (isDemoMode || !storiesTableExists) {
-      toast({
-        title: "Demo Mode",
-        description: "Connect to Supabase to delete stories",
-        variant: "destructive",
-      })
-      return
-    }
-
-    try {
-      const { error } = await supabase
-        .from('impact_stories')
-        .delete()
-        .eq('id', storyId)
-
-      if (error) throw error
-
-      setStories(prev => prev.filter(story => story.id !== storyId))
-      toast({
-        title: "Success",
-        description: "Story deleted successfully",
-      })
-    } catch (error: any) {
-      console.error('Error deleting story:', error)
-      toast({
-        title: "Error",
-        description: "Failed to delete story",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const getStoriesByCategory = (category: string) => {
-    return stories.filter(story => story.category === category)
-  }
-
-  // Filter products that can be listed on website (excluding consumables marked with internal categories)
+  // Filter products that can be listed on website
   const websiteProducts = inventory.filter(item => {
-    // Include plants, honey, and consumables that are not marked as internal-only
     return !item.category?.startsWith("[Internal]") && 
-           item.quantity > 0 // Only show items in stock
+           item.quantity > 0
   })
 
   const filteredProducts = websiteProducts.filter((item) => {
@@ -384,17 +288,16 @@ export function WebsiteIntegrationTab() {
   const listedCount = websiteProducts.filter(item => item.ready_for_sale).length
   const unlistedCount = websiteProducts.filter(item => !item.ready_for_sale).length
 
-  const storyStats = {
-    total: stories.length,
-    published: stories.filter(s => s.is_published).length,
-    water: getStoriesByCategory('water').length,
-    food_security: getStoriesByCategory('food_security').length,
-    beautification: getStoriesByCategory('beautification').length,
+  const greenTownsStats = {
+    waterSources: waterSources.length,
+    activeWater: waterSources.filter(s => s.is_active).length,
+    greenChampions: greenChampions.length,
+    activeChampions: greenChampions.filter(c => c.is_active).length,
   }
 
   return (
     <div className="space-y-6">
-      {(isDemoMode || !tableExists || !storiesTableExists) && (
+      {(isDemoMode || !tableExists) && (
         <div className="p-6 border-b">
           <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={isDemoMode ? 'demo' : 'connected'} />
         </div>
@@ -407,7 +310,7 @@ export function WebsiteIntegrationTab() {
             <Globe className="h-6 w-6" />
             Website Management
           </h2>
-          <p className="text-muted-foreground">Manage products and content visible on your website</p>
+          <p className="text-muted-foreground text-sm">Manage website content</p>
         </div>
       </div>
 
@@ -418,67 +321,67 @@ export function WebsiteIntegrationTab() {
             <Package className="h-4 w-4" />
             Products
           </TabsTrigger>
-          <TabsTrigger value="impact" className="flex items-center gap-2">
+          <TabsTrigger value="green-towns" className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
-            Impact Stories
+            Green Towns
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="products" className="space-y-6 mt-6">
 
-      {/* Products Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+      {/* Products Summary Cards - 2 columns on mobile */}
+        <div className="grid grid-cols-2 gap-3">
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-blue-600 rounded-full">
+                <Package className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-blue-800">Total Products</p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-900">{websiteProducts.length}</p>
+                <p className="text-xs font-medium text-blue-800">Total</p>
+                <p className="text-xl font-bold text-blue-900">{websiteProducts.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
-                <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <Card className="bg-green-50 border-green-200">
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-green-600 rounded-full">
+                <Eye className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-green-800">Listed</p>
-                <p className="text-lg sm:text-2xl font-bold text-green-900">{listedCount}</p>
+                <p className="text-xs font-medium text-green-800">Listed</p>
+                <p className="text-xl font-bold text-green-900">{listedCount}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-gray-50 border-gray-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-gray-600 rounded-full">
-                <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <Card className="bg-gray-50 border-gray-200">
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-gray-600 rounded-full">
+                <EyeOff className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-800">Hidden</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">{unlistedCount}</p>
+                <p className="text-xs font-medium text-gray-800">Hidden</p>
+                <p className="text-xl font-bold text-gray-900">{unlistedCount}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
-                <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <Card className="bg-purple-50 border-purple-200">
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-purple-600 rounded-full">
+                <Globe className="h-4 w-4 text-white" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-purple-800">Visibility Rate</p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-900">
+                <p className="text-xs font-medium text-purple-800">Visibility</p>
+                <p className="text-xl font-bold text-purple-900">
                   {websiteProducts.length > 0 ? Math.round((listedCount / websiteProducts.length) * 100) : 0}%
                 </p>
               </div>
@@ -682,161 +585,76 @@ export function WebsiteIntegrationTab() {
       )}
       </TabsContent>
 
-      <TabsContent value="impact" className="space-y-6 mt-6">
+      <TabsContent value="green-towns" className="space-y-6 mt-6">
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold">Our Impact Page Content</h3>
-            <p className="text-muted-foreground">Manage the stories that appear in the "Our Impact" section of your About Us page</p>
+            <h3 className="text-lg font-semibold">Green Towns Initiative</h3>
+            <p className="text-muted-foreground text-sm">Water sources and green champions</p>
           </div>
 
-          {/* Impact Stories Summary Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          {/* Green Towns Summary Cards - 2 columns on mobile */}
+          <div className="grid grid-cols-2 gap-3">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Stories</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{storyStats.total}</div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Published</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{storyStats.published}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Water</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
+                <CardTitle className="text-sm font-medium">Water Sources</CardTitle>
                 <Droplets className="h-4 w-4 text-blue-500" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{storyStats.water}</div>
+              <CardContent className="p-3 pt-0">
+                <div className="text-2xl font-bold">{greenTownsStats.waterSources}</div>
+                <p className="text-xs text-muted-foreground">{greenTownsStats.activeWater} active</p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Food Security</CardTitle>
-                <Wheat className="h-4 w-4 text-green-500" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
+                <CardTitle className="text-sm font-medium">Green Champions</CardTitle>
+                <School className="h-4 w-4 text-green-500" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{storyStats.food_security}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Beautification</CardTitle>
-                <Trees className="h-4 w-4 text-purple-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{storyStats.beautification}</div>
+              <CardContent className="p-3 pt-0">
+                <div className="text-2xl font-bold">{greenTownsStats.greenChampions}</div>
+                <p className="text-xs text-muted-foreground">{greenTownsStats.activeChampions} active</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Impact Stories Category Tabs */}
+          {/* Green Towns Category Tabs */}
           <Tabs defaultValue="water" className="w-full">
-            <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-              <TabsList className="grid w-full grid-cols-3 md:w-auto">
+            <div className="flex flex-col space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="water" className="flex items-center gap-2">
                   <Droplets className="h-4 w-4" />
-                  Water
+                  Water Sources
                 </TabsTrigger>
-                <TabsTrigger value="food_security" className="flex items-center gap-2">
-                  <Wheat className="h-4 w-4" />
-                  Food Security
-                </TabsTrigger>
-                <TabsTrigger value="beautification" className="flex items-center gap-2">
-                  <Trees className="h-4 w-4" />
-                  Beautification
+                <TabsTrigger value="champions" className="flex items-center gap-2">
+                  <School className="h-4 w-4" />
+                  Green Champions
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="water" className="space-y-4">
+            <TabsContent value="water" className="space-y-4 mt-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-blue-100 text-blue-800">
-                    {getStoriesByCategory('water').length} stories
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    Springs rehabilitation stories
-                  </span>
-                </div>
-                {storiesTableExists && (
-                  <AddImpactStoryForm 
-                    category="water"
-                    onStoryAdded={handleStoryAdded}
-                  />
-                )}
+                <Badge className="bg-blue-100 text-blue-800">
+                  {waterSources.length} water sources
+                </Badge>
               </div>
-              <StoryList 
-                stories={getStoriesByCategory('water')}
-                onTogglePublished={toggleStoryPublished}
-                onUpdateOrder={updateStoryOrder}
-                onDelete={deleteStory}
-                onStoryUpdated={handleStoryUpdated}
-                isDemo={isDemoMode || !storiesTableExists}
+              <GalleryList 
+                items={waterSources}
+                type="water"
+                isDemo={isDemoMode || !waterSourcesTableExists}
               />
             </TabsContent>
 
-            <TabsContent value="food_security" className="space-y-4">
+            <TabsContent value="champions" className="space-y-4 mt-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-green-100 text-green-800">
-                    {getStoriesByCategory('food_security').length} stories
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    Food security impact stories
-                  </span>
-                </div>
-                {storiesTableExists && (
-                  <AddImpactStoryForm 
-                    category="food_security"
-                    onStoryAdded={handleStoryAdded}
-                  />
-                )}
+                <Badge className="bg-green-100 text-green-800">
+                  {greenChampions.length} schools
+                </Badge>
               </div>
-              <StoryList 
-                stories={getStoriesByCategory('food_security')}
-                onTogglePublished={toggleStoryPublished}
-                onUpdateOrder={updateStoryOrder}
-                onDelete={deleteStory}
-                onStoryUpdated={handleStoryUpdated}
-                isDemo={isDemoMode || !storiesTableExists}
-              />
-            </TabsContent>
-
-            <TabsContent value="beautification" className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-purple-100 text-purple-800">
-                    {getStoriesByCategory('beautification').length} stories
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    Community beautification projects
-                  </span>
-                </div>
-                {storiesTableExists && (
-                  <AddImpactStoryForm 
-                    category="beautification"
-                    onStoryAdded={handleStoryAdded}
-                  />
-                )}
-              </div>
-              <StoryList 
-                stories={getStoriesByCategory('beautification')}
-                onTogglePublished={toggleStoryPublished}
-                onUpdateOrder={updateStoryOrder}
-                onDelete={deleteStory}
-                onStoryUpdated={handleStoryUpdated}
-                isDemo={isDemoMode || !storiesTableExists}
+              <GalleryList 
+                items={greenChampions}
+                type="champion"
+                isDemo={isDemoMode || !greenChampionsTableExists}
               />
             </TabsContent>
           </Tabs>
@@ -847,24 +665,21 @@ export function WebsiteIntegrationTab() {
   )
 }
 
-interface StoryListProps {
-  stories: ImpactStory[]
-  onTogglePublished: (story: ImpactStory) => void
-  onUpdateOrder: (storyId: string, newOrder: number) => void
-  onDelete: (storyId: string) => void
-  onStoryUpdated: (story: ImpactStory) => void
+interface GalleryListProps {
+  items: (WaterSource | GreenChampion)[]
+  type: 'water' | 'champion'
   isDemo: boolean
 }
 
-function StoryList({ stories, onTogglePublished, onUpdateOrder, onDelete, onStoryUpdated, isDemo }: StoryListProps) {
-  if (stories.length === 0) {
+function GalleryList({ items, type, isDemo }: GalleryListProps) {
+  if (items.length === 0) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <div className="text-center space-y-2">
-            <h3 className="text-lg font-medium">No stories yet</h3>
-            <p className="text-muted-foreground">
-              Add your first impact story to get started
+            <h3 className="text-lg font-medium">No items yet</h3>
+            <p className="text-muted-foreground text-sm">
+              {type === 'water' ? 'Add water sources to showcase' : 'Add green champion schools'}
             </p>
           </div>
         </CardContent>
@@ -873,103 +688,45 @@ function StoryList({ stories, onTogglePublished, onUpdateOrder, onDelete, onStor
   }
 
   return (
-    <div className="space-y-4">
-      {stories.map((story, index) => (
-        <Card key={story.id} className="hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 space-y-3">
-                <div className="flex items-center gap-3">
-                  <h3 className="text-lg font-semibold">{story.title}</h3>
-                  <Badge variant={story.is_published ? "default" : "secondary"}>
-                    {story.is_published ? "Published" : "Draft"}
-                  </Badge>
-                  {story.media_urls && story.media_urls.length > 0 && (
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      <ImageIcon className="h-3 w-3" />
-                      {story.media_urls.length} media
-                    </Badge>
-                  )}
-                </div>
-                
-                <p className="text-muted-foreground line-clamp-3">
-                  {story.text}
-                </p>
-                
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>Order: {story.display_order}</span>
-                  <span>•</span>
-                  <span>Updated: {new Date(story.updated_at).toLocaleDateString()}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 ml-4">
-                {/* Order controls */}
-                <div className="flex flex-col gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onUpdateOrder(story.id, story.display_order - 1)}
-                    disabled={index === 0 || isDemo}
-                  >
-                    <ArrowUp className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onUpdateOrder(story.id, story.display_order + 1)}
-                    disabled={index === stories.length - 1 || isDemo}
-                  >
-                    <ArrowDown className="h-3 w-3" />
-                  </Button>
-                </div>
-
-                {/* Visibility toggle */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onTogglePublished(story)}
-                  disabled={isDemo}
-                >
-                  {story.is_published ? (
-                    <Eye className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  )}
-                </Button>
-
-                {/* Edit button */}
-                <EditImpactStoryForm 
-                  story={story}
-                  onStoryUpdated={onStoryUpdated}
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => (
+        <Card key={item.id} className="hover:shadow-md transition-shadow">
+          <CardContent className="p-4">
+            <div className="space-y-3">
+              {/* Media */}
+              <div className="relative">
+                <img 
+                  src={item.media_url} 
+                  alt={'spring_name' in item ? item.spring_name || 'Water source' : item.school_name || 'School'}
+                  className="w-full h-40 object-cover rounded-md"
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.jpg';
+                  }}
                 />
-
-                {/* Delete button */}
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="sm" disabled={isDemo}>
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Story</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete "{story.title}"? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => onDelete(story.id)}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <Badge 
+                  variant={item.is_active ? "default" : "secondary"}
+                  className="absolute top-2 right-2"
+                >
+                  {item.is_active ? "Active" : "Hidden"}
+                </Badge>
               </div>
+
+              {/* Title */}
+              <div>
+                <h3 className="font-semibold text-base">
+                  {'spring_name' in item ? item.spring_name : item.school_name}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Order: {item.display_order}
+                </p>
+              </div>
+
+              {/* Story */}
+              {item.story && (
+                <p className="text-sm text-muted-foreground line-clamp-3">
+                  {item.story}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
