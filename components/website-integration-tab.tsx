@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
@@ -27,8 +27,10 @@ import {
   School,
   ArrowUp,
   ArrowDown,
-  Image as ImageIcon,
-  Plus
+  ImageIcon,
+  Plus,
+  AlertCircle,
+  ExternalLink
 } from "lucide-react"
 import {
   AlertDialog,
@@ -41,6 +43,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface WaterSource {
   id: string
@@ -98,7 +101,7 @@ export function WebsiteIntegrationTab() {
         checkTableExists("water_source_gallery"),
         checkTableExists("green_champions_gallery")
       ])
-      
+
       setTableExists(inventoryExists)
       setWaterSourcesTableExists(waterExists)
       setGreenChampionsTableExists(championsExists)
@@ -271,7 +274,7 @@ export function WebsiteIntegrationTab() {
       item.sku?.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter
-    
+
     const matchesStatus = 
       statusFilter === "all" || 
       (statusFilter === "listed" && item.ready_for_sale) ||
@@ -294,6 +297,73 @@ export function WebsiteIntegrationTab() {
     greenChampions: greenChampions.length,
     activeChampions: greenChampions.filter(c => c.is_active).length,
   }
+
+  const handleEditWaterSource = (source: WaterSource) => {
+    toast({
+      title: "Edit Water Source",
+      description: "Edit functionality will be implemented",
+    })
+  }
+
+  const handleDeleteWaterSource = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this water source?")) return
+
+    try {
+      const { error } = await supabase
+        .from('water_source_gallery')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      setWaterSources(prev => prev.filter(s => s.id !== id))
+      toast({
+        title: "Success",
+        description: "Water source deleted successfully",
+      })
+    } catch (error) {
+      console.error('Error deleting water source:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete water source",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEditGreenChampion = (champion: GreenChampion) => {
+    toast({
+      title: "Edit Green Champion",
+      description: "Edit functionality will be implemented",
+    })
+  }
+
+  const handleDeleteGreenChampion = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this green champion?")) return
+
+    try {
+      const { error } = await supabase
+        .from('green_champions_gallery')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      setGreenChampions(prev => prev.filter(c => c.id !== id))
+      toast({
+        title: "Success",
+        description: "Green champion deleted successfully",
+      })
+    } catch (error) {
+      console.error('Error deleting green champion:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete green champion",
+        variant: "destructive",
+      })
+    }
+  }
+
 
   return (
     <div className="space-y-6">
@@ -637,6 +707,12 @@ export function WebsiteIntegrationTab() {
                 <Badge className="bg-blue-100 text-blue-800">
                   {waterSources.length} water sources
                 </Badge>
+                <DialogTrigger asChild>
+                  <Button size="sm" disabled={isDemoMode || !waterSourcesTableExists}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Water Source
+                  </Button>
+                </DialogTrigger>
               </div>
               <GalleryList 
                 items={waterSources}
@@ -650,6 +726,12 @@ export function WebsiteIntegrationTab() {
                 <Badge className="bg-green-100 text-green-800">
                   {greenChampions.length} schools
                 </Badge>
+                <DialogTrigger asChild>
+                  <Button size="sm" disabled={isDemoMode || !greenChampionsTableExists}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Green Champion
+                  </Button>
+                </DialogTrigger>
               </div>
               <GalleryList 
                 items={greenChampions}
@@ -727,6 +809,43 @@ function GalleryList({ items, type, isDemo }: GalleryListProps) {
                   {item.story}
                 </p>
               )}
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (type === 'water') {
+                      // @ts-ignore
+                      handleEditWaterSource(item as WaterSource)
+                    } else {
+                      // @ts-ignore
+                      handleEditGreenChampion(item as GreenChampion)
+                    }
+                  }}
+                  disabled={isDemo}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (type === 'water') {
+                      // @ts-ignore
+                      handleDeleteWaterSource(item.id)
+                    } else {
+                      // @ts-ignore
+                      handleDeleteGreenChampion(item.id)
+                    }
+                  }}
+                  className="text-destructive hover:text-destructive"
+                  disabled={isDemo}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

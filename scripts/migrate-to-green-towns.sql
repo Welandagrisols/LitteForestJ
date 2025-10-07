@@ -6,7 +6,7 @@
 DELETE FROM water_source_gallery;
 DELETE FROM green_champions_gallery;
 
--- 1. Migrate Water Source stories (category = 'water')
+-- 1. Migrate ALL Water Source stories (category = 'water')
 INSERT INTO water_source_gallery (
   spring_name,
   media_url,
@@ -31,10 +31,11 @@ SELECT
   created_at,
   updated_at
 FROM impact_stories
-WHERE category = 'water';
+WHERE category = 'water'
+ORDER BY display_order;
 
--- 2. Migrate school/beautification stories to Green Champions
--- Only migrate if there are stories with these categories
+-- 2. Migrate ALL stories to Green Champions (since you had many schools)
+-- This will include all categories as schools/champions
 INSERT INTO green_champions_gallery (
   school_name,
   media_url,
@@ -57,7 +58,7 @@ SELECT
   created_at,
   updated_at
 FROM impact_stories
-WHERE category IN ('beautification', 'food_security', 'green_champions', 'schools');
+ORDER BY display_order;
 
 -- 3. Verify the migration
 SELECT 
@@ -70,10 +71,11 @@ SELECT
   COUNT(*) as count
 FROM green_champions_gallery;
 
--- 4. Show what was in the original table
+-- 4. Show what was migrated
 SELECT 
   category,
   COUNT(*) as story_count,
-  string_agg(title, ', ') as titles
+  string_agg(title, ', ' ORDER BY display_order) as titles
 FROM impact_stories
-GROUP BY category;
+GROUP BY category
+ORDER BY category;
