@@ -26,16 +26,15 @@ SELECT
   END as media_url,
   'image' as media_type,
   text as story,
-  display_order,
+  ROW_NUMBER() OVER (ORDER BY created_at) as display_order,
   is_published as is_active,
   created_at,
   updated_at
 FROM impact_stories
 WHERE category = 'water'
-ORDER BY display_order;
+ORDER BY created_at;
 
--- 2. Migrate ALL stories to Green Champions (since you had many schools)
--- This will include all categories as schools/champions
+-- 2. Migrate ALL other stories to Green Champions (schools, beautification, etc.)
 INSERT INTO green_champions_gallery (
   school_name,
   media_url,
@@ -53,12 +52,13 @@ SELECT
     ELSE ''
   END as media_url,
   text as story,
-  display_order,
+  ROW_NUMBER() OVER (ORDER BY created_at) as display_order,
   is_published as is_active,
   created_at,
   updated_at
 FROM impact_stories
-ORDER BY display_order;
+WHERE category != 'water' OR category IS NULL
+ORDER BY created_at;
 
 -- 3. Verify the migration
 SELECT 
@@ -74,8 +74,7 @@ FROM green_champions_gallery;
 -- 4. Show what was migrated
 SELECT 
   category,
-  COUNT(*) as story_count,
-  string_agg(title, ', ' ORDER BY display_order) as titles
+  COUNT(*) as story_count
 FROM impact_stories
 GROUP BY category
 ORDER BY category;
