@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useToast } from "@/components/ui/use-toast"
 import { EditInventoryForm } from "@/components/edit-inventory-form"
 import { demoInventory } from "@/components/demo-data"
@@ -733,10 +734,11 @@ export function WebsiteIntegrationTab() {
                   </Button>
                 </DialogTrigger>
               </div>
-              <GalleryList 
+              <GreenChampionsAccordion 
                 items={greenChampions}
-                type="champion"
                 isDemo={isDemoMode || !greenChampionsTableExists}
+                onEdit={handleEditGreenChampion}
+                onDelete={handleDeleteGreenChampion}
               />
             </TabsContent>
           </Tabs>
@@ -849,6 +851,143 @@ function GalleryList({ items, type, isDemo }: GalleryListProps) {
             </div>
           </CardContent>
         </Card>
+      ))}
+    </div>
+  )
+}
+
+interface GreenChampionsAccordionProps {
+  items: GreenChampion[]
+  isDemo: boolean
+  onEdit: (champion: GreenChampion) => void
+  onDelete: (id: string) => void
+}
+
+function GreenChampionsAccordion({ items, isDemo, onEdit, onDelete }: GreenChampionsAccordionProps) {
+  const [openItems, setOpenItems] = useState<string[]>([])
+
+  if (items.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-medium">No schools yet</h3>
+            <p className="text-muted-foreground text-sm">
+              Add green champion schools to showcase
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const toggleItem = (id: string) => {
+    setOpenItems(prev => 
+      prev.includes(id) 
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      {items.map((champion) => (
+        <Collapsible
+          key={champion.id}
+          open={openItems.includes(champion.id)}
+          onOpenChange={() => toggleItem(champion.id)}
+        >
+          <Card className="bg-green-50 border-green-200">
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between p-4 cursor-pointer hover:bg-green-100 transition-colors">
+                <div className="flex items-center gap-3">
+                  <School className="h-5 w-5 text-green-600" />
+                  <div className="text-left">
+                    <h3 className="font-semibold text-green-900">{champion.school_name}</h3>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={champion.is_active ? "default" : "secondary"} className="bg-green-600">
+                    {champion.is_active ? "Active" : "Hidden"}
+                  </Badge>
+                  {openItems.includes(champion.id) ? (
+                    <ArrowUp className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <ArrowDown className="h-4 w-4 text-green-600" />
+                  )}
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            
+            <CollapsibleContent>
+              <CardContent className="p-4 pt-0 space-y-4">
+                {/* Story Text */}
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {champion.story || "We are preparing detailed information about the impact created with students and the community."}
+                  </p>
+                </div>
+
+                {/* Media Attachments */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-700">Media Attachments:</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {champion.media_url && (
+                      <div className="relative group">
+                        <img 
+                          src={champion.media_url} 
+                          alt={`${champion.school_name} media 1`}
+                          className="w-full h-32 object-cover rounded-md border border-gray-200"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.jpg';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-md" />
+                      </div>
+                    )}
+                    <div className="relative group">
+                      <img 
+                        src="/placeholder.jpg" 
+                        alt={`${champion.school_name} media 2`}
+                        className="w-full h-32 object-cover rounded-md border border-gray-200"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-md" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-green-200">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onEdit(champion)
+                    }}
+                    disabled={isDemo}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(champion.id)
+                    }}
+                    className="text-destructive hover:text-destructive"
+                    disabled={isDemo}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       ))}
     </div>
   )
