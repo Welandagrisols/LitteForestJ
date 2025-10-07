@@ -1,3 +1,4 @@
+
 -- Migration script: Move data from impact_stories to Green Towns Initiative tables
 -- Run this in your Supabase SQL Editor
 
@@ -28,9 +29,7 @@ SELECT
 FROM impact_stories
 WHERE category = 'water';
 
--- 2. Migrate School/Green Champions stories 
--- (Adjust the category condition based on where your school stories were stored)
--- If they were in 'beautification' category, use that:
+-- 2. Migrate Green Champions stories (category = 'green_champions')
 INSERT INTO green_champions_gallery (
   school_name,
   media_url,
@@ -53,9 +52,7 @@ SELECT
   created_at,
   updated_at
 FROM impact_stories
-WHERE category = 'beautification' 
-  OR title ILIKE '%school%'
-  OR title ILIKE '%champion%';
+WHERE category = 'green_champions';
 
 -- 3. Verify the migration
 SELECT 
@@ -68,5 +65,13 @@ SELECT
   COUNT(*) as count
 FROM green_champions_gallery;
 
--- 4. (Optional) After verifying data is correct, you can drop the old table:
+-- 4. Show summary of what was migrated
+SELECT 
+  category,
+  COUNT(*) as story_count
+FROM impact_stories
+WHERE category IN ('water', 'green_champions')
+GROUP BY category;
+
+-- 5. (Optional) After verifying data is correct, you can drop the old table:
 -- DROP TABLE impact_stories;
