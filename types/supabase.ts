@@ -103,6 +103,73 @@ export interface Database {
           updated_at?: string
         }
       }
+      water_source_gallery: {
+        Row: {
+          id: string
+          spring_name: string | null
+          media_url: string
+          media_type: string
+          caption: string | null
+          display_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          spring_name?: string | null
+          media_url: string
+          media_type: string
+          caption?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          spring_name?: string | null
+          media_url?: string
+          media_type?: string
+          caption?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      green_champions_gallery: {
+        Row: {
+          id: string
+          school_name: string | null
+          media_url: string
+          caption: string | null
+          display_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          school_name?: string | null
+          media_url: string
+          caption?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          school_name?: string | null
+          media_url?: string
+          caption?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       sales: {
         Row: {
           id: string
