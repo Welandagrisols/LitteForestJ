@@ -109,7 +109,7 @@ export interface Database {
           spring_name: string | null
           media_url: string
           media_type: string
-          caption: string | null
+          story: string | null
           display_order: number
           is_active: boolean
           created_at: string
@@ -120,7 +120,7 @@ export interface Database {
           spring_name?: string | null
           media_url: string
           media_type: string
-          caption?: string | null
+          story?: string | null
           display_order?: number
           is_active?: boolean
           created_at?: string
@@ -131,7 +131,7 @@ export interface Database {
           spring_name?: string | null
           media_url?: string
           media_type?: string
-          caption?: string | null
+          story?: string | null
           display_order?: number
           is_active?: boolean
           created_at?: string
@@ -143,7 +143,7 @@ export interface Database {
           id: string
           school_name: string | null
           media_url: string
-          caption: string | null
+          story: string | null
           display_order: number
           is_active: boolean
           created_at: string
@@ -153,7 +153,7 @@ export interface Database {
           id?: string
           school_name?: string | null
           media_url: string
-          caption?: string | null
+          story?: string | null
           display_order?: number
           is_active?: boolean
           created_at?: string
@@ -163,7 +163,7 @@ export interface Database {
           id?: string
           school_name?: string | null
           media_url?: string
-          caption?: string | null
+          story?: string | null
           display_order?: number
           is_active?: boolean
           created_at?: string

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.water_source_gallery (
   spring_name TEXT,
   media_url TEXT NOT NULL,
   media_type TEXT NOT NULL,
-  caption TEXT,
+  story TEXT,
   display_order INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.green_champions_gallery (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   school_name TEXT,
   media_url TEXT NOT NULL,
-  caption TEXT,
+  story TEXT,
   display_order INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -56,12 +56,12 @@ FOR SELECT USING (is_active = true);
 
 -- 7. Migrate existing water spring data from impact_stories
 -- Create entries in water_source_gallery using existing impact_stories data
-INSERT INTO public.water_source_gallery (spring_name, media_url, media_type, caption, display_order, is_active)
+INSERT INTO public.water_source_gallery (spring_name, media_url, media_type, story, display_order, is_active)
 SELECT 
   title as spring_name,
   'https://placeholder-url.com/spring-image.jpg' as media_url,
   'image' as media_type,
-  text as caption,
+  text as story,
   display_order,
   is_published as is_active
 FROM public.impact_stories
