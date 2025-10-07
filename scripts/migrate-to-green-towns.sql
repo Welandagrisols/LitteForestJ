@@ -26,13 +26,13 @@ SELECT
   END as media_url,
   'image' as media_type,
   text as story,
-  ROW_NUMBER() OVER (ORDER BY created_at) as display_order,
+  display_order,
   is_published as is_active,
   created_at,
   updated_at
 FROM impact_stories
 WHERE category = 'water'
-ORDER BY created_at;
+ORDER BY display_order;
 
 -- 2. Migrate ALL other stories to Green Champions (schools, beautification, etc.)
 INSERT INTO green_champions_gallery (
@@ -52,13 +52,13 @@ SELECT
     ELSE ''
   END as media_url,
   text as story,
-  ROW_NUMBER() OVER (ORDER BY created_at) as display_order,
+  display_order,
   is_published as is_active,
   created_at,
   updated_at
 FROM impact_stories
 WHERE category != 'water' OR category IS NULL
-ORDER BY created_at;
+ORDER BY display_order;
 
 -- 3. Verify the migration
 SELECT 
