@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase'
 import { 
   sendEmailNotification, 
@@ -14,7 +13,7 @@ class NotificationService {
 
   startMonitoring() {
     if (this.isMonitoring) return
-    
+
     this.isMonitoring = true
     console.log('Starting notification monitoring service...')
 
@@ -64,25 +63,33 @@ class NotificationService {
   private async checkDueTasks() {
     try {
       const today = new Date().toISOString().split('T')[0]
-      
-      const { data: tasks, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .lte('due_date', today)
-        .neq('status', 'Completed')
-        .eq('completed', false)
 
-      if (error) {
-        // If due_date column doesn't exist, skip this check
-        if (error.code === '42703' && error.message.includes('due_date')) {
-          console.log('Due date column not found in tasks table, skipping due task notifications')
-          return
+      // Check for due tasks (only if due_date column exists)
+      let dueTasks: any[] = []
+
+      try {
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*')
+          .lte('due_date', today)
+          .neq('status', 'Completed')
+          .eq('completed', false)
+
+        if (error) {
+          // Check if error is due to missing column
+          if (error.message?.includes('due_date') || error.code === '42703') {
+            console.log('Due date column not found in tasks table, skipping due task notifications')
+          } else {
+            console.error('Error checking due tasks:', error)
+          }
+        } else {
+          dueTasks = data || []
         }
-        console.error('Error checking due tasks:', error)
-        return
+      } catch (err) {
+        console.log('Due date feature not available in tasks table')
       }
 
-      if (tasks && tasks.length > 0) {
+      if (dueTasks.length > 0) {
         const notification = createTaskDueNotification(tasks)
         await sendEmailNotification(notification)
         console.log(`Sent task due notification for ${tasks.length} tasks`)
