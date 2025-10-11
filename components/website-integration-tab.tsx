@@ -688,12 +688,10 @@ export function WebsiteIntegrationTab() {
                 <Badge className="bg-blue-100 text-blue-800">
                   {waterSources.length} water sources
                 </Badge>
-                <DialogTrigger asChild>
-                  <Button size="sm" disabled={isDemoMode || !waterSourcesTableExists}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Water Source
-                  </Button>
-                </DialogTrigger>
+                <Button size="sm" disabled={isDemoMode || !waterSourcesTableExists}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Water Source
+                </Button>
               </div>
               <GalleryList 
                 items={waterSources}
@@ -707,12 +705,10 @@ export function WebsiteIntegrationTab() {
                 <Badge className="bg-green-100 text-green-800">
                   {greenChampions.length} schools
                 </Badge>
-                <DialogTrigger asChild>
-                  <Button size="sm" disabled={isDemoMode || !greenChampionsTableExists}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Green Champion
-                  </Button>
-                </DialogTrigger>
+                <Button size="sm" disabled={isDemoMode || !greenChampionsTableExists}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Green Champion
+                </Button>
               </div>
               <GreenChampionsAccordion 
                 items={greenChampions}
