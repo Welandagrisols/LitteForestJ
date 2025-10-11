@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, Package, ShoppingCart, Users, CheckSquare } from "lucide-react"
+import { AlertCircle, ShoppingCart } from "lucide-react"
 import { demoInventory, demoSales } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 
@@ -211,56 +211,44 @@ export function DashboardTab() {
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={isDemoMode ? 'demo' : 'connecting'} />}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <Card className="dashboard-card card-plants group">
-          <CardHeader className="pb-3 px-6 pt-6">
-            <CardTitle className="card-title">
-              <Package className="h-5 w-5 drop-shadow-lg" />
-              Total Plants
-            </CardTitle>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card>
+          <CardHeader className="px-4 pt-3 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Plants</CardTitle>
           </CardHeader>
-          <CardContent className="px-6 pb-6">
-            <div className="card-value">{inventorySummary.totalItems}</div>
-            <div className="card-description">Active inventory items</div>
+          <CardContent className="px-4 pb-4 pt-1">
+            <div className="text-2xl sm:text-3xl font-bold">{inventorySummary.totalItems}</div>
+            <p className="text-xs text-muted-foreground mt-1">Active inventory items</p>
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card card-seedlings group">
-          <CardHeader className="pb-3 px-6 pt-6">
-            <CardTitle className="card-title">
-              <CheckSquare className="h-5 w-5 drop-shadow-lg" />
-              Total Seedlings
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-3 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Seedlings</CardTitle>
           </CardHeader>
-          <CardContent className="px-6 pb-6">
-            <div className="card-value">{inventorySummary.totalQuantity.toLocaleString()}</div>
-            <div className="card-description">Plants in stock</div>
+          <CardContent className="px-4 pb-4 pt-1">
+            <div className="text-2xl sm:text-3xl font-bold">{inventorySummary.totalQuantity.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground mt-1">Plants in stock</p>
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card card-sales group">
-          <CardHeader className="pb-3 px-6 pt-6">
-            <CardTitle className="card-title">
-              <ShoppingCart className="h-5 w-5 drop-shadow-lg" />
-              Total Sales
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-3 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
           </CardHeader>
-          <CardContent className="px-6 pb-6">
-            <div className="card-value">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
-            <div className="card-description">All time revenue</div>
+          <CardContent className="px-4 pb-4 pt-1">
+            <div className="text-2xl sm:text-3xl font-bold">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground mt-1">All time revenue</p>
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card card-today-sales group">
-          <CardHeader className="pb-3 px-6 pt-6">
-            <CardTitle className="card-title">
-              <Users className="h-5 w-5 drop-shadow-lg" />
-              Today's Sales
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-3 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Today's Sales</CardTitle>
           </CardHeader>
-          <CardContent className="px-6 pb-6">
-            <div className="card-value">{salesSummary.todaySales}</div>
-            <div className="card-description">Sales today</div>
+          <CardContent className="px-4 pb-4 pt-1">
+            <div className="text-2xl sm:text-3xl font-bold">{salesSummary.todaySales}</div>
+            <p className="text-xs text-muted-foreground mt-1">Sales today</p>
           </CardContent>
         </Card>
       </div>

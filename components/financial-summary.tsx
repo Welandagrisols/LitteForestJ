@@ -48,43 +48,43 @@ export function FinancialSummary({ inventory, sales }: FinancialSummaryProps) {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-        <CardHeader className="pb-1 px-3 pt-3">
-          <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Inventory Value</CardTitle>
+      <Card>
+        <CardHeader className="px-4 pt-3 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">Inventory Value</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3">
-          <div className="text-lg sm:text-2xl font-bold text-primary">Ksh {inventoryMetrics.totalValue.toLocaleString()}</div>
-          <div className="text-xs text-muted-foreground">{inventoryMetrics.totalSeedlings} seedlings</div>
+        <CardContent className="px-4 pb-4 pt-1">
+          <div className="text-2xl sm:text-3xl font-bold">Ksh {inventoryMetrics.totalValue.toLocaleString()}</div>
+          <p className="text-xs text-muted-foreground mt-1">{inventoryMetrics.totalSeedlings} seedlings</p>
         </CardContent>
       </Card>
 
-      <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-        <CardHeader className="pb-1 px-3 pt-3">
-          <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Inventory Cost</CardTitle>
+      <Card>
+        <CardHeader className="px-4 pt-3 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">Inventory Cost</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3">
-          <div className="text-lg sm:text-2xl font-bold text-secondary">Ksh {inventoryMetrics.totalCost.toLocaleString()}</div>
-          <div className="text-xs text-muted-foreground">Production cost</div>
+        <CardContent className="px-4 pb-4 pt-1">
+          <div className="text-2xl sm:text-3xl font-bold">Ksh {inventoryMetrics.totalCost.toLocaleString()}</div>
+          <p className="text-xs text-muted-foreground mt-1">Production cost</p>
         </CardContent>
       </Card>
 
-      <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-        <CardHeader className="pb-1 px-3 pt-3">
-          <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Sales Profit</CardTitle>
+      <Card>
+        <CardHeader className="px-4 pt-3 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">Sales Profit</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3">
-          <div className="text-lg sm:text-2xl font-bold text-accent">Ksh {salesMetrics.totalProfit.toLocaleString()}</div>
-          <div className="text-xs text-muted-foreground">{salesMetrics.totalSeedlingsSold} sold</div>
+        <CardContent className="px-4 pb-4 pt-1">
+          <div className="text-2xl sm:text-3xl font-bold">Ksh {salesMetrics.totalProfit.toLocaleString()}</div>
+          <p className="text-xs text-muted-foreground mt-1">{salesMetrics.totalSeedlingsSold} sold</p>
         </CardContent>
       </Card>
 
-      <Card className="mobile-card warm-card hover:shadow-md transition-shadow">
-        <CardHeader className="pb-1 px-3 pt-3">
-          <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Profit Margin</CardTitle>
+      <Card>
+        <CardHeader className="px-4 pt-3 pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">Profit Margin</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3">
-          <div className="text-lg sm:text-2xl font-bold text-accent">{averageProfitMargin}%</div>
-          <div className="text-xs text-muted-foreground">Average margin</div>
+        <CardContent className="px-4 pb-4 pt-1">
+          <div className="text-2xl sm:text-3xl font-bold">{averageProfitMargin}%</div>
+          <p className="text-xs text-muted-foreground mt-1">Average margin</p>
         </CardContent>
       </Card>
     </div>
