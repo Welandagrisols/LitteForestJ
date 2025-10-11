@@ -213,42 +213,38 @@ export function DashboardTab() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
-          <CardHeader className="px-4 pt-3 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Plants</CardTitle>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Plants</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 pb-4 pt-1">
-            <div className="text-2xl sm:text-3xl font-bold">{inventorySummary.totalItems}</div>
-            <p className="text-xs text-muted-foreground mt-1">Active inventory items</p>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventorySummary.totalItems}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="px-4 pt-3 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Seedlings</CardTitle>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Seedlings</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 pb-4 pt-1">
-            <div className="text-2xl sm:text-3xl font-bold">{inventorySummary.totalQuantity.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">Plants in stock</p>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventorySummary.totalQuantity.toLocaleString()}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="px-4 pt-3 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 pb-4 pt-1">
-            <div className="text-2xl sm:text-3xl font-bold">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">All time revenue</p>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="px-4 pt-3 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Today's Sales</CardTitle>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Today's Sales</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 pb-4 pt-1">
-            <div className="text-2xl sm:text-3xl font-bold">{salesSummary.todaySales}</div>
-            <p className="text-xs text-muted-foreground mt-1">Sales today</p>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{salesSummary.todaySales}</div>
           </CardContent>
         </Card>
       </div>
