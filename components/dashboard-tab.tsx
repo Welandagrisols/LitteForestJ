@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ShoppingCart } from "lucide-react"
+import { AlertCircle, ShoppingCart, Package } from "lucide-react"
 import { demoInventory, demoSales } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 
