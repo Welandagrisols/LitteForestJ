@@ -276,29 +276,21 @@ export function ReportsTab() {
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-blue">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <TrendingUp className="card-icon" />
-              Total Profit
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Profit</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">Ksh {totalProfit.toLocaleString()}</div>
-            <div className="card-description">Net profit</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {totalProfit.toLocaleString()}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-orange">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <TrendingUp className="card-icon" />
-              Avg Margin
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Avg Margin</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{averageProfitMargin.toFixed(1)}%</div>
-            <div className="card-description">Profit margin</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{averageProfitMargin.toFixed(1)}%</div>
           </CardContent>
         </Card>
       </div>

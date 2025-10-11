@@ -265,7 +265,7 @@ export function SalesTab() {
             <CardTitle className="text-sm font-medium">Avg Per Sale</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-purple-600">
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">
               Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
             </div>
           </CardContent>

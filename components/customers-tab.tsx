@@ -450,7 +450,7 @@ export function CustomersTab() {
                       <CardTitle className="text-sm font-medium">New (30d)</CardTitle>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 pt-0">
-                      <div className="text-3xl sm:text-4xl font-bold text-purple-600">{stats.newCustomers}</div>
+                      <div className="text-3xl sm:text-4xl font-bold text-orange-600">{stats.newCustomers}</div>
                     </CardContent>
                   </Card>
 

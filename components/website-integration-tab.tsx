@@ -434,7 +434,7 @@ export function WebsiteIntegrationTab() {
             <CardTitle className="text-sm font-medium">Visibility</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-purple-600">
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">
               {websiteProducts.length > 0 ? Math.round((listedCount / websiteProducts.length) * 100) : 0}%
             </div>
           </CardContent>

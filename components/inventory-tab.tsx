@@ -307,7 +307,7 @@ export function InventoryTab() {
             <CardTitle className="text-sm font-medium">Total Items</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-blue-600">{stats.totalItems}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{stats.totalItems}</div>
           </CardContent>
         </Card>
 
@@ -316,7 +316,7 @@ export function InventoryTab() {
             <CardTitle className="text-sm font-medium">Categories</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-purple-600">{stats.categories.size}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{stats.categories.size}</div>
           </CardContent>
         </Card>
       </div>
