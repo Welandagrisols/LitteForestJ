@@ -380,7 +380,7 @@ export function OpsTab() {
             <CardTitle className="text-sm font-medium">Total Items</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{loading ? "..." : stats.totalPlants + stats.totalConsumables}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{loading ? "..." : stats.totalPlants + stats.totalConsumables}</div>
           </CardContent>
         </Card>
 
@@ -389,7 +389,7 @@ export function OpsTab() {
             <CardTitle className="text-sm font-medium">Categories</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{loading ? "..." : stats.categories.length}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{loading ? "..." : stats.categories.length}</div>
           </CardContent>
         </Card>
       </div>
