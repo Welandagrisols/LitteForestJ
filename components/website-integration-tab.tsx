@@ -402,60 +402,40 @@ export function WebsiteIntegrationTab() {
 
       {/* Products Summary Cards - 2 columns on mobile */}
         <div className="grid grid-cols-2 gap-3">
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-blue-600 rounded-full">
-                <Package className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-blue-800">Total</p>
-                <p className="text-xl font-bold text-blue-900">{websiteProducts.length}</p>
-              </div>
-            </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{websiteProducts.length}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-green-50 border-green-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-green-600 rounded-full">
-                <Eye className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-green-800">Listed</p>
-                <p className="text-xl font-bold text-green-900">{listedCount}</p>
-              </div>
-            </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Listed</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{listedCount}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-50 border-gray-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-gray-600 rounded-full">
-                <EyeOff className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-800">Hidden</p>
-                <p className="text-xl font-bold text-gray-900">{unlistedCount}</p>
-              </div>
-            </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Hidden</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{unlistedCount}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-purple-50 border-purple-200">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-purple-600 rounded-full">
-                <Globe className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-purple-800">Visibility</p>
-                <p className="text-xl font-bold text-purple-900">
-                  {websiteProducts.length > 0 ? Math.round((listedCount / websiteProducts.length) * 100) : 0}%
-                </p>
-              </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Visibility</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">
+              {websiteProducts.length > 0 ? Math.round((listedCount / websiteProducts.length) * 100) : 0}%
             </div>
           </CardContent>
         </Card>

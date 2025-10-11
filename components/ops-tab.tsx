@@ -357,59 +357,39 @@ export function OpsTab() {
 
       {/* Statistics Dashboard */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-        <Card className="mobile-card bg-green-50 border-green-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-600 rounded-full">
-                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-green-800">Plants</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-green-900">{loading ? "..." : stats.totalPlants}</p>
-              </div>
-            </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Plants</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{loading ? "..." : stats.totalPlants}</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-purple-50 border-purple-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-600 rounded-full">
-                <Database className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-purple-800">Consumables</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-purple-900">{loading ? "..." : stats.totalConsumables}</p>
-              </div>
-            </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Consumables</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{loading ? "..." : stats.totalConsumables}</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-gray-50 border-gray-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-gray-600 rounded-full">
-                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-gray-800">Total Items</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-gray-900">{loading ? "..." : stats.totalPlants + stats.totalConsumables}</p>
-              </div>
-            </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{loading ? "..." : stats.totalPlants + stats.totalConsumables}</div>
           </CardContent>
         </Card>
 
-        <Card className="mobile-card bg-blue-50 border-blue-200">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
-                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <p className="mobile-text-sm font-medium text-blue-800">Categories</p>
-                <p className="mobile-text-lg sm:text-2xl font-bold text-blue-900">{loading ? "..." : stats.categories.length}</p>
-              </div>
-            </div>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Categories</CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{loading ? "..." : stats.categories.length}</div>
           </CardContent>
         </Card>
       </div>
