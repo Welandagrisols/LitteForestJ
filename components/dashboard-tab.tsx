@@ -207,7 +207,7 @@ export function DashboardTab() {
   const tablesNotExist = !tablesExist.inventory || !tablesExist.sales
 
   return (
-    <div className="space-y-6 p-4 lg:p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+    <div className="space-y-6 p-4 lg:p-8">
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={isDemoMode ? 'demo' : 'connecting'} />}
 
       {/* Summary Cards */}
@@ -252,12 +252,9 @@ export function DashboardTab() {
       {/* Main Content - 2 Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         {/* Recent Sales */}
-        <Card className="border border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-lg shadow-2xl shadow-black/20 overflow-hidden hover:shadow-3xl transition-all duration-300 hover:border-orange-500/30">
-          <CardHeader className="px-6 py-5 bg-gradient-to-r from-orange-900/30 to-amber-900/30 border-b border-orange-500/20">
-            <CardTitle className="text-xl font-bold text-orange-400 flex items-center gap-3">
-              <ShoppingCart className="h-6 w-6 drop-shadow-lg" />
-              Recent Sales
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="text-lg font-semibold text-orange-600">Recent Sales</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -268,20 +265,20 @@ export function DashboardTab() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow style={{ background: 'rgba(30, 41, 59, 0.8)', color: '#e2e8f0' }}>
-                      <TableHead className="text-sm font-bold px-4 py-4 text-slate-300">Date</TableHead>
-                      <TableHead className="text-sm font-bold px-4 py-4 text-slate-300">Plant</TableHead>
-                      <TableHead className="text-sm font-bold px-4 py-4 text-slate-300">Qty</TableHead>
-                      <TableHead className="text-sm font-bold px-4 py-4 text-slate-300">Amount</TableHead>
+                    <TableRow>
+                      <TableHead className="text-sm font-medium px-4 py-3">Date</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Plant</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Qty</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Amount</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {recentSales.map((sale) => (
-                      <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-sm px-4 py-4 text-slate-300 font-medium">{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-sm px-4 py-4 font-bold text-white">{sale.inventory?.plant_name || "Unknown"}</TableCell>
-                        <TableCell className="text-sm px-4 py-4 text-slate-300 font-medium">{sale.quantity}</TableCell>
-                        <TableCell className="text-sm px-4 py-4 font-bold text-green-400">Ksh {sale.total_amount.toLocaleString()}</TableCell>
+                      <TableRow key={sale.id}>
+                        <TableCell className="text-sm px-4 py-3">{new Date(sale.sale_date).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-sm px-4 py-3">{sale.inventory?.plant_name || "Unknown"}</TableCell>
+                        <TableCell className="text-sm px-4 py-3">{sale.quantity}</TableCell>
+                        <TableCell className="text-sm px-4 py-3">Ksh {sale.total_amount.toLocaleString()}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -292,15 +289,10 @@ export function DashboardTab() {
         </Card>
 
         {/* Low Stock Items */}
-        <Card className="border border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-lg shadow-2xl shadow-black/20 overflow-hidden hover:shadow-3xl transition-all duration-300 hover:border-red-500/30">
-          <CardHeader className="px-6 py-5 bg-gradient-to-r from-red-900/30 to-pink-900/30 border-b border-red-500/20">
-            <CardTitle className="text-xl font-bold text-red-400 flex items-center gap-3">
-              <AlertCircle className="h-6 w-6 drop-shadow-lg" />
-              Low Stock Items
-            </CardTitle>
-            <CardDescription className="text-red-300 font-semibold">
-              Items that need restocking
-            </CardDescription>
+        <Card>
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="text-lg font-semibold text-orange-600">Low Stock Items</CardTitle>
+            <CardDescription>Items that need restocking</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -311,22 +303,19 @@ export function DashboardTab() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow style={{ background: 'rgba(30, 41, 59, 0.8)', color: '#e2e8f0' }}>
-                      <TableHead className="text-sm font-bold px-4 py-4 text-slate-300">Plant</TableHead>
-                      <TableHead className="text-sm font-bold px-4 py-4 text-slate-300">Quantity</TableHead>
-                      <TableHead className="text-sm font-bold px-4 py-4 text-slate-300">Status</TableHead>
+                    <TableRow>
+                      <TableHead className="text-sm font-medium px-4 py-3">Plant</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Quantity</TableHead>
+                      <TableHead className="text-sm font-medium px-4 py-3">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {lowStockItems.map((item) => (
-                      <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-sm px-4 py-4 font-bold text-white">{item.plant_name}</TableCell>
-                        <TableCell className="text-sm px-4 py-4 text-slate-300 font-medium">{item.quantity}</TableCell>
-                        <TableCell className="px-4 py-4">
-                          <Badge variant="outline" className="bg-red-900/30 text-red-400 border-red-500/40 text-sm font-bold">
-                            <AlertCircle className="h-4 w-4 mr-2" />
-                            Low Stock
-                          </Badge>
+                      <TableRow key={item.id}>
+                        <TableCell className="text-sm px-4 py-3">{item.plant_name}</TableCell>
+                        <TableCell className="text-sm px-4 py-3">{item.quantity}</TableCell>
+                        <TableCell className="px-4 py-3">
+                          <Badge variant="outline">Low Stock</Badge>
                         </TableCell>
                       </TableRow>
                     ))}
