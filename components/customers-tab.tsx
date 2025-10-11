@@ -17,7 +17,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { demoCustomers, demoInventory } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { exportToExcel } from "@/lib/excel-export"
-import { Download, Loader2, MessageSquare, Send, Users, Phone, Mail, Calendar, Copy, Trash2 } from "lucide-react"
+import { Download, Loader2, MessageSquare, Send, Users, Phone, Mail, Calendar, Copy, Trash2, Package } from "lucide-react"
 
 interface Customer {
   id: string

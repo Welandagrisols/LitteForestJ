@@ -258,39 +258,55 @@ export function ReportsTab() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card>
+        <Card className="modern-card card-plants">
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Total Batches</CardTitle>
+            <CardTitle className="card-title">
+              <Package className="card-icon" />
+              Total Batches
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{totalBatches}</div>
+            <div className="card-value">{totalBatches}</div>
+            <div className="card-description">Plant batches</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="modern-card card-purple">
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="card-title">
+              <TrendingUp className="card-icon" />
+              Total Revenue
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {totalRevenue.toLocaleString()}</div>
+            <div className="card-value">Ksh {totalRevenue.toLocaleString()}</div>
+            <div className="card-description">Sales revenue</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="modern-card card-blue">
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Total Profit</CardTitle>
+            <CardTitle className="card-title">
+              <TrendingUp className="card-icon" />
+              Total Profit
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {totalProfit.toLocaleString()}</div>
+            <div className="card-value">Ksh {totalProfit.toLocaleString()}</div>
+            <div className="card-description">Net profit</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="modern-card card-orange">
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Profit Margin</CardTitle>
+            <CardTitle className="card-title">
+              <TrendingUp className="card-icon" />
+              Avg Margin
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{averageProfitMargin.toFixed(1)}%</div>
+            <div className="card-value">{averageProfitMargin.toFixed(1)}%</div>
+            <div className="card-description">Profit margin</div>
           </CardContent>
         </Card>
       </div>
