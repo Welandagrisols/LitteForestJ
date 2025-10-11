@@ -212,55 +212,39 @@ export function DashboardTab() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="modern-card card-plants">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Total Plants
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Plants</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{inventorySummary.totalItems}</div>
-            <div className="card-description">Plant varieties</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventorySummary.totalItems}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-purple">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Total Seedlings
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Seedlings</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{inventorySummary.totalQuantity.toLocaleString()}</div>
-            <div className="card-description">Available stock</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventorySummary.totalQuantity.toLocaleString()}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-blue">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <ShoppingCart className="card-icon" />
-              Total Revenue
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
-            <div className="card-description">All time sales</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-orange">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <ShoppingCart className="card-icon" />
-              Today's Sales
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Today's Sales</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{salesSummary.todaySales}</div>
-            <div className="card-description">Sales today</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{salesSummary.todaySales}</div>
           </CardContent>
         </Card>
       </div>
