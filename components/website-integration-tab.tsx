@@ -401,58 +401,42 @@ export function WebsiteIntegrationTab() {
         <TabsContent value="products" className="space-y-6 mt-6">
 
       {/* Products Summary Cards - 2 columns on mobile */}
-        <div className="grid grid-cols-2 gap-3">
-        <Card className="modern-card card-plants">
+      <div className="grid grid-cols-2 gap-3">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Total Products
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Products</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{websiteProducts.length}</div>
-            <div className="card-description">Available items</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{websiteProducts.length}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-purple">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <Eye className="card-icon" />
-              Listed
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Listed</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{listedCount}</div>
-            <div className="card-description">Visible online</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{listedCount}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-blue">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <EyeOff className="card-icon" />
-              Hidden
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Hidden</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{unlistedCount}</div>
-            <div className="card-description">Not listed</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{unlistedCount}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-orange">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <Globe className="card-icon" />
-              Visibility
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Visibility</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">
               {websiteProducts.length > 0 ? Math.round((listedCount / websiteProducts.length) * 100) : 0}%
             </div>
-            <div className="card-description">Online presence</div>
           </CardContent>
         </Card>
       </div>
