@@ -262,6 +262,13 @@ export function InventoryTab() {
   // Summary calculations
   const currentPlants = inventory.filter((item) => !isConsumable(item))
   const totalConsumables = inventory.filter((item) => isConsumable(item))
+  const stats = {
+    totalItems: inventory.length,
+    totalQuantity: inventory.reduce((sum, item) => sum + (item.quantity || 0), 0),
+    lowStock: inventory.filter(item => item.status === "Low Stock").length,
+    categories: new Set(inventory.map(item => item.category))
+  };
+
 
   return (
     <div className="modern-page space-y-8">
@@ -300,7 +307,7 @@ export function InventoryTab() {
             <CardTitle className="text-sm font-medium">Total Items</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventory.length}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600">{stats.totalItems}</div>
           </CardContent>
         </Card>
 
@@ -309,9 +316,7 @@ export function InventoryTab() {
             <CardTitle className="text-sm font-medium">Categories</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">
-              {new Set(inventory.map(item => item.category)).size}
-            </div>
+            <div className="text-3xl sm:text-4xl font-bold text-purple-600">{stats.categories.size}</div>
           </CardContent>
         </Card>
       </div>
@@ -661,10 +666,10 @@ export function InventoryTab() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredHoneyProducts.map((item) => (
-                <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200 h-fit max-w-sm mx-auto w-full">
+                <Card key={item.id} className="transition-all hover:shadow-md bg-orange-50 border-orange-200 h-fit max-w-sm mx-auto w-full">
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <Badge className="bg-purple-600 hover:bg-purple-700 text-white text-xs truncate max-w-[140px]">
+                      <Badge className="bg-orange-600 hover:bg-orange-700 text-white text-xs truncate max-w-[140px]">
                         🍯 Honey
                       </Badge>
                       <div className="flex gap-1 flex-shrink-0">
@@ -816,10 +821,10 @@ export function InventoryTab() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredConsumables.map((item) => (
-                <Card key={item.id} className="transition-all hover:shadow-md bg-purple-50 border-purple-200 h-fit max-w-sm mx-auto w-full">
+                <Card key={item.id} className="transition-all hover:shadow-md bg-blue-50 border-blue-200 h-fit max-w-sm mx-auto w-full">
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <Badge className="bg-purple-600 hover:bg-purple-700 text-white text-xs truncate max-w-[140px]">
+                      <Badge className="bg-blue-600 hover:bg-blue-700 text-white text-xs truncate max-w-[140px]">
                         🛒 {getConsumableCategory(item)}
                       </Badge>
                       <div className="flex gap-1 flex-shrink-0">

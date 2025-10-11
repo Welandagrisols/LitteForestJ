@@ -101,7 +101,7 @@ export function TasksTab() {
             <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{totalTasks}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600">{totalTasks}</div>
           </CardContent>
         </Card>
 
@@ -110,7 +110,7 @@ export function TasksTab() {
             <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {totalCost.toLocaleString()}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {totalCost.toLocaleString()}</div>
           </CardContent>
         </Card>
 
@@ -128,7 +128,7 @@ export function TasksTab() {
             <CardTitle className="text-sm font-medium">Average Cost</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {averageCost.toLocaleString()}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-purple-600">Ksh {averageCost.toLocaleString()}</div>
           </CardContent>
         </Card>
       </div>

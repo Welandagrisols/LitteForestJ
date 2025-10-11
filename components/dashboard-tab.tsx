@@ -235,7 +235,7 @@ export function DashboardTab() {
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
           </CardContent>
         </Card>
 
@@ -244,7 +244,7 @@ export function DashboardTab() {
             <CardTitle className="text-sm font-medium">Today's Sales</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{salesSummary.todaySales}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{salesSummary.todaySales}</div>
           </CardContent>
         </Card>
       </div>

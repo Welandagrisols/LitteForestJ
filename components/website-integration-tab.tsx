@@ -407,7 +407,7 @@ export function WebsiteIntegrationTab() {
             <CardTitle className="text-sm font-medium">Total Products</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{websiteProducts.length}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600">{websiteProducts.length}</div>
           </CardContent>
         </Card>
 
@@ -425,7 +425,7 @@ export function WebsiteIntegrationTab() {
             <CardTitle className="text-sm font-medium">Hidden</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{unlistedCount}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{unlistedCount}</div>
           </CardContent>
         </Card>
 
@@ -434,7 +434,7 @@ export function WebsiteIntegrationTab() {
             <CardTitle className="text-sm font-medium">Visibility</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">
+            <div className="text-3xl sm:text-4xl font-bold text-purple-600">
               {websiteProducts.length > 0 ? Math.round((listedCount / websiteProducts.length) * 100) : 0}%
             </div>
           </CardContent>

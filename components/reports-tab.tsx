@@ -272,7 +272,7 @@ export function ReportsTab() {
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {totalRevenue.toLocaleString()}</div>
+            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {totalRevenue.toLocaleString()}</div>
           </CardContent>
         </Card>
 

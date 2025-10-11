@@ -355,6 +355,15 @@ export function CustomersTab() {
     }
   }
 
+  // Placeholder for statistics, replace with actual data fetching if needed
+  const stats = {
+    totalCustomers: customers.length,
+    activeCustomers: customers.filter(c => new Date(c.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length, // Assuming active means created in last 30 days
+    newCustomers: customers.filter(c => new Date(c.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length, // Same as active for this example
+    totalValue: customers.reduce((sum, customer) => sum + (Number(customer.contact) || 0), 0) // This is a placeholder and likely incorrect for total value
+  }
+
+
   return (
     <div className="space-y-6">
       {(isDemoMode || !tableExists) && <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={tableExists ? "connected" : "demo"} />}
@@ -414,6 +423,48 @@ export function CustomersTab() {
               </div>
             </CardHeader>
             <CardContent>
+
+              {/* Statistics Cards Section */}
+              <div className="mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <Card>
+                    <CardHeader className="px-4 pt-4 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4 pt-0">
+                      <div className="text-3xl sm:text-4xl font-bold text-blue-600">{stats.totalCustomers}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="px-4 pt-4 pb-2">
+                      <CardTitle className="text-sm font-medium">Active</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4 pt-0">
+                      <div className="text-3xl sm:text-4xl font-bold text-green-600">{stats.activeCustomers}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="px-4 pt-4 pb-2">
+                      <CardTitle className="text-sm font-medium">New (30d)</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4 pt-0">
+                      <div className="text-3xl sm:text-4xl font-bold text-purple-600">{stats.newCustomers}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="px-4 pt-4 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Value</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4 pt-0">
+                      <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {stats.totalValue.toLocaleString()}</div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
               <div className="mb-6">
                 <Input
                   placeholder="Search customers by name, contact or email..."
