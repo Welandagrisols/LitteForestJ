@@ -258,29 +258,21 @@ export function ReportsTab() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="modern-card card-plants">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Total Batches
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Batches</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">{totalBatches}</div>
-            <div className="card-description">Plant batches</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{totalBatches}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-purple">
+        <Card>
           <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="card-title">
-              <TrendingUp className="card-icon" />
-              Total Revenue
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
-            <div className="card-value">Ksh {totalRevenue.toLocaleString()}</div>
-            <div className="card-description">Sales revenue</div>
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {totalRevenue.toLocaleString()}</div>
           </CardContent>
         </Card>
 

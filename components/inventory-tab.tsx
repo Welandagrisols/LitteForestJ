@@ -275,59 +275,43 @@ export function InventoryTab() {
         <p className="modern-subtitle">Manage your plants, consumables, and honey products inventory</p>
       </div>
 
-      {/* Modern Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="modern-card card-plants">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Plants
-            </CardTitle>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Plants</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">{currentPlants.length}</div>
-            <div className="card-description">Active plant varieties</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{currentPlants.length}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-purple">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <ShoppingCart className="card-icon" />
-              Consumables
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Consumables</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">{totalConsumables.length}</div>
-            <div className="card-description">Supply items</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{totalConsumables.length}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-blue">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <TrendingUp className="card-icon" />
-              Total Items
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">{inventory.length}</div>
-            <div className="card-description">Inventory items</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventory.length}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-orange">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <FileText className="card-icon" />
-              Categories
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Categories</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">
               {new Set(inventory.map(item => item.category)).size}
             </div>
-            <div className="card-description">Product types</div>
           </CardContent>
         </Card>
       </div>

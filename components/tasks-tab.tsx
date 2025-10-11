@@ -94,57 +94,41 @@ export function TasksTab() {
         <p className="modern-subtitle">Track nursery operations and maintenance tasks</p>
       </div>
 
-      {/* Modern Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="modern-card card-plants">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Total Tasks
-            </CardTitle>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">{totalTasks}</div>
-            <div className="card-description">All tasks created</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{totalTasks}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-purple">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Total Cost
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">Ksh {totalCost.toLocaleString()}</div>
-            <div className="card-description">Overall expenses</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {totalCost.toLocaleString()}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-blue">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Completed
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Completed</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">{completedTasks}</div>
-            <div className="card-description">Finished tasks</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{completedTasks}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-orange">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Average Cost
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Average Cost</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">Ksh {averageCost.toLocaleString()}</div>
-            <div className="card-description">Cost per task</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {averageCost.toLocaleString()}</div>
           </CardContent>
         </Card>
       </div>

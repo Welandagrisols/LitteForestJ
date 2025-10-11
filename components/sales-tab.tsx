@@ -223,43 +223,32 @@ export function SalesTab() {
         <p className="modern-subtitle">Track your sales performance and revenue</p>
       </div>
 
-      {/* Modern Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="modern-card card-sales">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Total Sales
-            </CardTitle>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">Ksh {totalSales.toLocaleString()}</div>
-            <div className="card-description">All time revenue</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">Ksh {totalSales.toLocaleString()}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-purple">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Items Sold
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Items Sold</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">{totalSeedlings.toLocaleString()}</div>
-            <div className="card-description">Total units sold</div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">{totalSeedlings.toLocaleString()}</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-blue">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              This Month
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">This Month</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">
               {
                 sales.filter((sale) => {
                   const saleDate = new Date(sale.sale_date)
@@ -268,22 +257,17 @@ export function SalesTab() {
                 }).length
               }
             </div>
-            <div className="card-description">Sales this month</div>
           </CardContent>
         </Card>
 
-        <Card className="modern-card card-orange">
-          <CardHeader className="pb-3">
-            <CardTitle className="card-title">
-              <Package className="card-icon" />
-              Average Sale
-            </CardTitle>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Per Sale</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="card-value">
+          <CardContent className="px-4 pb-4 pt-0">
+            <div className="text-3xl sm:text-4xl font-bold text-green-600">
               Ksh {sales.length > 0 ? Math.round(totalSales / sales.length).toLocaleString() : '0'}
             </div>
-            <div className="card-description">Average per sale</div>
           </CardContent>
         </Card>
       </div>
