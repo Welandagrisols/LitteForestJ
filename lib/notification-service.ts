@@ -90,9 +90,9 @@ class NotificationService {
       }
 
       if (dueTasks.length > 0) {
-        const notification = createTaskDueNotification(tasks)
+        const notification = createTaskDueNotification(dueTasks)
         await sendEmailNotification(notification)
-        console.log(`Sent task due notification for ${tasks.length} tasks`)
+        console.log(`Sent task due notification for ${dueTasks.length} tasks`)
       }
     } catch (error) {
       console.error('Error in checkDueTasks:', error)

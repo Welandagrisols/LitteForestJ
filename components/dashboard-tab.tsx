@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ShoppingCart, Package } from "lucide-react"
+import { AlertCircle, ShoppingCart, Package, TrendingUp, Sprout, DollarSign, Activity } from "lucide-react"
 import { demoInventory, demoSales } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 
@@ -211,40 +211,79 @@ export function DashboardTab() {
       {(isDemoMode || tablesNotExist) && <DemoModeBanner isDemoMode={isDemoMode} connectionStatus={isDemoMode ? 'demo' : 'connecting'} />}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card>
-          <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Total Plants</CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventorySummary.totalItems}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Plants</p>
+                <p className="text-3xl font-bold tracking-tight">{inventorySummary.totalItems}</p>
+                <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                  <TrendingUp className="h-3 w-3" />
+                  <span className="font-medium">+{inventoryIncrease}%</span>
+                  <span className="text-muted-foreground">from last month</span>
+                </div>
+              </div>
+              <div className="rounded-full bg-emerald-100 dark:bg-emerald-900 p-3">
+                <Sprout className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Total Seedlings</CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-green-600">{inventorySummary.totalQuantity.toLocaleString()}</div>
+        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Seedlings</p>
+                <p className="text-3xl font-bold tracking-tight">{inventorySummary.totalQuantity.toLocaleString()}</p>
+                <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                  <TrendingUp className="h-3 w-3" />
+                  <span className="font-medium">+{inventoryIncrease}%</span>
+                  <span className="text-muted-foreground">from last month</span>
+                </div>
+              </div>
+              <div className="rounded-full bg-green-100 dark:bg-green-900 p-3">
+                <Package className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-orange-600">Ksh {salesSummary.totalAmount.toLocaleString()}</div>
+        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
+                <p className="text-3xl font-bold tracking-tight">Ksh {salesSummary.totalAmount.toLocaleString()}</p>
+                <div className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400">
+                  <TrendingUp className="h-3 w-3" />
+                  <span className="font-medium">+{salesIncrease}%</span>
+                  <span className="text-muted-foreground">from last month</span>
+                </div>
+              </div>
+              <div className="rounded-full bg-orange-100 dark:bg-orange-900 p-3">
+                <DollarSign className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="px-4 pt-4 pb-2">
-            <CardTitle className="text-sm font-medium">Today's Sales</CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 pb-4 pt-0">
-            <div className="text-3xl sm:text-4xl font-bold text-orange-600">{salesSummary.todaySales}</div>
+        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950 dark:to-yellow-950">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Today's Sales</p>
+                <p className="text-3xl font-bold tracking-tight">{salesSummary.todaySales}</p>
+                <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                  <Activity className="h-3 w-3" />
+                  <span className="font-medium">Active today</span>
+                </div>
+              </div>
+              <div className="rounded-full bg-amber-100 dark:bg-amber-900 p-3">
+                <ShoppingCart className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

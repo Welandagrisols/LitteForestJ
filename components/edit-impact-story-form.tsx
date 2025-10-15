@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
 import { uploadImageToSupabase } from "@/lib/image-upload"
 
 interface ImpactStory {
@@ -85,9 +86,9 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
         setUploading(true)
         for (const file of newMediaFiles) {
           try {
-            const url = await uploadImageToSupabase(file, 'impact-stories')
-            if (url) {
-              newMediaUrls.push(url)
+            const result = await uploadImageToSupabase(file, 'impact-stories')
+            if (result.success && result.url) {
+              newMediaUrls.push(result.url)
             }
           } catch (error) {
             console.error('Error uploading file:', error)
@@ -105,8 +106,8 @@ export function EditImpactStoryForm({ story, onStoryUpdated }: EditImpactStoryFo
       const allMediaUrls = [...existingMediaUrls, ...newMediaUrls]
 
       // Update the story
-      const { data, error } = await supabase
-        .from('impact_stories')
+      const { data, error } = await (supabase
+        .from('impact_stories') as any)
         .update({
           title: formData.title,
           text: formData.text,

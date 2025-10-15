@@ -79,8 +79,8 @@ export function AddImpactStoryForm({ category, onStoryAdded }: AddImpactStoryFor
         .order('display_order', { ascending: false })
         .limit(1)
 
-      const nextOrder = existingStories && existingStories.length > 0 
-        ? existingStories[0].display_order + 1 
+      const nextOrder = existingStories && existingStories.length > 0
+        ? (existingStories[0] as any).display_order + 1
         : 1
 
       // Upload media files
@@ -89,9 +89,9 @@ export function AddImpactStoryForm({ category, onStoryAdded }: AddImpactStoryFor
         setUploading(true)
         for (const file of mediaFiles) {
           try {
-            const url = await uploadImageToSupabase(file, 'impact-stories')
-            if (url) {
-              mediaUrls.push(url)
+            const result = await uploadImageToSupabase(file, 'impact-stories')
+            if (result.success && result.url) {
+              mediaUrls.push(result.url)
             }
           } catch (error) {
             console.error('Error uploading file:', error)
@@ -106,8 +106,8 @@ export function AddImpactStoryForm({ category, onStoryAdded }: AddImpactStoryFor
       }
 
       // Insert the story
-      const { data, error } = await supabase
-        .from('impact_stories')
+      const { data, error } = await (supabase
+        .from('impact_stories') as any)
         .insert([
           {
             title: formData.title,
