@@ -17,7 +17,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { demoCustomers, demoInventory } from "@/components/demo-data"
 import { DemoModeBanner } from "@/components/demo-mode-banner"
 import { exportToExcel } from "@/lib/excel-export"
-import { Download, Loader2, MessageSquare, Send, Users, Phone, Mail, Calendar, Copy, Trash2, Package } from "lucide-react"
+import { Download, Loader2, MessageSquare, Send, Users, Phone, Mail, Calendar, Copy, Trash2, Package, ExternalLink, Check } from "lucide-react"
 
 interface Customer {
   id: string
@@ -43,9 +43,10 @@ export function CustomersTab() {
   const [searchTerm, setSearchTerm] = useState("")
   const [tableExists, setTableExists] = useState(true)
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
-  const [customMessage, setCustomMessage] = useState("")
-  const [sendingMessages, setSendingMessages] = useState(false)
+  const [customMessage, setCustomMessage] = useState("Hi [FIRST_NAME],\n\n")
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [whatsappLinks, setWhatsappLinks] = useState<{name: string, contact: string, url: string, opened: boolean}[]>([])
+  const [linksDialogOpen, setLinksDialogOpen] = useState(false)
   const { toast } = useToast()
   const { user } = useAuth()
 
@@ -210,6 +211,18 @@ export function CustomersTab() {
     window.open(whatsappUrl, "_blank")
   }
 
+  const generateWhatsAppUrl = (phoneNumber: string, message: string) => {
+    const cleanNumber = phoneNumber.replace(/\D/g, "")
+    let formattedNumber = cleanNumber
+    if (cleanNumber.startsWith("0")) {
+      formattedNumber = "254" + cleanNumber.substring(1)
+    } else if (cleanNumber.startsWith("7") || cleanNumber.startsWith("1")) {
+      formattedNumber = "254" + cleanNumber
+    }
+    const encodedMessage = encodeURIComponent(message)
+    return `https://wa.me/${formattedNumber}?text=${encodedMessage}`
+  }
+
   const handleSendProductMessages = async () => {
     if (selectedCustomers.length === 0) {
       toast({
@@ -220,38 +233,31 @@ export function CustomersTab() {
       return
     }
 
-    setSendingMessages(true)
     const baseMessage = generateProductMessage()
-    let successCount = 0
+    const links: {name: string, contact: string, url: string, opened: boolean}[] = []
 
-    try {
-      for (const customerId of selectedCustomers) {
-        const customer = customers.find((c) => c.id === customerId)
-        if (customer) {
-          const firstName = customer.name.split(" ")[0]
-          const personalizedMessage = baseMessage.replace("[FIRST_NAME]", firstName)
-
-          // Small delay between messages to avoid overwhelming
-          await new Promise((resolve) => setTimeout(resolve, 500))
-
-          sendWhatsAppMessage(customer.contact, personalizedMessage)
-          successCount++
-        }
+    for (const customerId of selectedCustomers) {
+      const customer = customers.find((c) => c.id === customerId)
+      if (customer) {
+        const firstName = customer.name.split(" ")[0]
+        const personalizedMessage = baseMessage.replace("[FIRST_NAME]", firstName)
+        const url = generateWhatsAppUrl(customer.contact, personalizedMessage)
+        links.push({
+          name: customer.name,
+          contact: customer.contact,
+          url,
+          opened: false
+        })
       }
-
-      toast({
-        title: "Messages Sent",
-        description: `${successCount} WhatsApp messages opened successfully`,
-      })
-    } catch (error: any) {
-      toast({
-        title: "Error Sending Messages",
-        description: error.message,
-        variant: "destructive",
-      })
-    } finally {
-      setSendingMessages(false)
     }
+
+    setWhatsappLinks(links)
+    setLinksDialogOpen(true)
+    
+    toast({
+      title: "WhatsApp Links Ready",
+      description: `${links.length} personalized messages prepared. Click each link to send.`,
+    })
   }
 
   const handleSendCustomMessages = async () => {
@@ -264,7 +270,7 @@ export function CustomersTab() {
       return
     }
 
-    if (!customMessage.trim()) {
+    if (!customMessage.trim() || customMessage.trim() === "Hi [FIRST_NAME],") {
       toast({
         title: "No Message",
         description: "Please enter a custom message to send",
@@ -273,39 +279,30 @@ export function CustomersTab() {
       return
     }
 
-    setSendingMessages(true)
-    let successCount = 0
+    const links: {name: string, contact: string, url: string, opened: boolean}[] = []
 
-    try {
-      for (const customerId of selectedCustomers) {
-        const customer = customers.find((c) => c.id === customerId)
-        if (customer) {
-          const firstName = customer.name.split(" ")[0]
-          const personalizedMessage = customMessage.replace(/\[FIRST_NAME\]/g, firstName)
-
-          // Small delay between messages
-          await new Promise((resolve) => setTimeout(resolve, 500))
-
-          sendWhatsAppMessage(customer.contact, personalizedMessage)
-          successCount++
-        }
+    for (const customerId of selectedCustomers) {
+      const customer = customers.find((c) => c.id === customerId)
+      if (customer) {
+        const firstName = customer.name.split(" ")[0]
+        const personalizedMessage = customMessage.replace(/\[FIRST_NAME\]/g, firstName)
+        const url = generateWhatsAppUrl(customer.contact, personalizedMessage)
+        links.push({
+          name: customer.name,
+          contact: customer.contact,
+          url,
+          opened: false
+        })
       }
-
-      toast({
-        title: "Custom Messages Sent",
-        description: `${successCount} WhatsApp messages opened successfully`,
-      })
-
-      setCustomMessage("")
-    } catch (error: any) {
-      toast({
-        title: "Error Sending Messages",
-        description: error.message,
-        variant: "destructive",
-      })
-    } finally {
-      setSendingMessages(false)
     }
+
+    setWhatsappLinks(links)
+    setLinksDialogOpen(true)
+
+    toast({
+      title: "WhatsApp Links Ready",
+      description: `${links.length} personalized messages prepared. Click each link to send.`,
+    })
   }
 
   const copyMessage = (message: string) => {
@@ -315,6 +312,14 @@ export function CustomersTab() {
       description: "Message copied to clipboard",
     })
   }
+
+  const handleLinkClick = (index: number) => {
+    setWhatsappLinks(prev => prev.map((link, i) => 
+      i === index ? { ...link, opened: true } : link
+    ))
+  }
+
+  const openedCount = whatsappLinks.filter(l => l.opened).length
 
   const handleDeleteCustomer = async (customerId: string, customerName: string) => {
     if (isDemoMode || !tableExists) {
@@ -715,14 +720,10 @@ export function CustomersTab() {
                   </div>
                   <Button
                     onClick={handleSendProductMessages}
-                    disabled={selectedCustomers.length === 0 || sendingMessages || plants.length === 0}
+                    disabled={selectedCustomers.length === 0 || plants.length === 0}
                     className="w-full bg-green-600 hover:bg-green-700"
                   >
-                    {sendingMessages ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Send className="h-4 w-4 mr-2" />
-                    )}
+                    <Send className="h-4 w-4 mr-2" />
                     Send Product Updates ({selectedCustomers.length})
                   </Button>
                 </div>
@@ -743,14 +744,10 @@ export function CustomersTab() {
                   </div>
                   <Button
                     onClick={handleSendCustomMessages}
-                    disabled={selectedCustomers.length === 0 || sendingMessages || !customMessage.trim()}
+                    disabled={selectedCustomers.length === 0 || !customMessage.trim() || customMessage.trim() === "Hi [FIRST_NAME],"}
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
-                    {sendingMessages ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Send className="h-4 w-4 mr-2" />
-                    )}
+                    <Send className="h-4 w-4 mr-2" />
                     Send Custom Message ({selectedCustomers.length})
                   </Button>
                 </div>
@@ -792,6 +789,78 @@ export function CustomersTab() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* WhatsApp Links Dialog */}
+      <Dialog open={linksDialogOpen} onOpenChange={setLinksDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-green-600" />
+              Send WhatsApp Messages
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>Click each link to open WhatsApp and send the message</span>
+              <Badge variant={openedCount === whatsappLinks.length ? "default" : "secondary"}>
+                {openedCount}/{whatsappLinks.length} sent
+              </Badge>
+            </div>
+            <div className="max-h-[50vh] overflow-y-auto space-y-2">
+              {whatsappLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleLinkClick(index)}
+                  className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                    link.opened 
+                      ? "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800" 
+                      : "bg-background hover:bg-muted"
+                  }`}
+                >
+                  <div className="flex-1">
+                    <div className="font-medium flex items-center gap-2">
+                      {link.name}
+                      {link.opened && <Check className="h-4 w-4 text-green-600" />}
+                    </div>
+                    <div className="text-sm text-muted-foreground">{link.contact}</div>
+                  </div>
+                  <ExternalLink className={`h-4 w-4 ${link.opened ? "text-green-600" : "text-muted-foreground"}`} />
+                </a>
+              ))}
+            </div>
+            <div className="flex justify-between pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setLinksDialogOpen(false)
+                  setWhatsappLinks([])
+                }}
+              >
+                Close
+              </Button>
+              {openedCount === whatsappLinks.length && whatsappLinks.length > 0 && (
+                <Button
+                  onClick={() => {
+                    setLinksDialogOpen(false)
+                    setWhatsappLinks([])
+                    setSelectedCustomers([])
+                    toast({
+                      title: "All Messages Sent",
+                      description: `Successfully sent messages to ${whatsappLinks.length} customers`,
+                    })
+                  }}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Done - Clear Selection
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
