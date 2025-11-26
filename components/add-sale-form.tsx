@@ -148,7 +148,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
     }
   }
 
-  const handleSubmit = async (dataFromForm: any) => { // Accept data from react-hook-form
+  const handleSubmit = async (dataFromForm: any) => {
     console.log("handleSubmit called with data:", dataFromForm)
 
     if (isDemoMode) {
@@ -169,7 +169,6 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       return
     }
 
-    // Client-side validation for UX (server will also validate)
     const selectedInventoryItem = inventory.find(item => item.id === dataFromForm.inventory_id)
     if (!selectedInventoryItem) {
       toast({
@@ -180,13 +179,12 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       return
     }
 
-    if (dataFromForm.quantity > selectedInventoryItem.quantity) {
+    if (Number(dataFromForm.quantity) > selectedInventoryItem.quantity) {
       toast({
         title: "Insufficient Stock",
         description: `Cannot sell ${dataFromForm.quantity} units. Only ${selectedInventoryItem.quantity} available.`,
         variant: "destructive",
       })
-      // Refresh inventory to show current quantities
       fetchInventory()
       return
     }
@@ -202,76 +200,84 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
 
     try {
       setLoading(true)
-      console.log("Starting atomic sale transaction via RPC...")
+      console.log("Starting sale transaction...")
 
-      // Call the atomic sale transaction function
-      const { data, error } = await supabase.rpc('record_sale_atomic', {
-        p_inventory_id: dataFromForm.inventory_id,
-        p_quantity: Number(dataFromForm.quantity),
-        p_sale_date: dataFromForm.sale_date,
-        p_customer_id: isNewCustomer ? null : (dataFromForm.customer_id || null),
-        p_customer_name: isNewCustomer ? dataFromForm.customer_name?.trim() : null,
-        p_customer_contact: isNewCustomer ? dataFromForm.customer_contact?.trim() : null,
-        p_customer_email: isNewCustomer ? (dataFromForm.customer_email?.trim() || null) : null,
-        p_total_amount: Number(dataFromForm.total_amount)
-      } as any)
+      let customerId = dataFromForm.customer_id || null
 
-      if (error) {
-        console.error("RPC Error:", error)
+      // If new customer, create customer first
+      if (isNewCustomer && dataFromForm.customer_name && dataFromForm.customer_contact) {
+        console.log("Creating new customer...")
+        const { data: customerData, error: customerError } = await supabase
+          .from("customers")
+          .insert({
+            name: dataFromForm.customer_name.trim(),
+            contact: dataFromForm.customer_contact.trim(),
+            email: dataFromForm.customer_email?.trim() || null,
+          } as any)
+          .select()
+          .single()
+
+        if (customerError) {
+          console.error("Customer creation error:", customerError)
+          toast({
+            title: "Error",
+            description: `Failed to create customer: ${customerError.message}`,
+            variant: "destructive",
+          })
+          return
+        }
+        customerId = (customerData as any).id
+        console.log("Customer created with ID:", customerId)
+      }
+
+      // Insert the sale record
+      console.log("Inserting sale record...")
+      const { data: saleData, error: saleError } = await supabase
+        .from("sales")
+        .insert({
+          inventory_id: dataFromForm.inventory_id,
+          quantity: Number(dataFromForm.quantity),
+          sale_date: dataFromForm.sale_date,
+          customer_id: customerId,
+          total_amount: Number(dataFromForm.total_amount),
+        } as any)
+        .select()
+        .single()
+
+      if (saleError) {
+        console.error("Sale insert error:", saleError)
         toast({
-          title: "Database Error",
-          description: `Failed to record sale: ${error.message}`,
+          title: "Error",
+          description: `Failed to record sale: ${saleError.message}`,
           variant: "destructive",
         })
         return
       }
+      console.log("Sale recorded:", saleData)
 
-      console.log("RPC Response:", data)
+      // Update inventory quantity
+      const newQuantity = selectedInventoryItem.quantity - Number(dataFromForm.quantity)
+      console.log("Updating inventory quantity to:", newQuantity)
+      
+      const { error: inventoryError } = await supabase
+        .from("inventory")
+        .update({ quantity: newQuantity } as any)
+        .eq("id", dataFromForm.inventory_id)
 
-      // Handle the response from the atomic function
-      if (!(data as any)?.success) {
-        const errorMessage = (data as any)?.message || "Unknown error occurred"
-
-        switch ((data as any)?.error) {
-          case 'ITEM_NOT_FOUND':
-            toast({
-              title: "Item Not Found",
-              description: "The selected inventory item could not be found.",
-              variant: "destructive",
-            })
-            break
-          case 'INSUFFICIENT_STOCK':
-            toast({
-              title: "Insufficient Stock",
-              description: `${errorMessage}. Available: ${(data as any).available_quantity || 0}`,
-              variant: "destructive",
-            })
-            // Refresh inventory to show current quantities
-            fetchInventory()
-            break
-          case 'AMOUNT_MISMATCH':
-            toast({
-              title: "Price Mismatch",
-              description: errorMessage,
-              variant: "destructive",
-            })
-            break
-          default:
-            toast({
-              title: "Transaction Failed",
-              description: errorMessage,
-              variant: "destructive",
-            })
-        }
-        return
+      if (inventoryError) {
+        console.error("Inventory update error:", inventoryError)
+        toast({
+          title: "Warning",
+          description: "Sale recorded but inventory update failed. Please check inventory manually.",
+          variant: "destructive",
+        })
       }
 
-      // Success! The sale was recorded atomically
-      console.log("Sale transaction completed successfully via RPC")
+      console.log("Sale transaction completed successfully")
 
       toast({
         title: "Success",
-        description: (data as any).message || "Sale recorded successfully",
+        description: "Sale recorded successfully!",
       })
 
       // Reset form
