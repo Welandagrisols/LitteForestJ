@@ -320,6 +320,15 @@ export function CustomersTab() {
   }
 
   const openedCount = whatsappLinks.filter(l => l.opened).length
+  const nextUnopenedIndex = whatsappLinks.findIndex(l => !l.opened)
+
+  const handleOpenNext = () => {
+    if (nextUnopenedIndex !== -1) {
+      const link = whatsappLinks[nextUnopenedIndex]
+      window.open(link.url, "_blank")
+      handleLinkClick(nextUnopenedIndex)
+    }
+  }
 
   const handleDeleteCustomer = async (customerId: string, customerName: string) => {
     if (isDemoMode || !tableExists) {
@@ -800,13 +809,35 @@ export function CustomersTab() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Open Next Button - Main Action */}
+            {nextUnopenedIndex !== -1 && (
+              <Button
+                onClick={handleOpenNext}
+                className="w-full bg-green-600 hover:bg-green-700 text-lg py-6"
+                size="lg"
+              >
+                <Send className="h-5 w-5 mr-2" />
+                Open Next: {whatsappLinks[nextUnopenedIndex]?.name}
+                <Badge variant="secondary" className="ml-2 bg-white/20">
+                  {openedCount + 1}/{whatsappLinks.length}
+                </Badge>
+              </Button>
+            )}
+
+            {openedCount === whatsappLinks.length && whatsappLinks.length > 0 && (
+              <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <p className="font-medium text-green-700 dark:text-green-400">All {whatsappLinks.length} messages opened!</p>
+              </div>
+            )}
+
             <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>Click each link to open WhatsApp and send the message</span>
+              <span>Or click individual contacts below:</span>
               <Badge variant={openedCount === whatsappLinks.length ? "default" : "secondary"}>
                 {openedCount}/{whatsappLinks.length} sent
               </Badge>
             </div>
-            <div className="max-h-[50vh] overflow-y-auto space-y-2">
+            <div className="max-h-[40vh] overflow-y-auto space-y-2">
               {whatsappLinks.map((link, index) => (
                 <a
                   key={index}
@@ -818,7 +849,7 @@ export function CustomersTab() {
                     link.opened 
                       ? "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800" 
                       : "bg-background hover:bg-muted"
-                  }`}
+                  } ${index === nextUnopenedIndex ? "ring-2 ring-green-500" : ""}`}
                 >
                   <div className="flex-1">
                     <div className="font-medium flex items-center gap-2">
