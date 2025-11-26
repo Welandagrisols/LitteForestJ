@@ -45,6 +45,7 @@ export function CustomersTab() {
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
   const [customMessage, setCustomMessage] = useState("")
   const [sendingMessages, setSendingMessages] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const { toast } = useToast()
   const { user } = useAuth()
 
@@ -398,7 +399,7 @@ export function CustomersTab() {
                     {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                     Export to Excel
                   </Button>
-                  <Dialog>
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
                         className="bg-green-600 hover:bg-green-700 text-white"
@@ -408,6 +409,7 @@ export function CustomersTab() {
                             ? "Connect to Supabase and set up tables to enable adding customers"
                             : "Add new customer"
                         }
+                        onClick={() => setDialogOpen(true)}
                       >
                         Add New Customer
                       </Button>
@@ -416,7 +418,10 @@ export function CustomersTab() {
                       <DialogHeader>
                         <DialogTitle>Add New Customer</DialogTitle>
                       </DialogHeader>
-                      <AddCustomerForm onSuccess={() => fetchCustomers()} />
+                      <AddCustomerForm onSuccess={async () => {
+                        await fetchCustomers()
+                        setDialogOpen(false)
+                      }} />
                     </DialogContent>
                   </Dialog>
                 </div>
