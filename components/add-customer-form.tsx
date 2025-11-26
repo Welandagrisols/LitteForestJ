@@ -45,8 +45,10 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    console.log("Customer form handleSubmit called with data:", formData)
 
     if (isDemoMode) {
+      console.log("In demo mode, cannot add customer")
       toast({
         title: "Demo Mode",
         description: "Connect to Supabase and set up tables to enable adding customers",
@@ -55,7 +57,9 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
       return
     }
 
+    console.log("User state:", user)
     if (!user) {
+      console.log("No user found, showing auth required message")
       toast({
         title: "Authentication Required",
         description: "You must be logged in to add customers",
@@ -66,18 +70,20 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
 
     try {
       setLoading(true)
+      console.log("Inserting customer...")
 
-      const { error } = await supabase.from("customers").insert([
-        {
-          name: formData.name,
-          contact: formData.contact,
-          email: formData.email || null,
-          user_id: user.id,
-          created_at: new Date().toISOString(),
-        },
-      ] as any)
+      const { data, error } = await supabase.from("customers").insert({
+        name: formData.name,
+        contact: formData.contact,
+        email: formData.email || null,
+      } as any).select().single()
 
-      if (error) throw error
+      if (error) {
+        console.error("Customer insert error:", error)
+        throw error
+      }
+
+      console.log("Customer added successfully:", data)
 
       toast({
         title: "Success",
@@ -93,6 +99,7 @@ export function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
 
       onSuccess()
     } catch (error: any) {
+      console.error("Error adding customer:", error)
       toast({
         title: "Error adding customer",
         description: error.message,
