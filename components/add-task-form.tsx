@@ -11,14 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Trash2, Calculator } from "lucide-react"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 
 interface ConsumableUsage {
   id: string
@@ -37,7 +29,7 @@ interface AddTaskFormProps {
 export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
   const [formData, setFormData] = useState({
     task_name: "",
-    task_type: "Watering", // Set default value instead of empty string
+    task_type: "Watering",
     custom_task_type: "",
     description: "",
     task_date: new Date().toISOString().split("T")[0],
@@ -60,7 +52,6 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
   }, [])
 
   useEffect(() => {
-    // Auto-calculate labor cost when hours or rate changes
     const hours = parseFloat(formData.labor_hours) || 0
     const rate = parseFloat(formData.labor_rate) || 0
     const laborCost = hours * rate
@@ -69,7 +60,6 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
   async function fetchConsumablesAndBatches() {
     try {
-      // Fetch consumables (items with category starting with 'Consumable:')
       const { data: consumableData, error: consumableError } = await supabase
         .from("inventory")
         .select("sku, plant_name, price")
@@ -79,7 +69,6 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         console.error("Error fetching consumables:", consumableError)
       }
 
-      // Fetch plant batches (items with category NOT starting with 'Consumable:')
       const { data: batchData, error: batchError } = await supabase
         .from("inventory")
         .select("sku, plant_name")
@@ -126,17 +115,15 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         if (usage.id === id) {
           const updatedUsage = { ...usage, [field]: value }
 
-          // Auto-update related fields when consumable is selected
           if (field === "consumable_sku") {
             const consumable = consumables.find((c) => c.sku === value)
             if (consumable) {
               updatedUsage.consumable_name = consumable.plant_name
               updatedUsage.unit_cost = consumable.price
-              updatedUsage.unit = "Pieces" // Default unit
+              updatedUsage.unit = "Pieces"
             }
           }
 
-          // Recalculate total cost
           if (field === "quantity_used" || field === "unit_cost") {
             updatedUsage.total_cost = updatedUsage.quantity_used * updatedUsage.unit_cost
           }
@@ -173,6 +160,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("Task form handleSubmit called")
 
     if (isDemoMode) {
       toast({
@@ -189,7 +177,7 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
       const laborCost = parseFloat(formData.labor_cost) || 0
       const consumablesCost = calculateTotalConsumablesCost()
 
-      // Insert task
+      console.log("Inserting task...")
       const { data: taskData, error: taskError } = await supabase
         .from("tasks")
         .insert({
@@ -208,9 +196,13 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         .select()
         .single()
 
-      if (taskError) throw taskError
+      if (taskError) {
+        console.error("Task insert error:", taskError)
+        throw taskError
+      }
 
-      // Insert consumable usages
+      console.log("Task added:", taskData)
+
       if (consumableUsages.length > 0 && taskData) {
         const usageInserts = consumableUsages
           .filter((usage) => usage.consumable_sku && usage.quantity_used > 0)
@@ -225,7 +217,10 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
 
         if (usageInserts.length > 0) {
           const { error: usageError } = await supabase.from("task_consumables").insert(usageInserts as any)
-          if (usageError) throw usageError
+          if (usageError) {
+            console.error("Consumables insert error:", usageError)
+            throw usageError
+          }
         }
       }
 
@@ -234,7 +229,6 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
         description: "Task added successfully!",
       })
 
-      // Reset all form state
       setFormData({
         task_name: "",
         task_type: "Watering",
@@ -264,71 +258,53 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
     }
   }
 
-  const taskTypes = [
-    "Watering",
-    "Fertilizing",
-    "Pruning",
-    "Planting",
-    "Transplanting",
-    "Pest Control",
-    "Weeding",
-    "Harvesting",
-    "Maintenance",
-    "Other",
-  ]
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="w-full">Add New Task</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add New Task</DialogTitle>
-          <DialogDescription>Create a new task for your nursery</DialogDescription>
-</DialogHeader>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="task_name">Task Name *</Label>
-            <Input
-              id="task_name"
-              name="task_name"
-              value={formData.task_name}
-              onChange={handleChange}
-              placeholder="e.g., Watering Mango Seedlings"
-              required
-            />
-          </div>
+    <div className="flex flex-col h-[70vh] max-h-[600px]">
+      <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+        <form id="add-task-form" onSubmit={handleSubmit} className="space-y-4 pb-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="task_name">Task Name *</Label>
+              <Input
+                id="task_name"
+                name="task_name"
+                value={formData.task_name}
+                onChange={handleChange}
+                placeholder="e.g., Watering Mango Seedlings"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="task_type">Task Type *</Label>
-            <Select value={formData.task_type} onValueChange={(value) => setFormData((prev) => ({ ...prev, task_type: value }))} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select task type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Watering">Watering</SelectItem>
-                    <SelectItem value="Fertilizing">Fertilizing</SelectItem>
-                    <SelectItem value="Pruning">Pruning</SelectItem>
-                    <SelectItem value="Planting">Planting</SelectItem>
-                    <SelectItem value="Transplanting">Transplanting</SelectItem>
-                    <SelectItem value="Pest Control">Pest Control</SelectItem>
-                    <SelectItem value="Weeding">Weeding</SelectItem>
-                    <SelectItem value="Harvesting">Harvesting</SelectItem>
-                    <SelectItem value="Maintenance">Maintenance</SelectItem>
-                    <SelectItem value="Hive Inspection">Hive Inspection</SelectItem>
-                    <SelectItem value="Honey Extraction">Honey Extraction</SelectItem>
-                    <SelectItem value="Hive Maintenance">Hive Maintenance</SelectItem>
-                    <SelectItem value="Queen Management">Queen Management</SelectItem>
-                    <SelectItem value="Disease Treatment">Disease Treatment</SelectItem>
-                    <SelectItem value="Packaging">Packaging</SelectItem>
-                     <SelectItem value="Infrastructure">Infrastructure</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label htmlFor="task_type">Task Type *</Label>
+              <Select value={formData.task_type} onValueChange={(value) => setFormData((prev) => ({ ...prev, task_type: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select task type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Watering">Watering</SelectItem>
+                  <SelectItem value="Fertilizing">Fertilizing</SelectItem>
+                  <SelectItem value="Pruning">Pruning</SelectItem>
+                  <SelectItem value="Planting">Planting</SelectItem>
+                  <SelectItem value="Transplanting">Transplanting</SelectItem>
+                  <SelectItem value="Pest Control">Pest Control</SelectItem>
+                  <SelectItem value="Weeding">Weeding</SelectItem>
+                  <SelectItem value="Harvesting">Harvesting</SelectItem>
+                  <SelectItem value="Maintenance">Maintenance</SelectItem>
+                  <SelectItem value="Hive Inspection">Hive Inspection</SelectItem>
+                  <SelectItem value="Honey Extraction">Honey Extraction</SelectItem>
+                  <SelectItem value="Hive Maintenance">Hive Maintenance</SelectItem>
+                  <SelectItem value="Queen Management">Queen Management</SelectItem>
+                  <SelectItem value="Disease Treatment">Disease Treatment</SelectItem>
+                  <SelectItem value="Packaging">Packaging</SelectItem>
+                  <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {formData.task_type === "Other" && (
-              <div className="mt-2">
+              <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="custom_task_type">Custom Task Type *</Label>
                 <Input
                   id="custom_task_type"
@@ -340,255 +316,268 @@ export function AddTaskForm({ onSuccess }: AddTaskFormProps) {
                 />
               </div>
             )}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="task_date">Task Date *</Label>
-            <Input
-              id="task_date"
-              name="task_date"
-              type="date"
-              value={formData.task_date}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="batch_sku">Batch SKU</Label>
-            <Select value={formData.batch_sku || "none"} onValueChange={(value) => setFormData((prev) => ({ ...prev, batch_sku: value === "none" ? "" : value }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select batch (optional)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No specific batch</SelectItem>
-                {batches.map((batch) => (
-                  <SelectItem key={batch.sku} value={batch.sku}>
-                    {batch.sku} - {batch.plant_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select value={formData.status} onValueChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Planned">Planned</SelectItem>
-                <SelectItem value="In Progress">In Progress</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="assigned_to">Assigned To</Label>
-            <Input
-              id="assigned_to"
-              name="assigned_to"
-              value={formData.assigned_to}
-              onChange={handleChange}
-              placeholder="Person responsible"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Task details and notes"
-            rows={3}
-          />
-        </div>
-
-        {/* Labor Cost Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Calculator className="h-5 w-5" />
-              Labor Cost
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="labor_hours">Labor Hours</Label>
-                <Input
-                  id="labor_hours"
-                  name="labor_hours"
-                  type="number"
-                  step="0.5"
-                  value={formData.labor_hours}
-                  onChange={handleChange}
-                  placeholder="0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="labor_rate">Rate per Hour (Ksh)</Label>
-                <Input
-                  id="labor_rate"
-                  name="labor_rate"
-                  type="number"
-                  step="0.01"
-                  value={formData.labor_rate}
-                  onChange={handleChange}
-                  placeholder="0"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="labor_cost">Total Labor Cost (Ksh)</Label>
-                <Input
-                  id="labor_cost"
-                  name="labor_cost"
-                  type="number"
-                  step="0.01"
-                  value={formData.labor_cost}
-                  onChange={handleChange}
-                  placeholder="Auto-calculated"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="task_date">Task Date *</Label>
+              <Input
+                id="task_date"
+                name="task_date"
+                type="date"
+                value={formData.task_date}
+                onChange={handleChange}
+                required
+              />
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Consumables Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center justify-between">
-              Consumables Used
-              <Button type="button" onClick={addConsumableUsage} size="sm" variant="outline">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Consumable
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {consumableUsages.map((usage) => (
-              <div key={usage.id} className="flex gap-4 items-end p-4 border rounded-lg">
-                <div className="grid gap-4 md:grid-cols-5 flex-1">
+            <div className="space-y-2">
+              <Label htmlFor="batch_sku">Batch SKU</Label>
+              <Select value={formData.batch_sku || "none"} onValueChange={(value) => setFormData((prev) => ({ ...prev, batch_sku: value === "none" ? "" : value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select batch (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No specific batch</SelectItem>
+                  {batches.map((batch) => (
+                    <SelectItem key={batch.sku} value={batch.sku}>
+                      {batch.sku} - {batch.plant_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Planned">Planned</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="assigned_to">Assigned To</Label>
+              <Input
+                id="assigned_to"
+                name="assigned_to"
+                value={formData.assigned_to}
+                onChange={handleChange}
+                placeholder="Person responsible"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Task details and notes"
+              rows={2}
+            />
+          </div>
+
+          <Card>
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Calculator className="h-4 w-4" />
+                Labor Cost
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4 pt-0">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
+                <div className="space-y-1">
+                  <Label htmlFor="labor_hours" className="text-sm">Labor Hours</Label>
+                  <Input
+                    id="labor_hours"
+                    name="labor_hours"
+                    type="number"
+                    step="0.5"
+                    value={formData.labor_hours}
+                    onChange={handleChange}
+                    placeholder="0"
+                    className="h-9"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="labor_rate" className="text-sm">Rate/Hour (Ksh)</Label>
+                  <Input
+                    id="labor_rate"
+                    name="labor_rate"
+                    type="number"
+                    step="0.01"
+                    value={formData.labor_rate}
+                    onChange={handleChange}
+                    placeholder="0"
+                    className="h-9"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="labor_cost" className="text-sm">Total (Ksh)</Label>
+                  <Input
+                    id="labor_cost"
+                    name="labor_cost"
+                    type="number"
+                    step="0.01"
+                    value={formData.labor_cost}
+                    onChange={handleChange}
+                    placeholder="Auto-calculated"
+                    className="h-9"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-base flex items-center justify-between">
+                <span>Consumables Used</span>
+                <Button type="button" onClick={addConsumableUsage} size="sm" variant="outline" className="h-8 text-xs">
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4 pt-0 space-y-3">
+              {consumableUsages.map((usage, index) => (
+                <div key={usage.id} className="p-3 border rounded-lg bg-muted/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Item {index + 1}</span>
+                    <Button
+                      type="button"
+                      onClick={() => removeConsumableUsage(usage.id)}
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
                   <div className="space-y-2">
-                    <Label>Consumable</Label>
+                    <Label className="text-sm">Consumable</Label>
                     <Select
                       value={usage.consumable_sku}
                       onValueChange={(value) => updateConsumableUsage(usage.id, "consumable_sku", value)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="Select consumable" />
                       </SelectTrigger>
                       <SelectContent>
                         {consumables.map((consumable) => (
                           <SelectItem key={consumable.sku} value={consumable.sku}>
-                            {consumable.sku} - {consumable.plant_name}
+                            {consumable.plant_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Quantity Used</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={usage.quantity_used}
-                      onChange={(e) => updateConsumableUsage(usage.id, "quantity_used", parseFloat(e.target.value) || 0)}
-                      placeholder="0"
-                    />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-sm">Quantity</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={usage.quantity_used || ""}
+                        onChange={(e) => updateConsumableUsage(usage.id, "quantity_used", parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        className="h-9"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-sm">Unit</Label>
+                      <Select
+                        value={usage.unit}
+                        onValueChange={(value) => updateConsumableUsage(usage.id, "unit", value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {unitOptions.map((unit) => (
+                            <SelectItem key={unit} value={unit}>
+                              {unit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Unit</Label>
-                    <Select
-                      value={usage.unit}
-                      onValueChange={(value) => updateConsumableUsage(usage.id, "unit", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {unitOptions.map((unit) => (
-                          <SelectItem key={unit} value={unit}>
-                            {unit}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-sm">Unit Cost (Ksh)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={usage.unit_cost || ""}
+                        onChange={(e) => updateConsumableUsage(usage.id, "unit_cost", parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        className="h-9"
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label>Unit Cost (Ksh)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={usage.unit_cost}
-                      onChange={(e) => updateConsumableUsage(usage.id, "unit_cost", parseFloat(e.target.value) || 0)}
-                      placeholder="0"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Total Cost</Label>
-                    <div className="flex items-center h-10 px-3 bg-muted rounded-md">
-                      <Badge variant="secondary">Ksh {usage.total_cost.toLocaleString()}</Badge>
+                    <div className="space-y-1">
+                      <Label className="text-sm">Total</Label>
+                      <div className="flex items-center h-9 px-3 bg-background border rounded-md">
+                        <span className="text-sm font-medium">Ksh {usage.total_cost.toLocaleString()}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+              ))}
 
-                <Button
-                  type="button"
-                  onClick={() => removeConsumableUsage(usage.id)}
-                  size="sm"
-                  variant="outline"
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-
-            {consumableUsages.length === 0 && (
-              <div className="text-center py-4 text-muted-foreground">
-                No consumables added. Click "Add Consumable" to track materials used.
-              </div>
-            )}
-
-            {consumableUsages.length > 0 && (
-              <div className="flex justify-end">
-                <div className="text-lg font-semibold">
-                  Total Consumables: Ksh {calculateTotalConsumablesCost().toLocaleString()}
+              {consumableUsages.length === 0 && (
+                <div className="text-center py-3 text-sm text-muted-foreground">
+                  No consumables added. Click "Add" to track materials used.
                 </div>
+              )}
+
+              {consumableUsages.length > 0 && (
+                <div className="flex justify-end pt-2">
+                  <Badge variant="secondary" className="text-sm">
+                    Total: Ksh {calculateTotalConsumablesCost().toLocaleString()}
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="py-3 px-4">
+              <div className="flex justify-between items-center text-base font-semibold">
+                <span>Total Task Cost:</span>
+                <span className="text-primary">
+                  Ksh {((parseFloat(formData.labor_cost) || 0) + calculateTotalConsumablesCost()).toLocaleString()}
+                </span>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </form>
+      </div>
 
-        {/* Total Cost Summary */}
-        <Card className="bg-muted/50">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center text-lg font-semibold">
-              <span>Total Task Cost:</span>
-              <span className="text-primary">
-                Ksh {((parseFloat(formData.labor_cost) || 0) + calculateTotalConsumablesCost()).toLocaleString()}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Button type="submit" disabled={loading} className="w-full">
+      <div className="border-t border-border bg-background pt-4 mt-2">
+        <Button 
+          type="submit" 
+          form="add-task-form"
+          disabled={loading} 
+          className="w-full bg-accent hover:bg-accent/90 text-white"
+        >
           {loading ? "Adding Task..." : "Add Task"}
         </Button>
-        </DialogContent>
-      </Dialog>
-    </form>
+      </div>
+    </div>
   )
 }

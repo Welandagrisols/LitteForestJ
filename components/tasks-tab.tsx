@@ -135,21 +135,21 @@ export function TasksTab() {
 
       {/* Modern Filters and Add Button */}
       <div className="modern-filters">
-        <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
-          <div className="flex flex-col lg:flex-row gap-4 flex-1">
-            <div className="relative flex-1 max-w-lg">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search tasks, SKU, or assignee..."
+                placeholder="Search tasks..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 text-lg font-medium"
+                className="pl-10 text-base"
               />
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48 modern-button">
-                  <SelectValue placeholder="Filter by status" />
+                <SelectTrigger className="flex-1 sm:w-32">
+                  <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
                   {statusOptions.map((status) => (
@@ -160,8 +160,8 @@ export function TasksTab() {
                 </SelectContent>
               </Select>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-48 modern-button">
-                  <SelectValue placeholder="Filter by type" />
+                <SelectTrigger className="flex-1 sm:w-32">
+                  <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
                   {taskTypes.map((type) => (
@@ -180,7 +180,7 @@ export function TasksTab() {
                 Add Task
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="w-[95vw] max-w-lg sm:max-w-xl p-4 sm:p-6">
               <DialogHeader>
                 <DialogTitle>Add New Task</DialogTitle>
               </DialogHeader>
