@@ -43,10 +43,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
   const [isNewCustomer, setIsNewCustomer] = useState(false)
   const { toast } = useToast()
 
-  // Use useForm from react-hook-form for better form management
-  const { register, handleSubmit: handleFormSubmit, watch, setValue, formState: { errors } } = useForm<SaleFormData>() // Alias handleSubmit
-
-  const [formData, setFormData] = useState({
+  const defaultFormValues = {
     inventory_id: "",
     quantity: 1,
     sale_date: new Date().toISOString().split("T")[0],
@@ -55,7 +52,14 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
     customer_contact: "",
     customer_email: "",
     total_amount: 0,
+  }
+
+  // Use useForm from react-hook-form for better form management
+  const { register, handleSubmit: handleFormSubmit, watch, setValue, reset, formState: { errors } } = useForm<SaleFormData>({
+    defaultValues: defaultFormValues
   })
+
+  const [formData, setFormData] = useState(defaultFormValues)
 
   useEffect(() => {
     fetchInventory()
@@ -104,17 +108,21 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
     if (name === "quantity") {
       const quantity = Number(value)
       const price = selectedItem?.price || 0
+      const newTotal = quantity * price
 
       setFormData((prev) => ({
         ...prev,
         quantity,
-        total_amount: quantity * price,
+        total_amount: newTotal,
       }))
+      setValue("quantity", quantity)
+      setValue("total_amount", newTotal)
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }))
+      setValue(name as keyof SaleFormData, value)
     }
   }
 
@@ -122,17 +130,21 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
     if (name === "inventory_id") {
       const item = inventory.find((item) => item.id === value)
       setSelectedItem(item)
+      const newTotal = formData.quantity * (item?.price || 0)
 
       setFormData((prev) => ({
         ...prev,
         inventory_id: value,
-        total_amount: prev.quantity * (item?.price || 0),
+        total_amount: newTotal,
       }))
+      setValue("inventory_id", value)
+      setValue("total_amount", newTotal)
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }))
+      setValue(name as keyof SaleFormData, value)
     }
   }
 
@@ -263,7 +275,7 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
       })
 
       // Reset form
-      setFormData({
+      const resetValues = {
         inventory_id: "",
         quantity: 1,
         sale_date: new Date().toISOString().split("T")[0],
@@ -272,7 +284,9 @@ export function AddSaleForm({ onSuccess }: AddSaleFormProps) {
         customer_contact: "",
         customer_email: "",
         total_amount: 0,
-      })
+      }
+      setFormData(resetValues)
+      reset(resetValues)
 
       setSelectedItem(null)
       setIsNewCustomer(false)
