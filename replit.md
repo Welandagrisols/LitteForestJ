@@ -4,7 +4,17 @@ LittleForest is a comprehensive nursery management application built as a Progre
 
 The application is designed to work in both production (with Supabase backend) and demo mode (with local mock data), making it accessible for testing and development without requiring immediate database setup.
 
-## Recent Changes (November 26, 2025)
+## Recent Changes (November 27, 2025)
+- ✅ **Business Intelligence Dashboard**: Added comprehensive analytics to the dashboard:
+  - **Sales Trend Chart**: Area chart showing last 6 months of revenue and sales count
+  - **Best Sellers**: Top 5 plants ranked by quantity sold with visual progress bars
+  - **Top Customers**: Highest spending customers with purchase counts
+  - **Category Breakdown**: Pie chart showing revenue by plant category
+  - **Monthly Comparison**: This month vs last month with growth percentage
+  - **Low Stock Alerts**: Redesigned alerts section with better visibility
+- ✅ **WhatsApp "Open Next" Button**: Added prominent sequential messaging button for smoother bulk WhatsApp workflow
+
+## Previous Changes (November 26, 2025)
 - ✅ **Theme Toggle in App**: Added day/night mode toggle to the main app header, so users can switch themes after logging in (previously only available on login page)
 - ✅ **WhatsApp Messaging Fix**: Fixed bulk messaging to show clickable links in a dialog instead of auto-opening multiple browser windows (which got blocked)
 - ✅ **Custom Message Template**: Custom WhatsApp messages now start with "Hi [FIRST_NAME]," greeting by default, which auto-fills with customer's first name
