@@ -43,11 +43,14 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     const checkIfInstalled = () => {
       if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
         setIsInstalled(true)
+        return true
       }
       // Also check for iOS Safari standalone mode
       if ((window.navigator as any).standalone === true) {
         setIsInstalled(true)
+        return true
       }
+      return false
     }
 
     // Handle install prompt
@@ -55,10 +58,20 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       setCanInstall(true)
-      setShowInstallBanner(true)
+      
+      // Check if user has dismissed the banner before
+      const dismissed = localStorage.getItem('pwa-install-dismissed')
+      if (!dismissed) {
+        setShowInstallBanner(true)
+      }
     }
 
-    checkIfInstalled()
+    const installed = checkIfInstalled()
+    
+    // Show install option for iOS even without beforeinstallprompt
+    if (!installed && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      setCanInstall(true)
+    }
 
     // Handle online/offline status
     const handleOnline = async () => {
@@ -170,7 +183,10 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowInstallBanner(false)}
+              onClick={() => {
+                setShowInstallBanner(false)
+                localStorage.setItem('pwa-install-dismissed', 'true')
+              }}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -178,17 +194,18 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Permanent Install Button for Desktop */}
-      {!isInstalled && (
-        <div className="fixed top-4 right-4 z-40 hidden md:block">
+      {/* Permanent Install Button for Desktop and Mobile */}
+      {!isInstalled && canInstall && (
+        <div className="fixed top-4 right-4 z-40">
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={handleInstallClick}
-            className="bg-background/80 backdrop-blur-sm"
+            className="bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-shadow"
           >
             <Download className="h-4 w-4 mr-2" />
-            Install App
+            <span className="hidden sm:inline">Install App</span>
+            <span className="sm:hidden">Install</span>
           </Button>
         </div>
       )}

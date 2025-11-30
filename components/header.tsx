@@ -19,6 +19,7 @@ import {
   Bell
 } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Download } from "lucide-react"
 
 interface HeaderProps {
   activeTab: string
